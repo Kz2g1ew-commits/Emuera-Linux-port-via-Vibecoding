@@ -34,13 +34,6 @@ partial class Rikaichan
 
 	SolidBrush blueBrush;
 
-
-
-	//public void GenerateIndex()
-	//{
-
-	//}
-
 	public void ReceiveIndex(byte[] edictind)
 	{
 		this.edictind = edictind;
@@ -73,18 +66,8 @@ partial class Rikaichan
 		}
 		else
 		{
-			//var dialog = new ConfigDialog { StartPosition = FormStartPosition.CenterParent };
-			var dialog = new RikaiDialog(rikaiFilename, edict, ReceiveIndex);
-			//var dialogLines = new List<string>(16);
-			//dialogLines.Add($"{Config.RikaiFilename}.ind not found, generating. Should take a few minutes.");
-			//dialogLines.Add("Progress: 0/0");
-			////dialogLines[0] = $"{Config.RikaiFilename}.ind not found, generating. Should take a few minutes.";
-			////dialogLines[1] = "Progress 0/0";
-			//dialog.LabelText = string.Join("\n", dialogLines);
+			var dialog = new RikaiDialog(edict, ReceiveIndex);
 			dialog.Show();
-			//MessageBox.Show($"{Config.RikaiFilename}.ind not found, generating. Should take a few minutes.");
-
-			//GenerateIndex();
 		}
 
 
@@ -675,13 +658,6 @@ partial class Rikaichan
 
 		if (hidden) return;
 
-		//if (laststr_css == null || laststr_css.StrArray == null)
-		//{
-		//	return; //LATER: not sure if ever happens
-		//}
-
-
-
 		if (SearchFirst())
 		{
 			return;
@@ -705,27 +681,6 @@ partial class Rikaichan
 		{
 			return;
 		}
-
-		//var searchCandidates = new List<byte[]>(0x20);
-
-
-		//Font font = Config.Font;
-
-		//seems to actually work without all of this
-		//if (Config.TextDrawingMode == TextDrawingMode.GRAPHICS)
-		//	throw new NotImplementedException("Change drawing mode to Text Renderer"); //LATER
-
-		//SolidBrush b = new SolidBrush(new Color(0x00, 0x00, 0x00, 0x00));
-		//System.Drawing.Graphics.
-
-		//var pen = new System.Drawing.Pen(Config.ForeColor);
-
-
-
-		//graph.DrawRectangle(pen, 5, 5, 55, 55);
-		//graph.DrawPolygon(pen, new Point[] { { 5, 5 }, { 5, 55 }, { 55, 55 }, { 55, 5 } })
-		//DrawFilledRectangle(graph, pen, 5, 5, 55, 55);
-
 
 		int x;
 		int i = strpos - 1;
@@ -886,7 +841,6 @@ partial class Rikaichan
 			}
 		}
 
-		//int x_offset = 16;
 		int x_offset = x - length_max / 2;
 		if (x_offset < 16)
 		{
@@ -896,12 +850,6 @@ partial class Rikaichan
 		{
 			x_offset = screenWidth - 16 - length_max;
 		}
-		//if (x_offset + length_max > screenWidth - 16) x_offset = screenWidth - 16
-		//if (length_max < screenWidth - 64)
-		//{
-		//	//Our box isn't wide enough, so let's get them closer to cursor
-		//	x_offset = (screenWidth + x - length_max) / 2;
-		//}
 
 		int oldy = y;
 		i = 0;
@@ -937,16 +885,6 @@ partial class Rikaichan
 
 		y = oldy;
 
-		//graph.FillRectangle(blueBrush, x_offset, y - 20 * (outputList2.Count - 1), length_max, 20 * outputList2.Count);
-
-		//for (int j = 0; j < outputList2.Count; j++)
-		//{
-		//	//Color.White is slightly easier to see than Config.ForeColor, ForeColor is slightly gray.
-		//	TextRenderer.DrawText(graph, outputList2[j], Config.Font, new Point(x_offset, y), Color.White, TextFormatFlags.NoPrefix);
-		//	y -= 20;
-		//	if (y < -20) break;
-		//}
-
 		i = 0;
 		foreach (int linenum in linesPerBox)
 		{
@@ -962,59 +900,5 @@ partial class Rikaichan
 				if (y < -20) break;
 			}
 		}
-
-		//while (true)
-		//{
-
-		//	int tempy = y - 20 * outputList2.Count;
-		//	for (int j = 0; j < outputList2.Count; j++)
-		//	{
-		//		TextRenderer.DrawText(graph, outputList2[j], Config.Font, new Point(x_offset, tempy), Config.FocusColor, TextFormatFlags.NoPrefix);
-		//		tempy += 20;
-		//	}
-
-		//	y -= 20 * outputList2.Count;
-		//	if (y < -20) break;
-		//}
-
-		//graph.FillRectangle()
-
-		//graph.FillRectangle();
-		//graph.FillRectangle(blueBrush, 5, 5, 55, 55);
-
-		//{
-		//	int y = 30;
-		//	int i = searchResults.Count - 1;
-		//	int i_end = i - 8;
-		//	if (i_end < 0) i_end = 0;
-
-		//	for (; i >= i_end; i--)
-		//	{
-		//		var offset = searchResults[i];
-		//		int temp_len = 1;
-		//		while (edict[offset + temp_len] != '\n') temp_len++;
-		//		var temp = new byte[temp_len];
-		//		Array.Copy(edict, offset, temp, 0, temp_len);
-		//		var output = eucjp.GetString(temp);
-
-		//		TextRenderer.DrawText(graph, output, Config.Font, new Point(30, y), Config.FocusColor, TextFormatFlags.NoPrefix);
-
-		//		y += 20;
-		//	}
-		//}
-
-		//TextRenderer.DrawText(graph, "蚊燻り火 [かやりび] /(n) smoky fire to repel mosquitoes/ llWWW.W.", Config.Font, new Point(30, 30), Config.FocusColor, TextFormatFlags.NoPrefix);
-
-		//if (laststr_css != null && laststr_css.StrArray != null)
-		//{
-		//	TextRenderer.DrawText(graph, output, Config.Font, new Point(30, 45), Config.FocusColor, TextFormatFlags.NoPrefix);
-		//}
-
-		//const string input = "Dot Net Perls";
-		//byte[] array = Encoding.ASCII.GetBytes(input);
-		//string name = Encoding.Default.EncodingName;
-		//name = Encoding.Default.EncodingName;
-		//name = Encoding.Default.EncodingName;
-
 	}
 }
