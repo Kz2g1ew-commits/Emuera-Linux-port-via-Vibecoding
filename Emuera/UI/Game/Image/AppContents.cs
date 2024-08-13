@@ -16,7 +16,7 @@ static class AppContents
 	static ConcurrentDictionary<string, AbstractImage> resourceDic = new(Config.StrComper);
 	static ConcurrentDictionary<string, ASprite> imageDictionary = new(Config.StrComper);
 	static ConcurrentDictionary<int, GraphicsImage> gList = [];
-	static ConcurrentDictionary<string, ASprite> resourceImageDictionary = new();
+	static ConcurrentDictionary<string, ASprite> resourceImageDictionary = new(Config.StrComper);
 
 	// the ConstImages that has been loaded into memory. will free them in every SetBegin(BeginType.SHOP)
 	public static HashSet<ConstImage> tempLoadedConstImages = [];
@@ -144,16 +144,16 @@ static class AppContents
 						{
 							//アニメスプライト宣言ならcurrentAnime上書きしてフレーム追加モードにする。そうでないならnull
 							currentAnime = item as SpriteAnime;
-							if (reload)
-								imageDictionary.Remove(item.Name, out _);
+							if (reload && resourceImageDictionary.ContainsKey(item.Name))
+								resourceImageDictionary.Remove(item.Name, out _);
 
-							if (!imageDictionary.TryAdd(item.Name, item))
+							if (!resourceImageDictionary.TryAdd(item.Name, item))
 							{
 								ParserMediator.Warn(string.Format(trerror.SpriteNameAlreadyUsed.Text, item.Name), sp, 0);
 								item.Dispose();
 							}
-							else
-								resourceImageDictionary.TryAdd(item.Name, item);
+							//else
+							//	resourceImageDictionary.TryAdd(item.Name, item);
 						}
 					}
 				});
@@ -163,6 +163,7 @@ static class AppContents
 			return e;
 			//throw new CodeEE("リソースファイルのロード中にエラーが発生しました");
 		}
+		imageDictionary = new ConcurrentDictionary<string, ASprite>(resourceImageDictionary);
 		return null;
 	}
 
