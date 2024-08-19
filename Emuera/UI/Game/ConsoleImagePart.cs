@@ -197,7 +197,7 @@ sealed class ConsoleImagePart : AConsoleDisplayNode
 		if (Error)
 			return;
 		ASprite img = cImage;
-		if (isSelecting && cImageB != null)
+		if ((isSelecting || isFocus) && cImageB != null)
 			img = cImageB;
 
 		if (img != null && img.IsCreated)
