@@ -74,7 +74,7 @@ static class AppContents
 		}
 		else
 		{
-			imageDictionary = resourceImageDictionary;
+			imageDictionary = new ConcurrentDictionary<string, ASprite>(resourceImageDictionary);
 			return sprites - csprites;
 		}
 	}
