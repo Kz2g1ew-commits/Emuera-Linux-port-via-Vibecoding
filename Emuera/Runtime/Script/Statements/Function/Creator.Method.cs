@@ -7456,6 +7456,105 @@ internal static partial class FunctionMethodCreator
 	}
 	#endregion
 
+	#region daughter-patch追加
+	private sealed class GetMethMethod : FunctionMethod
+	{
+		public GetMethMethod()
+		{
+			ReturnType = typeof(Int64);
+			// argumentTypeArray = null;
+			argumentTypeArrayEx = new ArgTypeList[] {
+					new ArgTypeList{ ArgTypes = { ArgType.String, ArgType.Int, ArgType.VariadicAny }, OmitStart = 1 },
+				};
+			CanRestructure = false;
+		}
+
+		public override Int64 GetIntValue(ExpressionMediator exm, List<AExpression> arguments)
+		{
+			string name = arguments[0].GetStrValue(exm);
+			List<AExpression> methArgs = new List<AExpression>(arguments.Skip(2).ToArray());
+			var term = GlobalStatic.IdentifierDictionary.GetFunctionMethod(GlobalStatic.LabelDictionary, name, methArgs, true);
+
+			if (term == null)
+			{
+				if (arguments.Count < 2 || arguments[1] == null)
+					throw new CodeEE(string.Format(trerror.NotDefinedUserFunc.Text, name));
+				else
+					return arguments[1].GetIntValue(exm);
+			}
+			else if (!term.IsInteger)
+				throw new CodeEE(string.Format(trerror.IsNotInt.Text, name));
+			else
+				return term.GetIntValue(exm);
+		}
+	}
+	private sealed class GetMethsMethod : FunctionMethod
+	{
+		public GetMethsMethod()
+		{
+			ReturnType = typeof(string);
+			// argumentTypeArray = null;
+			argumentTypeArrayEx = new ArgTypeList[] {
+					new ArgTypeList{ ArgTypes = { ArgType.String, ArgType.String, ArgType.VariadicAny }, OmitStart = 1 },
+				};
+			CanRestructure = false;
+		}
+		public override string GetStrValue(ExpressionMediator exm, List<AExpression> arguments)
+		{
+			string name = arguments[0].GetStrValue(exm);
+			List<AExpression> methArgs = new List<AExpression>(arguments.Skip(2).ToArray());
+			var term = GlobalStatic.IdentifierDictionary.GetFunctionMethod(GlobalStatic.LabelDictionary, name, methArgs, true);
+
+			if (term == null)
+			{
+				if (arguments.Count < 2 || arguments[1] == null)
+					throw new CodeEE(string.Format(trerror.NotDefinedUserFunc.Text, name));
+				else
+					return arguments[1].GetStrValue(exm);
+			}
+			else if (!term.IsString)
+				throw new CodeEE(string.Format(trerror.IsNotStr.Text, name));
+			else
+				return term.GetStrValue(exm);
+		}
+	}
+	private sealed class ExistMethMethod : FunctionMethod
+	{
+		public ExistMethMethod()
+		{
+			ReturnType = typeof(Int64);
+			argumentTypeArray = new Type[] { typeof(string) };
+			CanRestructure = true;
+		}
+
+		public override Int64 GetIntValue(ExpressionMediator exm, List<AExpression> arguments)
+		{
+			string name = arguments[0].GetStrValue(exm);
+			AExpression term;
+			try
+			{
+				term = GlobalStatic.IdentifierDictionary.GetFunctionMethod(GlobalStatic.LabelDictionary, name, new List<AExpression>(), true);
+			}
+			catch (CodeEE)
+			{
+				return 0;
+			}
+
+			if (term == null)
+			{
+				return 0;
+			}
+			else
+			{
+				Int64 res = 0;
+				if (term.IsInteger) res |= 1;
+				if (term.IsString) res |= 2;
+				return res;
+			}
+		}
+	}
+
+	#endregion
 	//Bitmap Cache
 	#region Bitmap Cache
 	private sealed class BitmapCacheEnableMethod : FunctionMethod

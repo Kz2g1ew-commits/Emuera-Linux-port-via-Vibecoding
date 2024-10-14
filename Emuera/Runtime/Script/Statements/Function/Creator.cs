@@ -337,6 +337,12 @@ internal static partial class FunctionMethodCreator
 
 			#endregion
 
+			#region daughter-patch追加
+			["GETMETH"] = new GetMethMethod(),
+			["GETMETHS"] = new GetMethsMethod(),
+			["EXISTMETH"] = new ExistMethMethod(),
+			#endregion
+
 			//Bitmap Cache
 			["BITMAP_CACHE_ENABLE"] = new BitmapCacheEnableMethod(),
 
