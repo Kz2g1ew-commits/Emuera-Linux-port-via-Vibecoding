@@ -216,8 +216,8 @@ internal sealed class SpriteAnime : ASprite
 	/// </summary>
 	internal void ResetTime()
 	{
-		StartTime = DateTime.Now;
-		lastFrameTime = DateTime.Now;
+		StartTime = DateTime.MinValue;
+		lastFrameTime = DateTime.MinValue;
 		lastFrame = -1;
 	}
 
@@ -241,14 +241,17 @@ internal sealed class SpriteAnime : ASprite
 		if (lastFrame == -1)
 		{
 			StartTime = DateTime.Now;
+			lastFrameTime = StartTime;
 			lastFrame = 0;
 			return FrameList[0];
 		}
 		//時間経過なしに複数回呼ばれた場合はさっき返したフレームをもう一度返す。
 		if (DateTime.Now == lastFrameTime && lastFrame >= 0)
 			return FrameList[lastFrame];
+		//ここまで来たらlastFrameTimeを更新
+		lastFrameTime = DateTime.Now;
 		//StartTimeからの経過時間をtotaltimeで剰余計算
-		var elapsedTime = (DateTime.Now - StartTime).Milliseconds % totaltime;
+		long elapsedTime = (long)(lastFrameTime - StartTime).TotalMilliseconds % totaltime;
 		foreach (AnimeFrame frame in FrameList)
 		{
 			elapsedTime -= frame.DelayTimeMs;
