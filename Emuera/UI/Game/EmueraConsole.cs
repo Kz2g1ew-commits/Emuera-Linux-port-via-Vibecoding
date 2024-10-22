@@ -1787,11 +1787,6 @@ internal sealed partial class EmueraConsole : IDisposable
 				title = title.Replace("<br>", Environment.NewLine);
 				if (tooltip_duration == 0 || window.ToolTip.OwnerDraw == true)
 				{
-					if (window.ToolTip.OwnerDraw == true)
-					{
-						window.ToolTip.Draw += new DrawToolTipEventHandler(ToolTip_Draw);
-						window.ToolTip.Popup += new PopupEventHandler(ToolTip_Popup);
-					}
 					window.ToolTip.SetToolTip(window.MainPicBox, title);
 				}
 				else
@@ -1901,6 +1896,16 @@ internal sealed partial class EmueraConsole : IDisposable
 
 	public void CustomToolTip(bool b)
 	{
+		if (!b)
+		{
+			window.ToolTip.Draw -= new DrawToolTipEventHandler(ToolTip_Draw);
+			window.ToolTip.Popup -= new PopupEventHandler(ToolTip_Popup);
+		}
+		else if (!window.ToolTip.OwnerDraw)
+		{
+			window.ToolTip.Draw += new DrawToolTipEventHandler(ToolTip_Draw);
+			window.ToolTip.Popup += new PopupEventHandler(ToolTip_Popup);
+		}
 		window.ToolTip.OwnerDraw = b;
 	}
 
