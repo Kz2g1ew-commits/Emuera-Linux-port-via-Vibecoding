@@ -745,7 +745,7 @@ internal sealed partial class EmueraConsole : IDisposable
 		try
 		{
 			var log = GetLog(hideInfo);
-			File.WriteAllText(fullpath, log);
+			File.WriteAllText(fullpath, log, EncodingHandler.UTF8BOMEncoding);
 		}
 		catch (Exception)
 		{
