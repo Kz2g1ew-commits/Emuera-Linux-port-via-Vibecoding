@@ -529,6 +529,11 @@ namespace MinorShift.Emuera.Forms
 				textBox3.Enabled = !item.Fixed;
 			}
 			#endregion
+			#region EE_行連結の改行コード置換
+			{
+				textBox4.Text = Config.ReplaceContinuationBR;
+			}
+			#endregion
 			#region EE_AnchorのCB機能移植
 			setCheckBox(checkBoxCBuseCB, ConfigCode.CBUseClipboard);
 			setCheckBox(checkBoxCBIgnoreTags, ConfigCode.CBIgnoreTags);
@@ -702,6 +707,9 @@ namespace MinorShift.Emuera.Forms
 
 			#region EM_私家版_LoadText＆SaveText機能拡張
 			config.GetConfigItem(ConfigCode.ValidExtension).TryParse(textBox3.Text);
+			#endregion
+			#region EE_行連結の改行コード置換
+			config.GetConfigItem(ConfigCode.ReplaceContinuationBR).TryParse(textBox4.Text);
 			#endregion
 			#region EM_私家版_セーブ圧縮
 			config.GetConfigItem(ConfigCode.ZipSaveData).SetValue(checkBox32.Checked);

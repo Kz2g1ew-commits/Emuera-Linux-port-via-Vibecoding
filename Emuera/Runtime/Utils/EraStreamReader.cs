@@ -173,7 +173,7 @@ internal sealed partial class EraStreamReader : IDisposable
 					throw new CodeEE(trerror.UnexpectedContinuation.Text, new ScriptPosition(filename, curNo));
 			}
 			b.Append(line);
-			b.Append(' ');
+			b.Append(Config.ReplaceContinuationBR.Replace("\"", ""));
 		}
 		st = new CharStream(b.ToString());
 		LexicalAnalyzer.SkipWhiteSpace(st);

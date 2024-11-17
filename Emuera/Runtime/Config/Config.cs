@@ -130,7 +130,9 @@ internal static class Config
 		#region EE_重複定義の確認
 		CheckDuplicateIdentifier = instance.GetConfigValue<bool>(ConfigCode.CheckDuplicateIdentifier);
 		#endregion
-
+		#region EE_行連結の改行コード置換
+		ReplaceContinuationBR = instance.GetConfigValue<string>(ConfigCode.ReplaceContinuationBR);
+		#endregion
 
 		#region EM_私家版_LoadText＆SaveText機能拡張
 		ValidExtension = instance.GetConfigValue<List<string>>(ConfigCode.ValidExtension);
@@ -594,6 +596,9 @@ internal static class Config
 	#endregion
 	#region EE_重複定義の確認
 	public static bool CheckDuplicateIdentifier { get; private set; }
+	#endregion
+	#region EE_行連結の改行コード置換
+	public static string ReplaceContinuationBR { get; private set; }
 	#endregion
 	#region EM_私家版_LoadText＆SaveText機能拡張
 	public static List<string> ValidExtension { get; private set; }

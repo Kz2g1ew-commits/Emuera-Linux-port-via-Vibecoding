@@ -149,6 +149,8 @@
 			_useVAR = new System.Windows.Forms.CheckBox();
 			label25 = new System.Windows.Forms.Label();
 			textBox3 = new System.Windows.Forms.TextBox();
+			label35 = new System.Windows.Forms.Label();
+			textBox4 = new System.Windows.Forms.TextBox();
 			tabPageCompati = new System.Windows.Forms.TabPage();
 			flowLayoutPanel33 = new System.Windows.Forms.FlowLayoutPanel();
 			label30 = new System.Windows.Forms.Label();
@@ -214,6 +216,8 @@
 			tabPageRikai = new System.Windows.Forms.TabPage();
 			rikaiFlowLayoutPanel = new System.Windows.Forms.FlowLayoutPanel();
 			rikaiCheckBoxEnable = new System.Windows.Forms.CheckBox();
+			rikaiDictFilenameLabel = new System.Windows.Forms.Label();
+			flowLayoutPanel42 = new System.Windows.Forms.FlowLayoutPanel();
 			rikaiDictFilenameTextBox = new System.Windows.Forms.TextBox();
 			rikaiColorBoxBG = new ColorBox();
 			rikaiColorBoxText = new ColorBox();
@@ -227,8 +231,6 @@
 			flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
 			flowLayoutPanel3 = new System.Windows.Forms.FlowLayoutPanel();
 			flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
-			rikaiDictFilenameLabel = new System.Windows.Forms.Label();
-			flowLayoutPanel42 = new System.Windows.Forms.FlowLayoutPanel();
 			tabControl.SuspendLayout();
 			tabEnvironment.SuspendLayout();
 			flowLayoutPanel13.SuspendLayout();
@@ -296,10 +298,10 @@
 			((System.ComponentModel.ISupportInitialize)numericUpDownCBMinTimer).BeginInit();
 			tabPageRikai.SuspendLayout();
 			rikaiFlowLayoutPanel.SuspendLayout();
+			flowLayoutPanel42.SuspendLayout();
 			flowLayoutPanel1.SuspendLayout();
 			flowLayoutPanel3.SuspendLayout();
 			flowLayoutPanel2.SuspendLayout();
-			flowLayoutPanel42.SuspendLayout();
 			SuspendLayout();
 			// 
 			// buttonSave
@@ -1020,6 +1022,8 @@
 			flowLayoutPanel30.Controls.Add(_useVAR);
 			flowLayoutPanel30.Controls.Add(label25);
 			flowLayoutPanel30.Controls.Add(textBox3);
+			flowLayoutPanel30.Controls.Add(label35);
+			flowLayoutPanel30.Controls.Add(textBox4);
 			flowLayoutPanel30.Name = "flowLayoutPanel30";
 			// 
 			// label24
@@ -1092,6 +1096,16 @@
 			// 
 			resources.ApplyResources(textBox3, "textBox3");
 			textBox3.Name = "textBox3";
+			// 
+			// label35
+			// 
+			resources.ApplyResources(label35, "label35");
+			label35.Name = "label35";
+			// 
+			// textBox4
+			// 
+			resources.ApplyResources(textBox4, "textBox4");
+			textBox4.Name = "textBox4";
 			// 
 			// tabPageCompati
 			// 
@@ -1566,6 +1580,18 @@
 			rikaiCheckBoxEnable.Name = "rikaiCheckBoxEnable";
 			rikaiCheckBoxEnable.UseVisualStyleBackColor = true;
 			// 
+			// rikaiDictFilenameLabel
+			// 
+			resources.ApplyResources(rikaiDictFilenameLabel, "rikaiDictFilenameLabel");
+			rikaiDictFilenameLabel.Name = "rikaiDictFilenameLabel";
+			rikaiDictFilenameLabel.Click += rikaiDictFilenameLabel_Click;
+			// 
+			// flowLayoutPanel42
+			// 
+			flowLayoutPanel42.Controls.Add(rikaiDictFilenameTextBox);
+			resources.ApplyResources(flowLayoutPanel42, "flowLayoutPanel42");
+			flowLayoutPanel42.Name = "flowLayoutPanel42";
+			// 
 			// rikaiDictFilenameTextBox
 			// 
 			resources.ApplyResources(rikaiDictFilenameTextBox, "rikaiDictFilenameTextBox");
@@ -1638,18 +1664,6 @@
 			flowLayoutPanel2.Controls.Add(buttonReboot);
 			flowLayoutPanel2.Controls.Add(buttonCancel);
 			flowLayoutPanel2.Name = "flowLayoutPanel2";
-			// 
-			// rikaiDictFilenameLabel
-			// 
-			resources.ApplyResources(rikaiDictFilenameLabel, "rikaiDictFilenameLabel");
-			rikaiDictFilenameLabel.Name = "rikaiDictFilenameLabel";
-			rikaiDictFilenameLabel.Click += rikaiDictFilenameLabel_Click;
-			// 
-			// flowLayoutPanel42
-			// 
-			flowLayoutPanel42.Controls.Add(rikaiDictFilenameTextBox);
-			resources.ApplyResources(flowLayoutPanel42, "flowLayoutPanel42");
-			flowLayoutPanel42.Name = "flowLayoutPanel42";
 			// 
 			// ConfigDialog
 			// 
@@ -1777,14 +1791,14 @@
 			tabPageRikai.ResumeLayout(false);
 			rikaiFlowLayoutPanel.ResumeLayout(false);
 			rikaiFlowLayoutPanel.PerformLayout();
+			flowLayoutPanel42.ResumeLayout(false);
+			flowLayoutPanel42.PerformLayout();
 			flowLayoutPanel1.ResumeLayout(false);
 			flowLayoutPanel1.PerformLayout();
 			flowLayoutPanel3.ResumeLayout(false);
 			flowLayoutPanel3.PerformLayout();
 			flowLayoutPanel2.ResumeLayout(false);
 			flowLayoutPanel2.PerformLayout();
-			flowLayoutPanel42.ResumeLayout(false);
-			flowLayoutPanel42.PerformLayout();
 			ResumeLayout(false);
 			PerformLayout();
 		}
@@ -1990,5 +2004,7 @@
 		private System.Windows.Forms.CheckBox _useButtonFocusColor;
 		private System.Windows.Forms.CheckBox _useNewRandom;
 		private System.Windows.Forms.CheckBox _useVAR;
+		private System.Windows.Forms.Label label35;
+		private System.Windows.Forms.TextBox textBox4;
 	}
 }

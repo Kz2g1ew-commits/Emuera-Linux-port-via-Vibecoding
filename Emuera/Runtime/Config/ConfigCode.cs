@@ -152,6 +152,9 @@ internal enum ConfigCode
 	#region EE_重複定義の確認
 	CheckDuplicateIdentifier,
 	#endregion
+	#region EE_行連結の改行コード置換
+	ReplaceContinuationBR,
+	#endregion
 
 	#region EM_私家版_LoadText＆SaveText機能拡張
 	ValidExtension = 200,

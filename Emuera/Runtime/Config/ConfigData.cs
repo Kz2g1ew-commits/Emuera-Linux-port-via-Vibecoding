@@ -130,6 +130,9 @@ internal sealed class ConfigData
 		#region EE_重複定義の確認
 		configArray.Add(new ConfigItem<bool>(ConfigCode.CheckDuplicateIdentifier, "ERDで定義した識別子とローカル変数の重複を確認する", "Check duplicate ERD identifier and private variablea", false));
 		#endregion
+		#region EE_行連結の改行コード置換
+		configArray.Add(new ConfigItem<string>(ConfigCode.ReplaceContinuationBR, "行連結の改行コードの置換文字列", "String of replacing new line code inside continuation", "\" \""));
+		#endregion
 		#region EM_私家版_LoadText＆SaveText機能拡張
 		configArray.Add(new ConfigItem<List<string>>(ConfigCode.ValidExtension, "LOADTEXTとSAVETEXTで使える拡張子", "Valid extensions for LOADTEXT and SAVETEXT", ["txt"]));
 		#endregion
