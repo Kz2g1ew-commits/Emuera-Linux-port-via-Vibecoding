@@ -846,6 +846,64 @@ internal sealed partial class Process
 		printSaveDataText();
 	}
 
+	public void LoadSilent()
+	{
+		state.SystemState = SystemStateCode.LoadGameOpenning_Begin;
+
+		// This is printSaveDataText, but doesn't print any text.
+		if (isFirstTime)
+		{
+			isFirstTime = false;
+			dataIsAvailable = new bool[Config.SaveDataNos + 1];
+		}
+		int dataNo;
+		for (int i = 0; i < page; i++)
+		{
+			//console.PrintFlush(false);
+			//console.Print(string.Format(trsl.DisplaySaveSlot.Text, i * 20, i * 20 + 19));
+		}
+		for (int i = 0; i < 20; i++)
+		{
+			dataNo = page * 20 + i;
+			if (dataNo == dataIsAvailable.Length - 1)
+				break;
+			dataIsAvailable[dataNo] = false;
+			//console.PrintFlush(false);
+			//console.Print(string.Format("[{0, 2}] ", dataNo));
+			if (!writeSavedataTextFrom_Silent(dataNo))
+				continue;
+			dataIsAvailable[dataNo] = true;
+		}
+		for (int i = page; i < ((dataIsAvailable.Length - 2) / 20); i++)
+		{
+			//console.PrintFlush(false);
+			//console.Print(string.Format(trsl.DisplaySaveSlot.Text, (i + 1) * 20, (i + 1) * 20 + 19));
+		}
+		//オートセーブの処理は別途切り出し（表示処理の都合上）
+		dataIsAvailable[^1] = false;
+		if (state.SystemState != SystemStateCode.SaveGame_Begin)
+		{
+			dataNo = AutoSaveIndex;
+			//console.PrintFlush(false);
+			//console.Print(string.Format("[{0, 2}] ", dataNo));
+			if (writeSavedataTextFrom_Silent(dataNo))
+				dataIsAvailable[^1] = true;
+		}
+		//console.RefreshStrings(false);
+		//描画全部終わり
+		//console.PrintSingleLine("[100] 戻る");
+		setWaitInput();
+		if (state.SystemState == SystemStateCode.SaveGame_Begin)
+			state.SystemState = SystemStateCode.SaveGame_WaitInput;
+		else if (state.SystemState == SystemStateCode.LoadGame_Begin)
+			state.SystemState = SystemStateCode.LoadGame_WaitInput;
+		else// if (state.SystemState == SystemStateCode.LoadGameOpenning_Begin)
+			state.SystemState = SystemStateCode.LoadGameOpenning_WaitInput;
+		//きちんと処理されてるので、ここには来ない
+		//else
+		//    throw new ExeEE("異常な状態");
+	}
+
 	bool[] dataIsAvailable = new bool[21];
 	bool isFirstTime = true;
 	const int AutoSaveIndex = 99;
@@ -933,6 +991,9 @@ internal sealed partial class Process
 			return;
 		}
 		saveTarget = (int)systemResult;
+
+		GlobalStatic.ctrlZ.OnSavePrepare(saveTarget);
+
 		//既存データがあるなら選択肢を表示してSaveGame_WaitInputOverwriteへ移行。
 		if (available)
 		{
@@ -976,6 +1037,9 @@ internal sealed partial class Process
 			console.PrintError(trerror.UnexpectedSaveError.Text);
 			console.ReadAnyKey();
 		}
+		
+		GlobalStatic.ctrlZ.OnSave();
+
 		loadPrevState();
 	}
 
@@ -1029,6 +1093,8 @@ internal sealed partial class Process
 			return;
 		}
 
+		GlobalStatic.ctrlZ.OnLoad((int)systemResult);
+
 		if (!vEvaluator.LoadFrom((int)systemResult))
 			throw new ExeEE(trerror.UnexpectedErrorInLoaddata.Text);
 		deletePrevState();
@@ -1052,6 +1118,14 @@ internal sealed partial class Process
 		EraDataResult result = vEvaluator.CheckData(saveIndex, EraSaveFileType.Normal);
 		console.Print(result.DataMes);
 		console.NewLine();
+		return result.State == EraDataState.OK;
+	}
+
+	private bool writeSavedataTextFrom_Silent(int saveIndex)
+	{
+		EraDataResult result = vEvaluator.CheckData(saveIndex, EraSaveFileType.Normal);
+		//console.Print(result.DataMes);
+		//console.NewLine();
 		return result.State == EraDataState.OK;
 	}
 

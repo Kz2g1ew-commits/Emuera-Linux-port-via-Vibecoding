@@ -397,6 +397,9 @@ namespace MinorShift.Emuera.Forms
 						}
 					}
 					break;
+				case Keys.Z when (keyData & Keys.Modifiers & Keys.Control) == Keys.Control:
+					console?.GotoTitleAndLoadAndRepeatInput();
+					break;
 			}
 			return base.ProcessCmdKey(ref msg, keyData);
 		}

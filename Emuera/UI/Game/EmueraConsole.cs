@@ -8,6 +8,7 @@ using MinorShift.Emuera.Runtime;
 //using System.Linq.Expressions;
 //using System.Windows;
 using MinorShift.Emuera.Runtime.Config;
+using MinorShift.Emuera.Runtime.Config.JSON;
 using MinorShift.Emuera.Runtime.Script.Parser;
 using MinorShift.Emuera.Runtime.Script.Statements;
 using MinorShift.Emuera.Runtime.Script.Statements.Expression;
@@ -2514,6 +2515,81 @@ internal sealed partial class EmueraConsole : IDisposable
 		ReadAnyKey(false, false);
 		RunEmueraProgram("");
 		RefreshStrings(true);
+	}
+
+	// Used by ctrlZ.
+	public void GotoTitleAndLoadAndRepeatInput()
+	{
+		if (!GlobalStatic.ctrlZ.mEnabled) return;
+		if (JSONConfig.Data.UseNewRandom)
+		{
+			MessageBox.Show("CtrlZ: JSONConfig.Data.UseNewRandom not supported");
+			return;
+			// It is possible to implement, but I'm not sure if it will be worth it.
+			// * Approach 1 is to implement Random class deep copy:
+			// Would require making a custom Random class, since default one doesn't provide
+			// a way to do deep clone.
+			// https://stackoverflow.com/questions/47750409/deep-clone-of-system-random
+			// https://referencesource.microsoft.com/#mscorlib/system/random.cs
+			// * Approach 2 is to make a new random seed on every save,
+			// that requires a bit less storage but can potentially modify the way game works.
+			// It would probably still require making your 
+			// * Approach 3 is to pretend that UseNewRandom doesn't exist.
+			// I'm not sure what games currently use that anyway.
+		}
+		if (GlobalStatic.ctrlZ.mLastSave < 0) return;
+		if (GlobalStatic.ctrlZ.mInputs.Count == 0) return;
+		if (GlobalStatic.ctrlZ.mRewindInProgress)
+		{
+			GlobalStatic.ctrlZ.mRepeatedUndoRequested = true;
+			return;
+		}
+
+	again:
+
+		//GotoTitle
+		forceStopTimer();
+		ClearDisplay();
+		//動的作成の分だけは削除する
+		AppContents.UnloadGraphicList();
+		redraw = ConsoleRedraw.Normal;
+		UseUserStyle = false;
+		userStyle = new StringStyle(Config.ForeColor, FontStyle.Regular, null);
+		process.BeginTitle();
+		ReadAnyKey(false, false);
+		RunEmueraProgram("");
+		RefreshStrings(true);
+
+		//Load
+		GlobalStatic.ctrlZ.mRewindInProgress = true;
+
+		GlobalStatic.VEvaluator.Rand.SetRand(GlobalStatic.ctrlZ.mRandomSeed);
+
+		GlobalStatic.Process.LoadSilent();
+
+		PressEnterKey(true, GlobalStatic.ctrlZ.mLastSave.ToString(), false);
+
+		//RepeatInput
+		var inputs = GlobalStatic.ctrlZ.mInputs;
+		if (inputs.Count > 0)
+		{
+			inputs.RemoveAt(inputs.Count - 1);
+		}
+
+		for (int i = 0; i < inputs.Count; i++)
+		{
+			if (GlobalStatic.ctrlZ.mRepeatedUndoRequested)
+			{
+				GlobalStatic.ctrlZ.mRepeatedUndoRequested = false;
+				goto again;
+			}
+
+			PressEnterKey(true, inputs[i], false);
+		}
+
+		GlobalStatic.ctrlZ.mRewindInProgress = false;
+		GlobalStatic.ctrlZ.mRepeatedUndoRequested = false;
+		//^ because it's possible to leave it true overwise. I think.
 	}
 
 	bool force_temporary;

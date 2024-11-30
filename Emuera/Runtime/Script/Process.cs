@@ -294,6 +294,7 @@ internal sealed partial class Process(EmueraConsole view)
 	#endregion
 	public void InputInteger(long i)
 	{
+		GlobalStatic.ctrlZ.Add(i.ToString());
 		vEvaluator.RESULT = i;
 	}
 	#region EM_私家版_INPUT系機能拡張
@@ -310,10 +311,12 @@ internal sealed partial class Process(EmueraConsole view)
 	#endregion
 	public void InputSystemInteger(long i)
 	{
+		GlobalStatic.ctrlZ.Add(i.ToString());
 		systemResult = i;
 	}
 	public void InputString(string s)
 	{
+		GlobalStatic.ctrlZ.Add(s);
 		vEvaluator.RESULTS = s;
 	}
 
