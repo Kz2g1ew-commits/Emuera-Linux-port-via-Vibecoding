@@ -5,6 +5,7 @@
     <tr id="UI.MainWindow.FileFilter"><![CDATA[ERB 文件]]></tr>
     <tr id="UI.MainWindow.File"><![CDATA[文件(&F)]]></tr>
     <tr id="UI.MainWindow.File.Restart"><![CDATA[重启(&R)]]></tr>
+    <tr id="UI.MainWindow.File.RestartDebug"><![CDATA[在调试模式下重新启动]]></tr>
     <tr id="UI.MainWindow.File.SaveLog"><![CDATA[保存日志...(&S)]]></tr>
     <tr id="UI.MainWindow.File.CopyLogToClipboard"><![CDATA[将日志复制到剪贴板(&C)]]></tr>
     <tr id="UI.MainWindow.File.BackToTitle"><![CDATA[返回标题画面(&T)]]></tr>
@@ -15,6 +16,8 @@
     <tr id="UI.MainWindow.Debug"><![CDATA[调试(&D)]]></tr>
     <tr id="UI.MainWindow.Debug.OpenDebugWindow"><![CDATA[打开调试窗口]]></tr>
     <tr id="UI.MainWindow.Debug.UpdateDebugInfo"><![CDATA[更新调试信息]]></tr>
+    <tr id="UI.MainWindow.Tools"><![CDATA[工具]]></tr>
+    <tr id="UI.MainWindow.Tools.LockWindowWidth"><![CDATA[锁定窗口宽度]]></tr>
     <tr id="UI.MainWindow.Help"><![CDATA[帮助(&H)]]></tr>
     <tr id="UI.MainWindow.Help.Config"><![CDATA[设置(&C)]]></tr>
     <tr id="UI.MainWindow.ContextMenu.KeyMacro"><![CDATA[按键宏]]></tr>

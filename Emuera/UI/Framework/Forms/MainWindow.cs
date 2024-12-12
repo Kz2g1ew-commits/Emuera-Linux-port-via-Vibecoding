@@ -113,6 +113,7 @@ namespace MinorShift.Emuera.Forms
 		{
 			fileToolStripMenuItem.Text = Lang.UI.MainWindow.File.Text;
 			rebootToolStripMenuItem.Text = Lang.UI.MainWindow.File.Restart.Text;
+			デバッグモードで再起動ToolStripMenuItem.Text = Lang.UI.MainWindow.File.RestartDebug.Text;
 			ログをクリップボードにコピーToolStripMenuItem.Text = Lang.UI.MainWindow.File.CopyLogToClipboard.Text;
 			ログを保存するSToolStripMenuItem.Text = Lang.UI.MainWindow.File.SaveLog.Text;
 			タイトルへ戻るTToolStripMenuItem.Text = Lang.UI.MainWindow.File.BackToTitle.Text;
@@ -126,6 +127,9 @@ namespace MinorShift.Emuera.Forms
 			デバッグToolStripMenuItem.Text = Lang.UI.MainWindow.Debug.Text;
 			デバッグウインドウを開くToolStripMenuItem.Text = Lang.UI.MainWindow.Debug.OpenDebugWindow.Text;
 			デバッグ情報の更新ToolStripMenuItem.Text = Lang.UI.MainWindow.Debug.UpdateDebugInfo.Text;
+			
+			ツールToolStripMenuItem.Text = Lang.UI.MainWindow.Tools.Text;
+			ウィンドウ幅のロックToolStripMenuItem.Text = Lang.UI.MainWindow.Tools.LockWindowWidth.Text;
 
 			ヘルプHToolStripMenuItem.Text = Lang.UI.MainWindow.Help.Text;
 			コンフィグCToolStripMenuItem.Text = Lang.UI.MainWindow.Help.Config.Text;
