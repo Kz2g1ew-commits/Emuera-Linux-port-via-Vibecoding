@@ -57,6 +57,7 @@ internal sealed partial class Lang
 			{
 				public static string Text { get { return trClass[typeof(File)].Text; } }
 				[Managed] public static TranslatableString Restart { get; } = new TranslatableString("再起動(&R)");
+				[Managed] public static TranslatableString RestartDebug { get; } = new TranslatableString("デバッグモードで再起動");
 				[Managed] public static TranslatableString SaveLog { get; } = new TranslatableString("ログを保存する...(&S)");
 				[Managed] public static TranslatableString CopyLogToClipboard { get; } = new TranslatableString("ログをクリップボードにコピー(&C)");
 				[Managed] public static TranslatableString BackToTitle { get; } = new TranslatableString("タイトル画面へ戻る(&T)");
@@ -73,6 +74,13 @@ internal sealed partial class Lang
 				public static string Text { get { return trClass[typeof(Debug)].Text; } }
 				[Managed] public static TranslatableString OpenDebugWindow { get; } = new TranslatableString("デバッグウインドウを開く");
 				[Managed] public static TranslatableString UpdateDebugInfo { get; } = new TranslatableString("デバッグ情報の更新");
+			}
+			
+			[Translate("ツール"), Managed]
+			public sealed class Tools
+			{
+				public static string Text { get { return trClass[typeof(Tools)].Text; } }
+				[Managed] public static TranslatableString LockWindowWidth { get; } = new TranslatableString("ウィンドウ幅のロック変更");
 			}
 
 			[Translate("ヘルプ(&H)"), Managed]
