@@ -130,6 +130,7 @@ namespace MinorShift.Emuera.Forms
 			
 			ツールToolStripMenuItem.Text = Lang.UI.MainWindow.Tools.Text;
 			ウィンドウ幅のロックToolStripMenuItem.Text = Lang.UI.MainWindow.Tools.LockWindowWidth.Text;
+			クリップボードにコピーToolStripMenuItem.Text = Lang.UI.MainWindow.Tools.CopyToClipboard.Text;
 
 			ヘルプHToolStripMenuItem.Text = Lang.UI.MainWindow.Help.Text;
 			コンフィグCToolStripMenuItem.Text = Lang.UI.MainWindow.Help.Config.Text;
@@ -1500,5 +1501,17 @@ namespace MinorShift.Emuera.Forms
 			Application.ExitThread();
 
 		}
+		
+		private void クリップボードにコピーToolStripMenuItem_Click_1(object sender, EventArgs e)
+		{
+			if(クリップボードにコピーToolStripMenuItem.Checked)
+				GlobalStatic.Console.CBProc.Init();
+			else
+				GlobalStatic.Console.CBProc.Reset();
+			ConfigData.Instance.GetConfigItem(ConfigCode.CBUseClipboard).SetValue(クリップボードにコピーToolStripMenuItem.Checked);
+			Config.SetConfig(ConfigData.Instance);
+			ConfigData.Instance.SaveConfig();
+		}
+
 	}
 }

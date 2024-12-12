@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!--
-    Microsoft ResX Schema 
+    Microsoft ResX Schema
 
     Version 2.0
 
@@ -48,7 +48,7 @@
     value   : The object must be serialized with
             : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
             : and then encoded with base64 encoding.
-    
+
     mimetype: application/x-microsoft.net.object.soap.base64
     value   : The object must be serialized with
             : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
@@ -163,10 +163,10 @@
     <value>NoControl</value>
   </data>
   <data name="buttonCancel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>150, 3</value>
+    <value>151, 3</value>
   </data>
   <data name="buttonCancel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>63, 25</value>
+    <value>64, 25</value>
   </data>
   <data name="buttonCancel.TabIndex" type="System.Int32, mscorlib">
     <value>2</value>
@@ -199,7 +199,7 @@
     <value>50, 3</value>
   </data>
   <data name="buttonReboot.Size" type="System.Drawing.Size, System.Drawing">
-    <value>94, 25</value>
+    <value>95, 25</value>
   </data>
   <data name="buttonReboot.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -247,7 +247,7 @@
     <value>3, 3</value>
   </data>
   <data name="checkBox18.Size" type="System.Drawing.Size, System.Drawing">
-    <value>148, 19</value>
+    <value>153, 19</value>
   </data>
   <data name="checkBox18.TabIndex" type="System.Int32, mscorlib">
     <value>65</value>
@@ -307,7 +307,7 @@
     <value>3, 53</value>
   </data>
   <data name="checkBox5.Size" type="System.Drawing.Size, System.Drawing">
-    <value>148, 19</value>
+    <value>149, 19</value>
   </data>
   <data name="checkBox5.TabIndex" type="System.Int32, mscorlib">
     <value>60</value>
@@ -338,7 +338,7 @@
     <value>0, 0, 0, 0</value>
   </data>
   <data name="flowLayoutPanel4.Size" type="System.Drawing.Size, System.Drawing">
-    <value>154, 75</value>
+    <value>159, 75</value>
   </data>
   <data name="flowLayoutPanel4.TabIndex" type="System.Int32, mscorlib">
     <value>79</value>
@@ -401,7 +401,7 @@
     <value>3, 28</value>
   </data>
   <data name="checkBox4.Size" type="System.Drawing.Size, System.Drawing">
-    <value>111, 19</value>
+    <value>113, 19</value>
   </data>
   <data name="checkBox4.TabIndex" type="System.Int32, mscorlib">
     <value>59</value>
@@ -431,7 +431,7 @@
     <value>3, 53</value>
   </data>
   <data name="checkBox7.Size" type="System.Drawing.Size, System.Drawing">
-    <value>117, 19</value>
+    <value>120, 19</value>
   </data>
   <data name="checkBox7.TabIndex" type="System.Int32, mscorlib">
     <value>62</value>
@@ -455,7 +455,7 @@
     <value>TopDown</value>
   </data>
   <data name="flowLayoutPanel5.Location" type="System.Drawing.Point, System.Drawing">
-    <value>154, 0</value>
+    <value>159, 0</value>
   </data>
   <data name="flowLayoutPanel5.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>0, 0, 0, 0</value>
@@ -485,7 +485,7 @@
     <value>0, 0, 0, 0</value>
   </data>
   <data name="flowLayoutPanel6.Size" type="System.Drawing.Size, System.Drawing">
-    <value>286, 75</value>
+    <value>291, 75</value>
   </data>
   <data name="flowLayoutPanel6.TabIndex" type="System.Int32, mscorlib">
     <value>81</value>
@@ -512,7 +512,7 @@
     <value>3, 78</value>
   </data>
   <data name="checkBox24.Size" type="System.Drawing.Size, System.Drawing">
-    <value>203, 19</value>
+    <value>208, 19</value>
   </data>
   <data name="checkBox24.TabIndex" type="System.Int32, mscorlib">
     <value>77</value>
@@ -542,7 +542,7 @@
     <value>3, 103</value>
   </data>
   <data name="checkBox33.Size" type="System.Drawing.Size, System.Drawing">
-    <value>222, 19</value>
+    <value>223, 19</value>
   </data>
   <data name="checkBox33.TabIndex" type="System.Int32, mscorlib">
     <value>77</value>
@@ -686,7 +686,7 @@
     <value>129, 7</value>
   </data>
   <data name="label17.Size" type="System.Drawing.Size, System.Drawing">
-    <value>138, 15</value>
+    <value>139, 15</value>
   </data>
   <data name="label17.TabIndex" type="System.Int32, mscorlib">
     <value>70</value>
@@ -713,7 +713,7 @@
     <value>0, 0, 0, 0</value>
   </data>
   <data name="flowLayoutPanel9.Size" type="System.Drawing.Size, System.Drawing">
-    <value>270, 29</value>
+    <value>271, 29</value>
   </data>
   <data name="flowLayoutPanel9.TabIndex" type="System.Int32, mscorlib">
     <value>82</value>
@@ -770,7 +770,7 @@
     <value>129, 7</value>
   </data>
   <data name="label20.Size" type="System.Drawing.Size, System.Drawing">
-    <value>114, 15</value>
+    <value>119, 15</value>
   </data>
   <data name="label20.TabIndex" type="System.Int32, mscorlib">
     <value>71</value>
@@ -797,7 +797,7 @@
     <value>0, 0, 0, 0</value>
   </data>
   <data name="flowLayoutPanel8.Size" type="System.Drawing.Size, System.Drawing">
-    <value>246, 29</value>
+    <value>251, 29</value>
   </data>
   <data name="flowLayoutPanel8.TabIndex" type="System.Int32, mscorlib">
     <value>82</value>
@@ -827,7 +827,7 @@
     <value>3, 20, 3, 3</value>
   </data>
   <data name="label22.Size" type="System.Drawing.Size, System.Drawing">
-    <value>128, 15</value>
+    <value>130, 15</value>
   </data>
   <data name="label22.TabIndex" type="System.Int32, mscorlib">
     <value>72</value>
@@ -959,7 +959,7 @@
     <value>3, 7</value>
   </data>
   <data name="label23.Size" type="System.Drawing.Size, System.Drawing">
-    <value>91, 15</value>
+    <value>92, 15</value>
   </data>
   <data name="label23.TabIndex" type="System.Int32, mscorlib">
     <value>75</value>
@@ -995,7 +995,7 @@
     <value>ユーザー設定</value>
   </data>
   <data name="comboBox6.Location" type="System.Drawing.Point, System.Drawing">
-    <value>100, 3</value>
+    <value>101, 3</value>
   </data>
   <data name="comboBox6.Size" type="System.Drawing.Size, System.Drawing">
     <value>178, 23</value>
@@ -1022,7 +1022,7 @@
     <value>0, 0, 0, 0</value>
   </data>
   <data name="flowLayoutPanel12.Size" type="System.Drawing.Size, System.Drawing">
-    <value>281, 29</value>
+    <value>282, 29</value>
   </data>
   <data name="flowLayoutPanel12.TabIndex" type="System.Int32, mscorlib">
     <value>85</value>
@@ -1043,7 +1043,7 @@
     <value>Right</value>
   </data>
   <data name="textBox2.Location" type="System.Drawing.Point, System.Drawing">
-    <value>99, 32</value>
+    <value>100, 32</value>
   </data>
   <data name="textBox2.Size" type="System.Drawing.Size, System.Drawing">
     <value>179, 23</value>
@@ -1073,7 +1073,7 @@
     <value>0, 0, 0, 0</value>
   </data>
   <data name="flowLayoutPanel11.Size" type="System.Drawing.Size, System.Drawing">
-    <value>281, 58</value>
+    <value>282, 58</value>
   </data>
   <data name="flowLayoutPanel11.TabIndex" type="System.Int32, mscorlib">
     <value>84</value>
@@ -1157,7 +1157,7 @@
     <value>3, 3, 3, 3</value>
   </data>
   <data name="label18.Size" type="System.Drawing.Size, System.Drawing">
-    <value>98, 15</value>
+    <value>101, 15</value>
   </data>
   <data name="label18.TabIndex" type="System.Int32, mscorlib">
     <value>65</value>
@@ -1250,7 +1250,7 @@
     <value>129, 7</value>
   </data>
   <data name="label9.Size" type="System.Drawing.Size, System.Drawing">
-    <value>65, 15</value>
+    <value>68, 15</value>
   </data>
   <data name="label9.TabIndex" type="System.Int32, mscorlib">
     <value>56</value>
@@ -1277,7 +1277,7 @@
     <value>0, 20, 0, 0</value>
   </data>
   <data name="flowLayoutPanel14.Size" type="System.Drawing.Size, System.Drawing">
-    <value>197, 29</value>
+    <value>200, 29</value>
   </data>
   <data name="flowLayoutPanel14.TabIndex" type="System.Int32, mscorlib">
     <value>68</value>
@@ -1334,7 +1334,7 @@
     <value>129, 7</value>
   </data>
   <data name="label5.Size" type="System.Drawing.Size, System.Drawing">
-    <value>98, 15</value>
+    <value>99, 15</value>
   </data>
   <data name="label5.TabIndex" type="System.Int32, mscorlib">
     <value>61</value>
@@ -1361,7 +1361,7 @@
     <value>0, 0, 0, 0</value>
   </data>
   <data name="flowLayoutPanel15.Size" type="System.Drawing.Size, System.Drawing">
-    <value>230, 29</value>
+    <value>231, 29</value>
   </data>
   <data name="flowLayoutPanel15.TabIndex" type="System.Int32, mscorlib">
     <value>68</value>
@@ -1418,7 +1418,7 @@
     <value>129, 7</value>
   </data>
   <data name="label1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>92, 15</value>
+    <value>93, 15</value>
   </data>
   <data name="label1.TabIndex" type="System.Int32, mscorlib">
     <value>63</value>
@@ -1445,7 +1445,7 @@
     <value>0, 0, 0, 0</value>
   </data>
   <data name="flowLayoutPanel16.Size" type="System.Drawing.Size, System.Drawing">
-    <value>224, 29</value>
+    <value>225, 29</value>
   </data>
   <data name="flowLayoutPanel16.TabIndex" type="System.Int32, mscorlib">
     <value>68</value>
@@ -1472,7 +1472,7 @@
     <value>3, 160</value>
   </data>
   <data name="checkBox14.Size" type="System.Drawing.Size, System.Drawing">
-    <value>186, 19</value>
+    <value>185, 19</value>
   </data>
   <data name="checkBox14.TabIndex" type="System.Int32, mscorlib">
     <value>67</value>
@@ -1535,7 +1535,7 @@
     <value>3, 20, 3, 3</value>
   </data>
   <data name="label26.Size" type="System.Drawing.Size, System.Drawing">
-    <value>94, 15</value>
+    <value>95, 15</value>
   </data>
   <data name="label26.TabIndex" type="System.Int32, mscorlib">
     <value>65</value>
@@ -1679,7 +1679,7 @@
     <value>129, 7</value>
   </data>
   <data name="label2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>61, 15</value>
+    <value>62, 15</value>
   </data>
   <data name="label2.TabIndex" type="System.Int32, mscorlib">
     <value>72</value>
@@ -1706,7 +1706,7 @@
     <value>0, 0, 0, 0</value>
   </data>
   <data name="flowLayoutPanel18.Size" type="System.Drawing.Size, System.Drawing">
-    <value>193, 29</value>
+    <value>194, 29</value>
   </data>
   <data name="flowLayoutPanel18.TabIndex" type="System.Int32, mscorlib">
     <value>38</value>
@@ -1763,7 +1763,7 @@
     <value>129, 7</value>
   </data>
   <data name="label3.Size" type="System.Drawing.Size, System.Drawing">
-    <value>69, 15</value>
+    <value>70, 15</value>
   </data>
   <data name="label3.TabIndex" type="System.Int32, mscorlib">
     <value>73</value>
@@ -1790,7 +1790,7 @@
     <value>0, 0, 0, 0</value>
   </data>
   <data name="flowLayoutPanel19.Size" type="System.Drawing.Size, System.Drawing">
-    <value>201, 29</value>
+    <value>202, 29</value>
   </data>
   <data name="flowLayoutPanel19.TabIndex" type="System.Int32, mscorlib">
     <value>38</value>
@@ -1817,7 +1817,7 @@
     <value>NoControl</value>
   </data>
   <data name="button1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>13, 61</value>
+    <value>14, 61</value>
   </data>
   <data name="button1.Size" type="System.Drawing.Size, System.Drawing">
     <value>202, 30</value>
@@ -1853,7 +1853,7 @@
     <value>3, 20, 3, 3</value>
   </data>
   <data name="checkBox8.Size" type="System.Drawing.Size, System.Drawing">
-    <value>159, 19</value>
+    <value>160, 19</value>
   </data>
   <data name="checkBox8.TabIndex" type="System.Int32, mscorlib">
     <value>69</value>
@@ -1883,7 +1883,7 @@
     <value>3, 139</value>
   </data>
   <data name="checkBox21.Size" type="System.Drawing.Size, System.Drawing">
-    <value>177, 19</value>
+    <value>178, 19</value>
   </data>
   <data name="checkBox21.TabIndex" type="System.Int32, mscorlib">
     <value>83</value>
@@ -1913,7 +1913,7 @@
     <value>3, 164</value>
   </data>
   <data name="checkBox17.Size" type="System.Drawing.Size, System.Drawing">
-    <value>200, 19</value>
+    <value>201, 19</value>
   </data>
   <data name="checkBox17.TabIndex" type="System.Int32, mscorlib">
     <value>80</value>
@@ -1973,7 +1973,7 @@
     <value>129, 7</value>
   </data>
   <data name="label19.Size" type="System.Drawing.Size, System.Drawing">
-    <value>80, 15</value>
+    <value>81, 15</value>
   </data>
   <data name="label19.TabIndex" type="System.Int32, mscorlib">
     <value>77</value>
@@ -2000,7 +2000,7 @@
     <value>0, 0, 0, 0</value>
   </data>
   <data name="flowLayoutPanel20.Size" type="System.Drawing.Size, System.Drawing">
-    <value>212, 29</value>
+    <value>213, 29</value>
   </data>
   <data name="flowLayoutPanel20.TabIndex" type="System.Int32, mscorlib">
     <value>38</value>
@@ -2057,7 +2057,7 @@
     <value>129, 7</value>
   </data>
   <data name="label10.Size" type="System.Drawing.Size, System.Drawing">
-    <value>80, 15</value>
+    <value>81, 15</value>
   </data>
   <data name="label10.TabIndex" type="System.Int32, mscorlib">
     <value>78</value>
@@ -2084,7 +2084,7 @@
     <value>0, 0, 0, 0</value>
   </data>
   <data name="flowLayoutPanel21.Size" type="System.Drawing.Size, System.Drawing">
-    <value>212, 29</value>
+    <value>213, 29</value>
   </data>
   <data name="flowLayoutPanel21.TabIndex" type="System.Int32, mscorlib">
     <value>38</value>
@@ -2111,7 +2111,7 @@
     <value>NoControl</value>
   </data>
   <data name="button3.Location" type="System.Drawing.Point, System.Drawing">
-    <value>19, 247</value>
+    <value>20, 247</value>
   </data>
   <data name="button3.Size" type="System.Drawing.Size, System.Drawing">
     <value>196, 30</value>
@@ -2174,7 +2174,7 @@
     <value>129, 7</value>
   </data>
   <data name="ScrollRange.Size" type="System.Drawing.Size, System.Drawing">
-    <value>86, 15</value>
+    <value>87, 15</value>
   </data>
   <data name="ScrollRange.TabIndex" type="System.Int32, mscorlib">
     <value>82</value>
@@ -2201,7 +2201,7 @@
     <value>0, 20, 0, 0</value>
   </data>
   <data name="flowLayoutPanel22.Size" type="System.Drawing.Size, System.Drawing">
-    <value>218, 29</value>
+    <value>219, 29</value>
   </data>
   <data name="flowLayoutPanel22.TabIndex" type="System.Int32, mscorlib">
     <value>38</value>
@@ -2225,7 +2225,7 @@
     <value>134, 54</value>
   </data>
   <data name="flowLayoutPanel23.Size" type="System.Drawing.Size, System.Drawing">
-    <value>218, 329</value>
+    <value>219, 329</value>
   </data>
   <data name="flowLayoutPanel23.TabIndex" type="System.Int32, mscorlib">
     <value>38</value>
@@ -2271,114 +2271,6 @@
   </data>
   <data name="flowLayoutPanel27.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
     <value>GrowAndShrink</value>
-  </data>
-  <data name="colorBoxBG.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="colorBoxBG.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
-    <value>GrowAndShrink</value>
-  </data>
-  <data name="colorBoxBG.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 3</value>
-  </data>
-  <data name="colorBoxBG.Size" type="System.Drawing.Size, System.Drawing">
-    <value>210, 31</value>
-  </data>
-  <data name="colorBoxBG.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
-  </data>
-  <data name="&gt;&gt;colorBoxBG.Name" xml:space="preserve">
-    <value>colorBoxBG</value>
-  </data>
-  <data name="&gt;&gt;colorBoxBG.Type" xml:space="preserve">
-    <value>MinorShift.Emuera.Forms.ColorBox, Emuera, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;colorBoxBG.Parent" xml:space="preserve">
-    <value>flowLayoutPanel27</value>
-  </data>
-  <data name="&gt;&gt;colorBoxBG.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="colorBoxFG.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="colorBoxFG.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
-    <value>GrowAndShrink</value>
-  </data>
-  <data name="colorBoxFG.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 40</value>
-  </data>
-  <data name="colorBoxFG.Size" type="System.Drawing.Size, System.Drawing">
-    <value>210, 31</value>
-  </data>
-  <data name="colorBoxFG.TabIndex" type="System.Int32, mscorlib">
-    <value>1</value>
-  </data>
-  <data name="&gt;&gt;colorBoxFG.Name" xml:space="preserve">
-    <value>colorBoxFG</value>
-  </data>
-  <data name="&gt;&gt;colorBoxFG.Type" xml:space="preserve">
-    <value>MinorShift.Emuera.Forms.ColorBox, Emuera, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;colorBoxFG.Parent" xml:space="preserve">
-    <value>flowLayoutPanel27</value>
-  </data>
-  <data name="&gt;&gt;colorBoxFG.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="colorBoxSelecting.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="colorBoxSelecting.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
-    <value>GrowAndShrink</value>
-  </data>
-  <data name="colorBoxSelecting.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 77</value>
-  </data>
-  <data name="colorBoxSelecting.Size" type="System.Drawing.Size, System.Drawing">
-    <value>210, 31</value>
-  </data>
-  <data name="colorBoxSelecting.TabIndex" type="System.Int32, mscorlib">
-    <value>2</value>
-  </data>
-  <data name="&gt;&gt;colorBoxSelecting.Name" xml:space="preserve">
-    <value>colorBoxSelecting</value>
-  </data>
-  <data name="&gt;&gt;colorBoxSelecting.Type" xml:space="preserve">
-    <value>MinorShift.Emuera.Forms.ColorBox, Emuera, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;colorBoxSelecting.Parent" xml:space="preserve">
-    <value>flowLayoutPanel27</value>
-  </data>
-  <data name="&gt;&gt;colorBoxSelecting.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="colorBoxBacklog.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="colorBoxBacklog.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
-    <value>GrowAndShrink</value>
-  </data>
-  <data name="colorBoxBacklog.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 114</value>
-  </data>
-  <data name="colorBoxBacklog.Size" type="System.Drawing.Size, System.Drawing">
-    <value>210, 31</value>
-  </data>
-  <data name="colorBoxBacklog.TabIndex" type="System.Int32, mscorlib">
-    <value>3</value>
-  </data>
-  <data name="&gt;&gt;colorBoxBacklog.Name" xml:space="preserve">
-    <value>colorBoxBacklog</value>
-  </data>
-  <data name="&gt;&gt;colorBoxBacklog.Type" xml:space="preserve">
-    <value>MinorShift.Emuera.Forms.ColorBox, Emuera, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;colorBoxBacklog.Parent" xml:space="preserve">
-    <value>flowLayoutPanel27</value>
-  </data>
-  <data name="&gt;&gt;colorBoxBacklog.ZOrder" xml:space="preserve">
-    <value>3</value>
   </data>
   <data name="flowLayoutPanel24.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -2441,7 +2333,7 @@
     <value>1</value>
   </data>
   <data name="flowLayoutPanel24.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 168</value>
+    <value>0, 20</value>
   </data>
   <data name="flowLayoutPanel24.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>0, 20, 0, 0</value>
@@ -2462,7 +2354,7 @@
     <value>flowLayoutPanel27</value>
   </data>
   <data name="&gt;&gt;flowLayoutPanel24.ZOrder" xml:space="preserve">
-    <value>4</value>
+    <value>0</value>
   </data>
   <data name="button2.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Right</value>
@@ -2474,7 +2366,7 @@
     <value>NoControl</value>
   </data>
   <data name="button2.Location" type="System.Drawing.Point, System.Drawing">
-    <value>35, 200</value>
+    <value>20, 52</value>
   </data>
   <data name="button2.Size" type="System.Drawing.Size, System.Drawing">
     <value>178, 30</value>
@@ -2495,7 +2387,7 @@
     <value>flowLayoutPanel27</value>
   </data>
   <data name="&gt;&gt;button2.ZOrder" xml:space="preserve">
-    <value>5</value>
+    <value>1</value>
   </data>
   <data name="flowLayoutPanel25.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -2537,7 +2429,7 @@
     <value>129, 7</value>
   </data>
   <data name="label8.Size" type="System.Drawing.Size, System.Drawing">
-    <value>68, 15</value>
+    <value>69, 15</value>
   </data>
   <data name="label8.TabIndex" type="System.Int32, mscorlib">
     <value>52</value>
@@ -2558,13 +2450,13 @@
     <value>1</value>
   </data>
   <data name="flowLayoutPanel25.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 233</value>
+    <value>0, 85</value>
   </data>
   <data name="flowLayoutPanel25.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>0, 0, 0, 0</value>
   </data>
   <data name="flowLayoutPanel25.Size" type="System.Drawing.Size, System.Drawing">
-    <value>200, 29</value>
+    <value>201, 29</value>
   </data>
   <data name="flowLayoutPanel25.TabIndex" type="System.Int32, mscorlib">
     <value>38</value>
@@ -2579,7 +2471,7 @@
     <value>flowLayoutPanel27</value>
   </data>
   <data name="&gt;&gt;flowLayoutPanel25.ZOrder" xml:space="preserve">
-    <value>6</value>
+    <value>2</value>
   </data>
   <data name="flowLayoutPanel26.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -2642,7 +2534,7 @@
     <value>1</value>
   </data>
   <data name="flowLayoutPanel26.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 262</value>
+    <value>0, 114</value>
   </data>
   <data name="flowLayoutPanel26.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>0, 0, 0, 0</value>
@@ -2663,7 +2555,7 @@
     <value>flowLayoutPanel27</value>
   </data>
   <data name="&gt;&gt;flowLayoutPanel26.ZOrder" xml:space="preserve">
-    <value>7</value>
+    <value>3</value>
   </data>
   <data name="flowLayoutPanel27.FlowDirection" type="System.Windows.Forms.FlowDirection, System.Windows.Forms">
     <value>TopDown</value>
@@ -2672,7 +2564,7 @@
     <value>126, 53</value>
   </data>
   <data name="flowLayoutPanel27.Size" type="System.Drawing.Size, System.Drawing">
-    <value>216, 291</value>
+    <value>201, 143</value>
   </data>
   <data name="flowLayoutPanel27.TabIndex" type="System.Int32, mscorlib">
     <value>38</value>
@@ -2738,7 +2630,7 @@
     <value>3, 3, 3, 3</value>
   </data>
   <data name="label21.Size" type="System.Drawing.Size, System.Drawing">
-    <value>229, 30</value>
+    <value>227, 30</value>
   </data>
   <data name="label21.TabIndex" type="System.Int32, mscorlib">
     <value>71</value>
@@ -2799,7 +2691,7 @@ ERBスクリプトが正常に動作しないことがあります</value>
     <value>3, 64</value>
   </data>
   <data name="checkBox2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>145, 19</value>
+    <value>146, 19</value>
   </data>
   <data name="checkBox2.TabIndex" type="System.Int32, mscorlib">
     <value>12</value>
@@ -2889,7 +2781,7 @@ ERBスクリプトが正常に動作しないことがあります</value>
     <value>3, 139</value>
   </data>
   <data name="checkBox16.Size" type="System.Drawing.Size, System.Drawing">
-    <value>204, 19</value>
+    <value>206, 19</value>
   </data>
   <data name="checkBox16.TabIndex" type="System.Int32, mscorlib">
     <value>55</value>
@@ -2919,7 +2811,7 @@ ERBスクリプトが正常に動作しないことがあります</value>
     <value>3, 164</value>
   </data>
   <data name="checkBox20.Size" type="System.Drawing.Size, System.Drawing">
-    <value>182, 19</value>
+    <value>183, 19</value>
   </data>
   <data name="checkBox20.TabIndex" type="System.Int32, mscorlib">
     <value>70</value>
@@ -2982,7 +2874,7 @@ ERBスクリプトが正常に動作しないことがあります</value>
     <value>3, 214</value>
   </data>
   <data name="checkBox22.Size" type="System.Drawing.Size, System.Drawing">
-    <value>279, 19</value>
+    <value>278, 19</value>
   </data>
   <data name="checkBox22.TabIndex" type="System.Int32, mscorlib">
     <value>73</value>
@@ -3012,7 +2904,7 @@ ERBスクリプトが正常に動作しないことがあります</value>
     <value>3, 239</value>
   </data>
   <data name="checkBoxSystemFullSpace.Size" type="System.Drawing.Size, System.Drawing">
-    <value>207, 19</value>
+    <value>211, 19</value>
   </data>
   <data name="checkBoxSystemFullSpace.TabIndex" type="System.Int32, mscorlib">
     <value>74</value>
@@ -3135,7 +3027,7 @@ ERBスクリプトが正常に動作しないことがあります</value>
     <value>102, 64</value>
   </data>
   <data name="flowLayoutPanel29.Size" type="System.Drawing.Size, System.Drawing">
-    <value>285, 310</value>
+    <value>284, 310</value>
   </data>
   <data name="flowLayoutPanel29.TabIndex" type="System.Int32, mscorlib">
     <value>38</value>
@@ -3201,7 +3093,7 @@ ERBスクリプトが正常に動作しないことがあります</value>
     <value>3, 3, 3, 3</value>
   </data>
   <data name="label24.Size" type="System.Drawing.Size, System.Drawing">
-    <value>229, 30</value>
+    <value>227, 30</value>
   </data>
   <data name="label24.TabIndex" type="System.Int32, mscorlib">
     <value>72</value>
@@ -3232,7 +3124,7 @@ ERBスクリプトが正常に動作しないことがあります</value>
     <value>3, 39</value>
   </data>
   <data name="checkBoxSystemTripleSymbol.Size" type="System.Drawing.Size, System.Drawing">
-    <value>190, 19</value>
+    <value>191, 19</value>
   </data>
   <data name="checkBoxSystemTripleSymbol.TabIndex" type="System.Int32, mscorlib">
     <value>73</value>
@@ -3262,7 +3154,7 @@ ERBスクリプトが正常に動作しないことがあります</value>
     <value>3, 64</value>
   </data>
   <data name="checkBox26.Size" type="System.Drawing.Size, System.Drawing">
-    <value>200, 19</value>
+    <value>205, 19</value>
   </data>
   <data name="checkBox26.TabIndex" type="System.Int32, mscorlib">
     <value>82</value>
@@ -3295,7 +3187,7 @@ ERBスクリプトが正常に動作しないことがあります</value>
     <value>20, 3, 3, 3</value>
   </data>
   <data name="checkBox32.Size" type="System.Drawing.Size, System.Drawing">
-    <value>248, 19</value>
+    <value>254, 19</value>
   </data>
   <data name="checkBox32.TabIndex" type="System.Int32, mscorlib">
     <value>81</value>
@@ -3355,7 +3247,7 @@ ERBスクリプトが正常に動作しないことがあります</value>
     <value>3, 139</value>
   </data>
   <data name="checkBox30.Size" type="System.Drawing.Size, System.Drawing">
-    <value>166, 19</value>
+    <value>169, 19</value>
   </data>
   <data name="checkBox30.TabIndex" type="System.Int32, mscorlib">
     <value>84</value>
@@ -3445,7 +3337,7 @@ ERBスクリプトが正常に動作しないことがあります</value>
     <value>3, 214</value>
   </data>
   <data name="_useNewRandom.Size" type="System.Drawing.Size, System.Drawing">
-    <value>196, 19</value>
+    <value>198, 19</value>
   </data>
   <data name="_useNewRandom.TabIndex" type="System.Int32, mscorlib">
     <value>88</value>
@@ -3475,7 +3367,7 @@ ERBスクリプトが正常に動作しないことがあります</value>
     <value>3, 239</value>
   </data>
   <data name="_useVAR.Size" type="System.Drawing.Size, System.Drawing">
-    <value>169, 19</value>
+    <value>168, 19</value>
   </data>
   <data name="_useVAR.TabIndex" type="System.Int32, mscorlib">
     <value>89</value>
@@ -3508,7 +3400,7 @@ ERBスクリプトが正常に動作しないことがあります</value>
     <value>3, 20, 3, 3</value>
   </data>
   <data name="label25.Size" type="System.Drawing.Size, System.Drawing">
-    <value>200, 15</value>
+    <value>201, 15</value>
   </data>
   <data name="label25.TabIndex" type="System.Int32, mscorlib">
     <value>86</value>
@@ -3565,7 +3457,7 @@ ERBスクリプトが正常に動作しないことがあります</value>
     <value>3, 20, 3, 3</value>
   </data>
   <data name="label35.Size" type="System.Drawing.Size, System.Drawing">
-    <value>260, 15</value>
+    <value>262, 15</value>
   </data>
   <data name="label35.TabIndex" type="System.Int32, mscorlib">
     <value>90</value>
@@ -3679,7 +3571,7 @@ ERBスクリプトが正常に動作しないことがあります</value>
     <value>3, 3, 3, 3</value>
   </data>
   <data name="label30.Size" type="System.Drawing.Size, System.Drawing">
-    <value>274, 60</value>
+    <value>278, 60</value>
   </data>
   <data name="label30.TabIndex" type="System.Int32, mscorlib">
     <value>72</value>
@@ -3748,7 +3640,7 @@ Emueraの過去のバージョンで動作したものが動作しない、
     <value>3, 94</value>
   </data>
   <data name="checkBoxCompatiCALLNAME.Size" type="System.Drawing.Size, System.Drawing">
-    <value>262, 19</value>
+    <value>263, 19</value>
   </data>
   <data name="checkBoxCompatiCALLNAME.TabIndex" type="System.Int32, mscorlib">
     <value>56</value>
@@ -3781,7 +3673,7 @@ Emueraの過去のバージョンで動作したものが動作しない、
     <value>3, 119</value>
   </data>
   <data name="checkBoxCompatiRAND.Size" type="System.Drawing.Size, System.Drawing">
-    <value>247, 19</value>
+    <value>248, 19</value>
   </data>
   <data name="checkBoxCompatiRAND.TabIndex" type="System.Int32, mscorlib">
     <value>73</value>
@@ -3814,7 +3706,7 @@ Emueraの過去のバージョンで動作したものが動作しない、
     <value>3, 144</value>
   </data>
   <data name="checkBox9.Size" type="System.Drawing.Size, System.Drawing">
-    <value>197, 19</value>
+    <value>199, 19</value>
   </data>
   <data name="checkBox9.TabIndex" type="System.Int32, mscorlib">
     <value>82</value>
@@ -3844,7 +3736,7 @@ Emueraの過去のバージョンで動作したものが動作しない、
     <value>3, 169</value>
   </data>
   <data name="checkBoxFuncNoIgnoreCase.Size" type="System.Drawing.Size, System.Drawing">
-    <value>260, 19</value>
+    <value>261, 19</value>
   </data>
   <data name="checkBoxFuncNoIgnoreCase.TabIndex" type="System.Int32, mscorlib">
     <value>77</value>
@@ -3877,7 +3769,7 @@ Emueraの過去のバージョンで動作したものが動作しない、
     <value>3, 194</value>
   </data>
   <data name="checkBox28.Size" type="System.Drawing.Size, System.Drawing">
-    <value>175, 19</value>
+    <value>176, 19</value>
   </data>
   <data name="checkBox28.TabIndex" type="System.Int32, mscorlib">
     <value>80</value>
@@ -3910,7 +3802,7 @@ Emueraの過去のバージョンで動作したものが動作しない、
     <value>3, 219</value>
   </data>
   <data name="checkBoxCompatiSP.Size" type="System.Drawing.Size, System.Drawing">
-    <value>116, 19</value>
+    <value>117, 19</value>
   </data>
   <data name="checkBoxCompatiSP.TabIndex" type="System.Int32, mscorlib">
     <value>81</value>
@@ -3979,7 +3871,7 @@ Emueraの過去のバージョンで動作したものが動作しない、
     <value>3, 286</value>
   </data>
   <data name="checkBox12.Size" type="System.Drawing.Size, System.Drawing">
-    <value>237, 19</value>
+    <value>241, 19</value>
   </data>
   <data name="checkBox12.TabIndex" type="System.Int32, mscorlib">
     <value>78</value>
@@ -4012,7 +3904,7 @@ Emueraの過去のバージョンで動作したものが動作しない、
     <value>3, 311</value>
   </data>
   <data name="checkBox25.Size" type="System.Drawing.Size, System.Drawing">
-    <value>260, 19</value>
+    <value>265, 19</value>
   </data>
   <data name="checkBox25.TabIndex" type="System.Int32, mscorlib">
     <value>79</value>
@@ -4054,7 +3946,7 @@ Emueraの過去のバージョンで動作したものが動作しない、
     <value>3, 3</value>
   </data>
   <data name="button7.Size" type="System.Drawing.Size, System.Drawing">
-    <value>127, 25</value>
+    <value>128, 25</value>
   </data>
   <data name="button7.TabIndex" type="System.Int32, mscorlib">
     <value>75</value>
@@ -4084,13 +3976,13 @@ Emueraの過去のバージョンで動作したものが動作しない、
     <value>NoControl</value>
   </data>
   <data name="button8.Location" type="System.Drawing.Point, System.Drawing">
-    <value>143, 3</value>
+    <value>144, 3</value>
   </data>
   <data name="button8.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>10, 3, 3, 3</value>
   </data>
   <data name="button8.Size" type="System.Drawing.Size, System.Drawing">
-    <value>132, 25</value>
+    <value>133, 25</value>
   </data>
   <data name="button8.TabIndex" type="System.Int32, mscorlib">
     <value>76</value>
@@ -4120,7 +4012,7 @@ Emueraの過去のバージョンで動作したものが動作しない、
     <value>0, 0, 0, 0</value>
   </data>
   <data name="flowLayoutPanel34.Size" type="System.Drawing.Size, System.Drawing">
-    <value>280, 31</value>
+    <value>284, 31</value>
   </data>
   <data name="flowLayoutPanel34.TabIndex" type="System.Int32, mscorlib">
     <value>39</value>
@@ -4144,7 +4036,7 @@ Emueraの過去のバージョンで動作したものが動作しない、
     <value>90, 40</value>
   </data>
   <data name="flowLayoutPanel33.Size" type="System.Drawing.Size, System.Drawing">
-    <value>280, 364</value>
+    <value>284, 364</value>
   </data>
   <data name="flowLayoutPanel33.TabIndex" type="System.Int32, mscorlib">
     <value>38</value>
@@ -4204,7 +4096,7 @@ Emueraの過去のバージョンで動作したものが動作しない、
     <value>3, 3</value>
   </data>
   <data name="checkBox23.Size" type="System.Drawing.Size, System.Drawing">
-    <value>226, 19</value>
+    <value>227, 19</value>
   </data>
   <data name="checkBox23.TabIndex" type="System.Int32, mscorlib">
     <value>73</value>
@@ -4234,7 +4126,7 @@ Emueraの過去のバージョンで動作したものが動作しない、
     <value>3, 28</value>
   </data>
   <data name="checkBox13.Size" type="System.Drawing.Size, System.Drawing">
-    <value>159, 19</value>
+    <value>164, 19</value>
   </data>
   <data name="checkBox13.TabIndex" type="System.Int32, mscorlib">
     <value>16</value>
@@ -4264,7 +4156,7 @@ Emueraの過去のバージョンで動作したものが動作しない、
     <value>3, 53</value>
   </data>
   <data name="checkBox35.Size" type="System.Drawing.Size, System.Drawing">
-    <value>248, 19</value>
+    <value>249, 19</value>
   </data>
   <data name="checkBox35.TabIndex" type="System.Int32, mscorlib">
     <value>74</value>
@@ -4297,7 +4189,7 @@ Emueraの過去のバージョンで動作したものが動作しない、
     <value>3, 20, 3, 3</value>
   </data>
   <data name="label12.Size" type="System.Drawing.Size, System.Drawing">
-    <value>129, 15</value>
+    <value>132, 15</value>
   </data>
   <data name="label12.TabIndex" type="System.Int32, mscorlib">
     <value>50</value>
@@ -4462,7 +4354,7 @@ Emueraの過去のバージョンで動作したものが動作しない、
     <value>3, 3, 3, 3</value>
   </data>
   <data name="label13.Size" type="System.Drawing.Size, System.Drawing">
-    <value>157, 15</value>
+    <value>156, 15</value>
   </data>
   <data name="label13.TabIndex" type="System.Int32, mscorlib">
     <value>52</value>
@@ -4606,7 +4498,7 @@ Emueraの過去のバージョンで動作したものが動作しない、
     <value>3, 3</value>
   </data>
   <data name="button5.Size" type="System.Drawing.Size, System.Drawing">
-    <value>136, 25</value>
+    <value>141, 25</value>
   </data>
   <data name="button5.TabIndex" type="System.Int32, mscorlib">
     <value>74</value>
@@ -4636,10 +4528,10 @@ Emueraの過去のバージョンで動作したものが動作しない、
     <value>NoControl</value>
   </data>
   <data name="button6.Location" type="System.Drawing.Point, System.Drawing">
-    <value>145, 3</value>
+    <value>150, 3</value>
   </data>
   <data name="button6.Size" type="System.Drawing.Size, System.Drawing">
-    <value>136, 25</value>
+    <value>137, 25</value>
   </data>
   <data name="button6.TabIndex" type="System.Int32, mscorlib">
     <value>75</value>
@@ -4666,7 +4558,7 @@ Emueraの過去のバージョンで動作したものが動作しない、
     <value>0, 20, 0, 0</value>
   </data>
   <data name="flowLayoutPanel31.Size" type="System.Drawing.Size, System.Drawing">
-    <value>284, 31</value>
+    <value>290, 31</value>
   </data>
   <data name="flowLayoutPanel31.TabIndex" type="System.Int32, mscorlib">
     <value>38</value>
@@ -4690,7 +4582,7 @@ Emueraの過去のバージョンで動作したものが動作しない、
     <value>93, 52</value>
   </data>
   <data name="flowLayoutPanel32.Size" type="System.Drawing.Size, System.Drawing">
-    <value>284, 368</value>
+    <value>290, 368</value>
   </data>
   <data name="flowLayoutPanel32.TabIndex" type="System.Int32, mscorlib">
     <value>38</value>
@@ -4740,39 +4632,6 @@ Emueraの過去のバージョンで動作したものが動作しない、
   <data name="flowLayoutPanel35.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
     <value>GrowAndShrink</value>
   </data>
-  <data name="checkBoxCBuseCB.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="checkBoxCBuseCB.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="checkBoxCBuseCB.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 3</value>
-  </data>
-  <data name="checkBoxCBuseCB.Size" type="System.Drawing.Size, System.Drawing">
-    <value>120, 19</value>
-  </data>
-  <data name="checkBoxCBuseCB.TabIndex" type="System.Int32, mscorlib">
-    <value>82</value>
-  </data>
-  <data name="checkBoxCBuseCB.Text" xml:space="preserve">
-    <value>Copy to clipboard</value>
-  </data>
-  <data name="checkBoxCBuseCB.ToolTip" xml:space="preserve">
-    <value>Enables copying all text from the program to the clipboard.</value>
-  </data>
-  <data name="&gt;&gt;checkBoxCBuseCB.Name" xml:space="preserve">
-    <value>checkBoxCBuseCB</value>
-  </data>
-  <data name="&gt;&gt;checkBoxCBuseCB.Type" xml:space="preserve">
-    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;checkBoxCBuseCB.Parent" xml:space="preserve">
-    <value>flowLayoutPanel35</value>
-  </data>
-  <data name="&gt;&gt;checkBoxCBuseCB.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
   <data name="checkBoxCBIgnoreTags.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
@@ -4780,7 +4639,7 @@ Emueraの過去のバージョンで動作したものが動作しない、
     <value>NoControl</value>
   </data>
   <data name="checkBoxCBIgnoreTags.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 28</value>
+    <value>3, 3</value>
   </data>
   <data name="checkBoxCBIgnoreTags.Size" type="System.Drawing.Size, System.Drawing">
     <value>104, 19</value>
@@ -4806,7 +4665,7 @@ the clipboard. This removes those tags. Note some games use &lt;&gt; in
     <value>flowLayoutPanel35</value>
   </data>
   <data name="&gt;&gt;checkBoxCBIgnoreTags.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>0</value>
   </data>
   <data name="flowLayoutPanel36.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -4876,7 +4735,7 @@ with another text string. Useful for creating a little space between
     <value>1</value>
   </data>
   <data name="flowLayoutPanel36.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 53</value>
+    <value>3, 28</value>
   </data>
   <data name="flowLayoutPanel36.Size" type="System.Drawing.Size, System.Drawing">
     <value>217, 29</value>
@@ -4894,7 +4753,7 @@ with another text string. Useful for creating a little space between
     <value>flowLayoutPanel35</value>
   </data>
   <data name="&gt;&gt;flowLayoutPanel36.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>1</value>
   </data>
   <data name="checkBoxCBNewLinesOnly.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -4903,10 +4762,10 @@ with another text string. Useful for creating a little space between
     <value>NoControl</value>
   </data>
   <data name="checkBoxCBNewLinesOnly.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 88</value>
+    <value>3, 63</value>
   </data>
   <data name="checkBoxCBNewLinesOnly.Size" type="System.Drawing.Size, System.Drawing">
-    <value>213, 19</value>
+    <value>214, 19</value>
   </data>
   <data name="checkBoxCBNewLinesOnly.TabIndex" type="System.Int32, mscorlib">
     <value>99</value>
@@ -4930,7 +4789,7 @@ resend old lines to fill that amount.</value>
     <value>flowLayoutPanel35</value>
   </data>
   <data name="&gt;&gt;checkBoxCBNewLinesOnly.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>2</value>
   </data>
   <data name="checkBoxCBClearBuffer.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -4939,10 +4798,10 @@ resend old lines to fill that amount.</value>
     <value>NoControl</value>
   </data>
   <data name="checkBoxCBClearBuffer.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 113</value>
+    <value>3, 88</value>
   </data>
   <data name="checkBoxCBClearBuffer.Size" type="System.Drawing.Size, System.Drawing">
-    <value>297, 19</value>
+    <value>301, 19</value>
   </data>
   <data name="checkBoxCBClearBuffer.TabIndex" type="System.Int32, mscorlib">
     <value>100</value>
@@ -4965,7 +4824,7 @@ keeps all text.</value>
     <value>flowLayoutPanel35</value>
   </data>
   <data name="&gt;&gt;checkBoxCBClearBuffer.ZOrder" xml:space="preserve">
-    <value>4</value>
+    <value>3</value>
   </data>
   <data name="label27.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -4974,10 +4833,10 @@ keeps all text.</value>
     <value>NoControl</value>
   </data>
   <data name="label27.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 135</value>
+    <value>3, 110</value>
   </data>
   <data name="label27.Size" type="System.Drawing.Size, System.Drawing">
-    <value>87, 15</value>
+    <value>88, 15</value>
   </data>
   <data name="label27.TabIndex" type="System.Int32, mscorlib">
     <value>101</value>
@@ -5000,7 +4859,7 @@ text when there's too many triggers in succession.</value>
     <value>flowLayoutPanel35</value>
   </data>
   <data name="&gt;&gt;label27.ZOrder" xml:space="preserve">
-    <value>5</value>
+    <value>4</value>
   </data>
   <data name="flowLayoutPanel37.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -5015,7 +4874,7 @@ text when there's too many triggers in succession.</value>
     <value>3, 3</value>
   </data>
   <data name="checkBoxCBTriggerLeftClick.Size" type="System.Drawing.Size, System.Drawing">
-    <value>118, 19</value>
+    <value>119, 19</value>
   </data>
   <data name="checkBoxCBTriggerLeftClick.TabIndex" type="System.Int32, mscorlib">
     <value>89</value>
@@ -5045,10 +4904,10 @@ text when there's too many triggers in succession.</value>
     <value>NoControl</value>
   </data>
   <data name="checkBoxCBTriggerMiddleClick.Location" type="System.Drawing.Point, System.Drawing">
-    <value>127, 3</value>
+    <value>128, 3</value>
   </data>
   <data name="checkBoxCBTriggerMiddleClick.Size" type="System.Drawing.Size, System.Drawing">
-    <value>135, 19</value>
+    <value>136, 19</value>
   </data>
   <data name="checkBoxCBTriggerMiddleClick.TabIndex" type="System.Int32, mscorlib">
     <value>102</value>
@@ -5072,10 +4931,10 @@ text when there's too many triggers in succession.</value>
     <value>1</value>
   </data>
   <data name="flowLayoutPanel37.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 153</value>
+    <value>3, 128</value>
   </data>
   <data name="flowLayoutPanel37.Size" type="System.Drawing.Size, System.Drawing">
-    <value>265, 25</value>
+    <value>267, 25</value>
   </data>
   <data name="flowLayoutPanel37.TabIndex" type="System.Int32, mscorlib">
     <value>102</value>
@@ -5090,7 +4949,7 @@ text when there's too many triggers in succession.</value>
     <value>flowLayoutPanel35</value>
   </data>
   <data name="&gt;&gt;flowLayoutPanel37.ZOrder" xml:space="preserve">
-    <value>6</value>
+    <value>5</value>
   </data>
   <data name="checkBoxCBTriggerDoubleLeftClick.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -5099,10 +4958,10 @@ text when there's too many triggers in succession.</value>
     <value>NoControl</value>
   </data>
   <data name="checkBoxCBTriggerDoubleLeftClick.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 184</value>
+    <value>3, 159</value>
   </data>
   <data name="checkBoxCBTriggerDoubleLeftClick.Size" type="System.Drawing.Size, System.Drawing">
-    <value>162, 19</value>
+    <value>163, 19</value>
   </data>
   <data name="checkBoxCBTriggerDoubleLeftClick.TabIndex" type="System.Int32, mscorlib">
     <value>103</value>
@@ -5123,7 +4982,7 @@ text when there's too many triggers in succession.</value>
     <value>flowLayoutPanel35</value>
   </data>
   <data name="&gt;&gt;checkBoxCBTriggerDoubleLeftClick.ZOrder" xml:space="preserve">
-    <value>7</value>
+    <value>6</value>
   </data>
   <data name="checkBoxCBTriggerAnyKeyWait.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -5132,7 +4991,7 @@ text when there's too many triggers in succession.</value>
     <value>NoControl</value>
   </data>
   <data name="checkBoxCBTriggerAnyKeyWait.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 209</value>
+    <value>3, 184</value>
   </data>
   <data name="checkBoxCBTriggerAnyKeyWait.Size" type="System.Drawing.Size, System.Drawing">
     <value>308, 19</value>
@@ -5157,7 +5016,7 @@ that this will still occur if you hold right click through a section of text.</v
     <value>flowLayoutPanel35</value>
   </data>
   <data name="&gt;&gt;checkBoxCBTriggerAnyKeyWait.ZOrder" xml:space="preserve">
-    <value>8</value>
+    <value>7</value>
   </data>
   <data name="checkBoxCBTriggerInputWait.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -5166,7 +5025,7 @@ that this will still occur if you hold right click through a section of text.</v
     <value>NoControl</value>
   </data>
   <data name="checkBoxCBTriggerInputWait.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 234</value>
+    <value>3, 209</value>
   </data>
   <data name="checkBoxCBTriggerInputWait.Size" type="System.Drawing.Size, System.Drawing">
     <value>279, 19</value>
@@ -5190,7 +5049,7 @@ that this will still occur if you hold right click through a section of text.</v
     <value>flowLayoutPanel35</value>
   </data>
   <data name="&gt;&gt;checkBoxCBTriggerInputWait.ZOrder" xml:space="preserve">
-    <value>9</value>
+    <value>8</value>
   </data>
   <data name="flowLayoutPanel38.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -5233,7 +5092,7 @@ in non-Classic Mode.</value>
     <value>79, 7</value>
   </data>
   <data name="label28.Size" type="System.Drawing.Size, System.Drawing">
-    <value>144, 15</value>
+    <value>145, 15</value>
   </data>
   <data name="label28.TabIndex" type="System.Int32, mscorlib">
     <value>86</value>
@@ -5258,10 +5117,10 @@ in non-Classic Mode.</value>
     <value>1</value>
   </data>
   <data name="flowLayoutPanel38.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 259</value>
+    <value>3, 234</value>
   </data>
   <data name="flowLayoutPanel38.Size" type="System.Drawing.Size, System.Drawing">
-    <value>226, 29</value>
+    <value>227, 29</value>
   </data>
   <data name="flowLayoutPanel38.TabIndex" type="System.Int32, mscorlib">
     <value>106</value>
@@ -5276,7 +5135,7 @@ in non-Classic Mode.</value>
     <value>flowLayoutPanel35</value>
   </data>
   <data name="&gt;&gt;flowLayoutPanel38.ZOrder" xml:space="preserve">
-    <value>10</value>
+    <value>9</value>
   </data>
   <data name="flowLayoutPanel39.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -5319,7 +5178,7 @@ adjusting unless you need a really long scrollable history.</value>
     <value>79, 7</value>
   </data>
   <data name="label31.Size" type="System.Drawing.Size, System.Drawing">
-    <value>89, 15</value>
+    <value>91, 15</value>
   </data>
   <data name="label31.TabIndex" type="System.Int32, mscorlib">
     <value>87</value>
@@ -5344,10 +5203,10 @@ adjusting unless you need a really long scrollable history.</value>
     <value>1</value>
   </data>
   <data name="flowLayoutPanel39.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 294</value>
+    <value>3, 269</value>
   </data>
   <data name="flowLayoutPanel39.Size" type="System.Drawing.Size, System.Drawing">
-    <value>171, 29</value>
+    <value>173, 29</value>
   </data>
   <data name="flowLayoutPanel39.TabIndex" type="System.Int32, mscorlib">
     <value>107</value>
@@ -5362,7 +5221,7 @@ adjusting unless you need a really long scrollable history.</value>
     <value>flowLayoutPanel35</value>
   </data>
   <data name="&gt;&gt;flowLayoutPanel39.ZOrder" xml:space="preserve">
-    <value>11</value>
+    <value>10</value>
   </data>
   <data name="flowLayoutPanel40.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -5404,7 +5263,7 @@ adjusting unless you need a really long scrollable history.</value>
     <value>79, 7</value>
   </data>
   <data name="label32.Size" type="System.Drawing.Size, System.Drawing">
-    <value>127, 15</value>
+    <value>128, 15</value>
   </data>
   <data name="label32.TabIndex" type="System.Int32, mscorlib">
     <value>97</value>
@@ -5428,10 +5287,10 @@ adjusting unless you need a really long scrollable history.</value>
     <value>1</value>
   </data>
   <data name="flowLayoutPanel40.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 329</value>
+    <value>3, 304</value>
   </data>
   <data name="flowLayoutPanel40.Size" type="System.Drawing.Size, System.Drawing">
-    <value>209, 29</value>
+    <value>210, 29</value>
   </data>
   <data name="flowLayoutPanel40.TabIndex" type="System.Int32, mscorlib">
     <value>108</value>
@@ -5446,7 +5305,7 @@ adjusting unless you need a really long scrollable history.</value>
     <value>flowLayoutPanel35</value>
   </data>
   <data name="&gt;&gt;flowLayoutPanel40.ZOrder" xml:space="preserve">
-    <value>12</value>
+    <value>11</value>
   </data>
   <data name="flowLayoutPanel41.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -5493,7 +5352,7 @@ at all. Note scrolling bypasses this and might still cause no-update issues.</va
     <value>250, 0</value>
   </data>
   <data name="label33.Size" type="System.Drawing.Size, System.Drawing">
-    <value>224, 15</value>
+    <value>226, 15</value>
   </data>
   <data name="label33.TabIndex" type="System.Int32, mscorlib">
     <value>93</value>
@@ -5519,10 +5378,10 @@ at all. Note scrolling bypasses this and might still cause no-update issues.</va
     <value>1</value>
   </data>
   <data name="flowLayoutPanel41.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 364</value>
+    <value>3, 339</value>
   </data>
   <data name="flowLayoutPanel41.Size" type="System.Drawing.Size, System.Drawing">
-    <value>306, 29</value>
+    <value>308, 29</value>
   </data>
   <data name="flowLayoutPanel41.TabIndex" type="System.Int32, mscorlib">
     <value>109</value>
@@ -5537,7 +5396,7 @@ at all. Note scrolling bypasses this and might still cause no-update issues.</va
     <value>flowLayoutPanel35</value>
   </data>
   <data name="&gt;&gt;flowLayoutPanel41.ZOrder" xml:space="preserve">
-    <value>13</value>
+    <value>12</value>
   </data>
   <data name="label34.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -5546,13 +5405,13 @@ at all. Note scrolling bypasses this and might still cause no-update issues.</va
     <value>NoControl</value>
   </data>
   <data name="label34.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 396</value>
+    <value>3, 371</value>
   </data>
   <data name="label34.MaximumSize" type="System.Drawing.Size, System.Drawing">
     <value>230, 0</value>
   </data>
   <data name="label34.Size" type="System.Drawing.Size, System.Drawing">
-    <value>216, 45</value>
+    <value>230, 30</value>
   </data>
   <data name="label34.TabIndex" type="System.Int32, mscorlib">
     <value>110</value>
@@ -5570,7 +5429,7 @@ at all. Note scrolling bypasses this and might still cause no-update issues.</va
     <value>flowLayoutPanel35</value>
   </data>
   <data name="&gt;&gt;label34.ZOrder" xml:space="preserve">
-    <value>14</value>
+    <value>13</value>
   </data>
   <data name="flowLayoutPanel35.FlowDirection" type="System.Windows.Forms.FlowDirection, System.Windows.Forms">
     <value>TopDown</value>
@@ -5579,7 +5438,7 @@ at all. Note scrolling bypasses this and might still cause no-update issues.</va
     <value>88, 20</value>
   </data>
   <data name="flowLayoutPanel35.Size" type="System.Drawing.Size, System.Drawing">
-    <value>314, 441</value>
+    <value>314, 401</value>
   </data>
   <data name="flowLayoutPanel35.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -5669,7 +5528,7 @@ at all. Note scrolling bypasses this and might still cause no-update issues.</va
     <value>3, 25</value>
   </data>
   <data name="rikaiDictFilenameLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>111, 15</value>
+    <value>113, 15</value>
   </data>
   <data name="rikaiDictFilenameLabel.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -5734,60 +5593,6 @@ at all. Note scrolling bypasses this and might still cause no-update issues.</va
   <data name="&gt;&gt;flowLayoutPanel42.ZOrder" xml:space="preserve">
     <value>2</value>
   </data>
-  <data name="rikaiColorBoxBG.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="rikaiColorBoxBG.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
-    <value>GrowAndShrink</value>
-  </data>
-  <data name="rikaiColorBoxBG.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 77</value>
-  </data>
-  <data name="rikaiColorBoxBG.Size" type="System.Drawing.Size, System.Drawing">
-    <value>210, 31</value>
-  </data>
-  <data name="rikaiColorBoxBG.TabIndex" type="System.Int32, mscorlib">
-    <value>2</value>
-  </data>
-  <data name="&gt;&gt;rikaiColorBoxBG.Name" xml:space="preserve">
-    <value>rikaiColorBoxBG</value>
-  </data>
-  <data name="&gt;&gt;rikaiColorBoxBG.Type" xml:space="preserve">
-    <value>MinorShift.Emuera.Forms.ColorBox, Emuera, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;rikaiColorBoxBG.Parent" xml:space="preserve">
-    <value>rikaiFlowLayoutPanel</value>
-  </data>
-  <data name="&gt;&gt;rikaiColorBoxBG.ZOrder" xml:space="preserve">
-    <value>3</value>
-  </data>
-  <data name="rikaiColorBoxText.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="rikaiColorBoxText.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
-    <value>GrowAndShrink</value>
-  </data>
-  <data name="rikaiColorBoxText.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 114</value>
-  </data>
-  <data name="rikaiColorBoxText.Size" type="System.Drawing.Size, System.Drawing">
-    <value>210, 31</value>
-  </data>
-  <data name="rikaiColorBoxText.TabIndex" type="System.Int32, mscorlib">
-    <value>3</value>
-  </data>
-  <data name="&gt;&gt;rikaiColorBoxText.Name" xml:space="preserve">
-    <value>rikaiColorBoxText</value>
-  </data>
-  <data name="&gt;&gt;rikaiColorBoxText.Type" xml:space="preserve">
-    <value>MinorShift.Emuera.Forms.ColorBox, Emuera, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;rikaiColorBoxText.Parent" xml:space="preserve">
-    <value>rikaiFlowLayoutPanel</value>
-  </data>
-  <data name="&gt;&gt;rikaiColorBoxText.ZOrder" xml:space="preserve">
-    <value>4</value>
-  </data>
   <data name="rikaiCheckBoxSeparateBoxes.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
@@ -5795,10 +5600,10 @@ at all. Note scrolling bypasses this and might still cause no-update issues.</va
     <value>NoControl</value>
   </data>
   <data name="rikaiCheckBoxSeparateBoxes.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 151</value>
+    <value>3, 77</value>
   </data>
   <data name="rikaiCheckBoxSeparateBoxes.Size" type="System.Drawing.Size, System.Drawing">
-    <value>261, 19</value>
+    <value>260, 19</value>
   </data>
   <data name="rikaiCheckBoxSeparateBoxes.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
@@ -5816,7 +5621,7 @@ at all. Note scrolling bypasses this and might still cause no-update issues.</va
     <value>rikaiFlowLayoutPanel</value>
   </data>
   <data name="&gt;&gt;rikaiCheckBoxSeparateBoxes.ZOrder" xml:space="preserve">
-    <value>5</value>
+    <value>3</value>
   </data>
   <data name="rikaiNote1.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -5825,10 +5630,10 @@ at all. Note scrolling bypasses this and might still cause no-update issues.</va
     <value>NoControl</value>
   </data>
   <data name="rikaiNote1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 173</value>
+    <value>3, 99</value>
   </data>
   <data name="rikaiNote1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>215, 15</value>
+    <value>217, 15</value>
   </data>
   <data name="rikaiNote1.TabIndex" type="System.Int32, mscorlib">
     <value>5</value>
@@ -5846,7 +5651,7 @@ at all. Note scrolling bypasses this and might still cause no-update issues.</va
     <value>rikaiFlowLayoutPanel</value>
   </data>
   <data name="&gt;&gt;rikaiNote1.ZOrder" xml:space="preserve">
-    <value>6</value>
+    <value>4</value>
   </data>
   <data name="rikaiNote2.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -5855,10 +5660,10 @@ at all. Note scrolling bypasses this and might still cause no-update issues.</va
     <value>NoControl</value>
   </data>
   <data name="rikaiNote2.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 188</value>
+    <value>3, 114</value>
   </data>
   <data name="rikaiNote2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>296, 15</value>
+    <value>297, 15</value>
   </data>
   <data name="rikaiNote2.TabIndex" type="System.Int32, mscorlib">
     <value>6</value>
@@ -5876,7 +5681,7 @@ at all. Note scrolling bypasses this and might still cause no-update issues.</va
     <value>rikaiFlowLayoutPanel</value>
   </data>
   <data name="&gt;&gt;rikaiNote2.ZOrder" xml:space="preserve">
-    <value>7</value>
+    <value>5</value>
   </data>
   <data name="rikaiNote3.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -5885,10 +5690,10 @@ at all. Note scrolling bypasses this and might still cause no-update issues.</va
     <value>NoControl</value>
   </data>
   <data name="rikaiNote3.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 203</value>
+    <value>3, 129</value>
   </data>
   <data name="rikaiNote3.Size" type="System.Drawing.Size, System.Drawing">
-    <value>205, 15</value>
+    <value>208, 15</value>
   </data>
   <data name="rikaiNote3.TabIndex" type="System.Int32, mscorlib">
     <value>7</value>
@@ -5906,7 +5711,7 @@ at all. Note scrolling bypasses this and might still cause no-update issues.</va
     <value>rikaiFlowLayoutPanel</value>
   </data>
   <data name="&gt;&gt;rikaiNote3.ZOrder" xml:space="preserve">
-    <value>8</value>
+    <value>6</value>
   </data>
   <data name="rikaiFlowLayoutPanel.FlowDirection" type="System.Windows.Forms.FlowDirection, System.Windows.Forms">
     <value>TopDown</value>
@@ -5996,7 +5801,7 @@ at all. Note scrolling bypasses this and might still cause no-update issues.</va
     <value>3, 0</value>
   </data>
   <data name="label16.Size" type="System.Drawing.Size, System.Drawing">
-    <value>198, 15</value>
+    <value>199, 15</value>
   </data>
   <data name="label16.TabIndex" type="System.Int32, mscorlib">
     <value>36</value>
@@ -6041,7 +5846,7 @@ at all. Note scrolling bypasses this and might still cause no-update issues.</va
     <value>3, 18</value>
   </data>
   <data name="flowLayoutPanel2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>216, 31</value>
+    <value>218, 31</value>
   </data>
   <data name="flowLayoutPanel2.TabIndex" type="System.Int32, mscorlib">
     <value>79</value>
@@ -6062,10 +5867,10 @@ at all. Note scrolling bypasses this and might still cause no-update issues.</va
     <value>TopDown</value>
   </data>
   <data name="flowLayoutPanel3.Location" type="System.Drawing.Point, System.Drawing">
-    <value>311, 484</value>
+    <value>309, 484</value>
   </data>
   <data name="flowLayoutPanel3.Size" type="System.Drawing.Size, System.Drawing">
-    <value>222, 52</value>
+    <value>224, 52</value>
   </data>
   <data name="flowLayoutPanel3.TabIndex" type="System.Int32, mscorlib">
     <value>80</value>
