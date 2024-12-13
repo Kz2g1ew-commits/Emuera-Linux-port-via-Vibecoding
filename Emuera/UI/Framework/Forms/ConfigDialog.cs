@@ -210,7 +210,6 @@ namespace MinorShift.Emuera.Forms
 			button6.Text = Lang.UI.ConfigDialog.Debug.DeveloperStandard.Text;
 
 			tabPageClipboard.Text = Lang.UI.ConfigDialog.Clipboard.Text;
-			checkBoxCBuseCB.Text = Lang.UI.ConfigDialog.Clipboard.CopyToClipboard.Text;
 			checkBoxCBIgnoreTags.Text = Lang.UI.ConfigDialog.Clipboard.IgnoreTags.Text;
 			label29.Text = Lang.UI.ConfigDialog.Clipboard.ReplaceTags.Text;
 			checkBoxCBNewLinesOnly.Text = Lang.UI.ConfigDialog.Clipboard.NewLineOnly.Text;
@@ -535,7 +534,6 @@ namespace MinorShift.Emuera.Forms
 			}
 			#endregion
 			#region EE_AnchorのCB機能移植
-			setCheckBox(checkBoxCBuseCB, ConfigCode.CBUseClipboard);
 			setCheckBox(checkBoxCBIgnoreTags, ConfigCode.CBIgnoreTags);
 			textBoxCBReplaceTags.Text = Config.CBReplaceTags;
 			setCheckBox(checkBoxCBNewLinesOnly, ConfigCode.CBNewLinesOnly);
@@ -729,7 +727,6 @@ namespace MinorShift.Emuera.Forms
 			Config.UpdateLangSetting(config);
 			#endregion
 			#region EE_AnchorのCB機能移植
-			config.GetConfigItem(ConfigCode.CBUseClipboard).SetValue(checkBoxCBuseCB.Checked);
 			config.GetConfigItem(ConfigCode.CBIgnoreTags).SetValue(checkBoxCBIgnoreTags.Checked);
 			config.GetConfigItem(ConfigCode.CBReplaceTags).SetValue(textBoxCBReplaceTags.Text);
 			config.GetConfigItem(ConfigCode.CBNewLinesOnly).SetValue(checkBoxCBNewLinesOnly.Checked);
@@ -743,6 +740,11 @@ namespace MinorShift.Emuera.Forms
 			config.GetConfigItem(ConfigCode.CBBufferSize).SetValue((int)numericUpDownCBBufferSize.Value);
 			config.GetConfigItem(ConfigCode.CBScrollCount).SetValue((int)numericUpDownCBScrollCount.Value);
 			config.GetConfigItem(ConfigCode.CBMinTimer).SetValue((int)numericUpDownCBMinTimer.Value);
+			#region EE_AnchorのCB機能移植Extension
+			GlobalStatic.Console.CBProc.SetMaxCB(Config.CBMaxCB);
+			GlobalStatic.Console.CBProc.SetScrollCount(Config.CBScrollCount);
+			GlobalStatic.Console.CBProc.SetTimerInterval(Config.CBMinTimer);
+			#endregion
 			#endregion
 
 			config.GetConfigItem(ConfigCode.RikaiEnabled).SetValue(rikaiCheckBoxEnable.Checked);

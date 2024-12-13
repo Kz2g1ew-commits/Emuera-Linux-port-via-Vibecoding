@@ -1,14 +1,13 @@
-﻿using MinorShift.Emuera.UI.Game;
-using System;
-using System.Text;
+﻿using System;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using MinorShift.Emuera.UI.Game;
+using System.Runtime.CompilerServices;
 
 namespace MinorShift.Emuera.Runtime.Script.Statements;
 
-internal class ClipboardProcessor
+internal partial class ClipboardProcessor
 {
-	private readonly bool useCB;
 	private readonly bool classicMode; // New Lines Only mode
 
 	private readonly Forms.MainWindow mainWin;
@@ -17,15 +16,15 @@ internal class ClipboardProcessor
 	private bool postWaiting; //Is there text waiting to be sent to clipboard?
 	private static System.Timers.Timer minTimer; //Minimum timer for refrehsing the clipboard to prevent spam
 
-	private readonly int MaxCB; //Max length in lines of the output to clipboard
+	private int MaxCB; //Max length in lines of the output to clipboard
 	private int ScrollPos; //Position of the clipboard output in the buffer
-	private readonly int ScrollCount; //Lines to scroll at a time
+	private int ScrollCount; //Lines to scroll at a time
 	private int NewLineCount; //Number of new lines
 	private int OldNewLineCount; //Number of lines in the last update, used for Classic mode + scrolling back to bottom
-	private StringBuilder OldText; //Last set of lines sent to the clipboard
-	private readonly CircularBuffer<string> lineBuffer; //Buffer for processed strings ready for clipboard
+	private string OldText; //Last set of lines sent to the clipboard
+	private CircularBuffer<string> lineBuffer; //Buffer for processed strings ready for clipboard
 
-	public string GetLatestString => OldText.ToString();
+	private bool Initialized;
 
 	internal enum CBTriggers
 	{
@@ -36,11 +35,8 @@ internal class ClipboardProcessor
 		InputWait,
 	}
 
-	private delegate void SetClipboardDelegate(string text, bool copy, int times, int delay); //Just for using the timer to set the clipboard.
-
 	public ClipboardProcessor(Forms.MainWindow parent)
 	{
-		useCB = Config.Config.CBUseClipboard;
 		classicMode = Config.Config.CBNewLinesOnly;
 
 		mainWin = parent;
@@ -54,17 +50,50 @@ internal class ClipboardProcessor
 		NewLineCount = 0;
 		OldNewLineCount = 0;
 
-		if (!useCB) return;
+		if (!Config.Config.CBUseClipboard) return;
 
+		Init();
+	}
+
+	public void Init()
+	{
+		if (Initialized)
+			return;
 		lineBuffer = new CircularBuffer<string>(Config.Config.CBBufferSize);
 		minTimer = new System.Timers.Timer(Config.Config.CBMinTimer) { AutoReset = false };
 		minTimer.Elapsed += MinTimerDone;
-		OldText = new StringBuilder();
+		OldText = "";
+		Initialized = true;
+	}
+
+	public void Reset()
+	{
+		lineBuffer = null;
+		minTimer.Dispose();
+		OldText = null;
+		Initialized = false;
+	}
+
+	public void SetTimerInterval(int interval)
+	{
+		if (!Initialized)
+			return;
+		minTimer.Interval = interval;
+	}
+
+	public void SetMaxCB(int value)
+	{
+		MaxCB = value;
+	}
+
+	public void SetScrollCount(int value)
+	{
+		ScrollCount = value;
 	}
 
 	public bool ScrollUp(int value)
 	{
-		if (!useCB) return false;
+		if (!Config.Config.CBUseClipboard) return false;
 		if (ScrollPos == 0 && classicMode && ScrollCount > OldNewLineCount) ScrollPos = OldNewLineCount;
 		else ScrollPos += ScrollCount * value;
 		if (lineBuffer.Count < ScrollPos) ScrollPos = lineBuffer.Count - ScrollCount;
@@ -74,7 +103,7 @@ internal class ClipboardProcessor
 
 	public bool ScrollDown(int value)
 	{
-		if (!useCB) return false;
+		if (!Config.Config.CBUseClipboard) return false;
 		ScrollPos -= ScrollCount;
 		if (ScrollPos < 0) ScrollPos = 0;
 		SendToCB(true);
@@ -102,7 +131,7 @@ internal class ClipboardProcessor
 	//FIXIT - Autoprocess old lines or just ditch?
 	public void AddLine(ConsoleDisplayLine inputLine, bool left)
 	{
-		if (!useCB) return;
+		if (!Config.Config.CBUseClipboard) return;
 
 		NewLineCount++;
 		string processed = ProcessLine(inputLine.ToString());
@@ -111,7 +140,7 @@ internal class ClipboardProcessor
 
 	public void DelLine(int count)
 	{
-		if (!useCB || count <= 0) return;
+		if (!Config.Config.CBUseClipboard || count <= 0) return;
 
 		NewLineCount = Math.Max(0, NewLineCount - count);
 		if (count >= lineBuffer.Count) lineBuffer.Clear();
@@ -127,7 +156,7 @@ internal class ClipboardProcessor
 
 	public void ClearScreen()
 	{
-		if (!useCB) return;
+		if (!Config.Config.CBUseClipboard) return;
 		if (Config.Config.CBClearBuffer)
 		{
 			lineBuffer.Clear();
@@ -142,7 +171,7 @@ internal class ClipboardProcessor
 
 	public void Check(CBTriggers type)
 	{
-		if (!useCB) return;
+		if (!Config.Config.CBUseClipboard) return;
 		switch (type)
 		{
 			case CBTriggers.LeftClick:
@@ -175,7 +204,7 @@ internal class ClipboardProcessor
 
 	private void SendToCB(bool force)
 	{
-		if (!useCB) return;
+		if (!Config.Config.CBUseClipboard) return;
 		if (NewLineCount == 0 && !force) return;
 		if (!MinTimeCheck())
 		{
@@ -190,16 +219,18 @@ internal class ClipboardProcessor
 		else length = Math.Min(MaxCB, lineBuffer.Count - ScrollPos);
 		if (length <= 0) return;
 
-		var newText = new StringBuilder();
+		var builder = new DefaultInterpolatedStringHandler(length * 2, 0);
 		for (int count = 0; count < length; count++)
 		{
-			newText.AppendLine(lineBuffer[lineBuffer.Count - length - ScrollPos + count]);
+			builder.AppendLiteral(lineBuffer[lineBuffer.Count - length - ScrollPos + count]);
+			builder.AppendLiteral("\n");
 		}
-		if (newText.ToString().Equals(OldText.ToString())) return;
-		var scpDelegate = new SetClipboardDelegate(Clipboard.SetDataObject);
+		var newText = builder.ToString();
+
+		if (newText == OldText) return;
 		try
 		{
-			mainWin.Invoke(scpDelegate, newText.ToString(), false, 3, 200);
+			mainWin.Invoke(() => Clipboard.SetDataObject(newText, false, 3, 200));
 			if (ScrollPos == 0) OldNewLineCount = NewLineCount;
 			NewLineCount = 0;
 			OldText = newText;
@@ -211,7 +242,9 @@ internal class ClipboardProcessor
 		}
 	}
 
-	private const string HTML_TAG_PATTERN = "<.*?>";
+
+	[GeneratedRegex("<.*?>")]
+	private static partial Regex HTMLTagRegex();
 
 	public static string StripHTML(string input)
 	{
@@ -219,7 +252,7 @@ internal class ClipboardProcessor
 		if (Config.Config.CBIgnoreTags && input.Contains('<'))
 		{
 			// regex is faster and simpler than a for loop you nerds
-			return Regex.Replace(input, HTML_TAG_PATTERN, Config.Config.CBReplaceTags);
+			return HTMLTagRegex().Replace(input, Config.Config.CBReplaceTags);
 		}
 		return input;
 	}
