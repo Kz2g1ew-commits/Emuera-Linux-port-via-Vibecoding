@@ -186,7 +186,6 @@
 			button6 = new System.Windows.Forms.Button();
 			tabPageClipboard = new System.Windows.Forms.TabPage();
 			flowLayoutPanel35 = new System.Windows.Forms.FlowLayoutPanel();
-			checkBoxCBuseCB = new System.Windows.Forms.CheckBox();
 			checkBoxCBIgnoreTags = new System.Windows.Forms.CheckBox();
 			flowLayoutPanel36 = new System.Windows.Forms.FlowLayoutPanel();
 			label29 = new System.Windows.Forms.Label();
@@ -1359,7 +1358,6 @@
 			// flowLayoutPanel35
 			// 
 			resources.ApplyResources(flowLayoutPanel35, "flowLayoutPanel35");
-			flowLayoutPanel35.Controls.Add(checkBoxCBuseCB);
 			flowLayoutPanel35.Controls.Add(checkBoxCBIgnoreTags);
 			flowLayoutPanel35.Controls.Add(flowLayoutPanel36);
 			flowLayoutPanel35.Controls.Add(checkBoxCBNewLinesOnly);
@@ -1375,13 +1373,6 @@
 			flowLayoutPanel35.Controls.Add(flowLayoutPanel41);
 			flowLayoutPanel35.Controls.Add(label34);
 			flowLayoutPanel35.Name = "flowLayoutPanel35";
-			// 
-			// checkBoxCBuseCB
-			// 
-			resources.ApplyResources(checkBoxCBuseCB, "checkBoxCBuseCB");
-			checkBoxCBuseCB.Name = "checkBoxCBuseCB";
-			toolTip1.SetToolTip(checkBoxCBuseCB, resources.GetString("checkBoxCBuseCB.ToolTip"));
-			checkBoxCBuseCB.UseVisualStyleBackColor = true;
 			// 
 			// checkBoxCBIgnoreTags
 			// 
@@ -1960,7 +1951,6 @@
 		private System.Windows.Forms.CheckBox checkBox34;
 		private System.Windows.Forms.TabPage tabPageClipboard;
 		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel35;
-		private System.Windows.Forms.CheckBox checkBoxCBuseCB;
 		private System.Windows.Forms.CheckBox checkBoxCBIgnoreTags;
 		private System.Windows.Forms.Label label29;
 		private System.Windows.Forms.TextBox textBoxCBReplaceTags;
