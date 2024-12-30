@@ -487,8 +487,9 @@ internal sealed partial class EmueraConsole : IDisposable
 				throw new CodeEE(trerror.ForceQuitAndRestartError.Text);
 			}
 		}
+		if (Program.rebootFlag)
+			window.Reboot();
 		GlobalStatic.ForceQuitAndRestart = true;
-		window.Close();
 		return;
 	}
 	#endregion
@@ -1194,7 +1195,10 @@ internal sealed partial class EmueraConsole : IDisposable
 			return;
 		else if (state == ConsoleState.Quit)
 		{
-			window.Close();
+			if (Program.rebootFlag)
+				window.Reboot();
+			else
+				window.Close();
 			return;
 		}
 		else if (state == ConsoleState.Error)
