@@ -549,27 +549,30 @@ internal sealed class PrintStringBuffer
 		#endregion
 		string str = css.Text;
 		Font font = css.Font;
-		//最適なサイズを二分探索する
-		var window = str.Length / 2;
-		int i = window;
 
+		//最適なサイズを二分探索する
 		var span = str.AsSpan();
 		ReadOnlySpan<char> test;
-		while (window > 1)
+
+		int biggestFitting = 0;
+		int smallestNotFitting = str.Length;
+		while (true)
 		{
-			test = span[..i];
-			if (sm.GetDisplayLength(test, font) <= widthLimit)//サイズ内ならlowLengthを更新。文字数を増やす。
+			int middle = (biggestFitting + smallestNotFitting) / 2;
+			if (middle == biggestFitting) middle++;
+			if (middle == smallestNotFitting) break;
+
+			test = span[..middle];
+			if (sm.GetDisplayLength(test, font) <= widthLimit)
 			{
-				window /= 2;
-				i += window;
+				biggestFitting = middle;
 			}
-			else//サイズ外ならhighLengthを更新。文字数を減らす。
+			else
 			{
-				window /= 2;
-				i -= window;
+				smallestNotFitting = middle;
 			}
 		}
-		return i;
+		return biggestFitting;
 	}
 	#endregion
 
