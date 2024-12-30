@@ -213,7 +213,7 @@ static class AppContents
 	{
 		if (tokens.Length < 2)
 			return null;
-		string name = tokens[0].Trim();//
+		string name = tokens[0].Trim().ToUpper();//
 		string arg2 = tokens[1];//画像ファイル名
 		if (name.Length == 0 || arg2.Length == 0)
 			return null;
@@ -354,6 +354,9 @@ static class AppContents
 
 		//新規スプライト定義
 		ASprite image = new SpriteF(name, parentImage, rect, pos, size);
+
+		if (Config.DisplayReport)
+			ParserMediator.SingleLine(string.Format(Lang.SystemLine.CreateFromCSV.Text, arg2, name));
 		return image;
 	}
 }

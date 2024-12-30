@@ -167,4 +167,10 @@ internal partial class ParserMediator
 
 	[GeneratedRegex(@"(?<!\\),")]
 	private static partial Regex unEscapedCommaRegex();
+
+	public static void SingleLine(string str)
+	{
+		console.PrintSingleLine(str);
+	}
+
 }
