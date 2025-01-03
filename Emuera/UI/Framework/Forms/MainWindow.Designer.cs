@@ -583,11 +583,14 @@ partial class MainWindow
 		mainPicBox.MouseMove += mainPicBox_MouseMove;
 		// 
 		// デバッグモードで再起動ToolStripMenuItem
-		// 
+		//
+		//
+		/*
 		デバッグモードで再起動ToolStripMenuItem.Name = "toolStripMenuItem1";
 		デバッグモードで再起動ToolStripMenuItem.Size = new System.Drawing.Size(212, 22);
 		デバッグモードで再起動ToolStripMenuItem.Text = "デバッグモードで再起動";
 		デバッグモードで再起動ToolStripMenuItem.Click += デバッグモードで再起動ToolStripMenuItem_Click;
+		*/
 		// 
 		// MainWindow
 		// 
