@@ -230,6 +230,7 @@
 			flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
 			flowLayoutPanel3 = new System.Windows.Forms.FlowLayoutPanel();
 			flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
+			checkBox27 = new System.Windows.Forms.CheckBox();
 			tabControl.SuspendLayout();
 			tabEnvironment.SuspendLayout();
 			flowLayoutPanel13.SuspendLayout();
@@ -360,6 +361,7 @@
 			flowLayoutPanel13.Controls.Add(label22);
 			flowLayoutPanel13.Controls.Add(flowLayoutPanel10);
 			flowLayoutPanel13.Controls.Add(flowLayoutPanel11);
+			flowLayoutPanel13.Controls.Add(checkBox27);
 			flowLayoutPanel13.Name = "flowLayoutPanel13";
 			// 
 			// flowLayoutPanel6
@@ -1656,6 +1658,12 @@
 			flowLayoutPanel2.Controls.Add(buttonCancel);
 			flowLayoutPanel2.Name = "flowLayoutPanel2";
 			// 
+			// checkBox27
+			// 
+			resources.ApplyResources(checkBox27, "checkBox27");
+			checkBox27.Name = "checkBox27";
+			checkBox27.UseVisualStyleBackColor = true;
+			// 
 			// ConfigDialog
 			// 
 			AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -1996,5 +2004,6 @@
 		private System.Windows.Forms.CheckBox _useVAR;
 		private System.Windows.Forms.Label label35;
 		private System.Windows.Forms.TextBox textBox4;
+		private System.Windows.Forms.CheckBox checkBox27;
 	}
 }

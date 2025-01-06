@@ -2520,7 +2520,7 @@ internal sealed partial class EmueraConsole : IDisposable
 	// Used by ctrlZ.
 	public void GotoTitleAndLoadAndRepeatInput()
 	{
-		if (!GlobalStatic.ctrlZ.mEnabled) return;
+		if (!Config.Ctrl_Z_Enabled) return;
 		if (JSONConfig.Data.UseNewRandom)
 		{
 			MessageBox.Show("CtrlZ: JSONConfig.Data.UseNewRandom not supported");

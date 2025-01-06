@@ -19,11 +19,10 @@ internal class CtrlZ
 
 	public bool mRewindInProgress = false;
 	public bool mRepeatedUndoRequested = false;
-	public bool mEnabled = true;
 
 	public void Add(string s)
 	{
-		if (!mEnabled) return;
+		if (!Config.Config.Ctrl_Z_Enabled) return;
 		if (mRewindInProgress) return;
 		mInputs.Add(s);
 	}
@@ -31,14 +30,14 @@ internal class CtrlZ
 	// Called on clicking save file.
 	public void OnSavePrepare(int aLastSaveExpected)
 	{
-		if (!mEnabled) return;
+		if (!Config.Config.Ctrl_Z_Enabled) return;
 		mLastSaveExpected = aLastSaveExpected;
 	}
 
 	// Called on confirming save overwrite
 	public void OnSave()
 	{
-		if (!mEnabled) return;
+		if (!Config.Config.Ctrl_Z_Enabled) return;
 		mLastSave = mLastSaveExpected;
 		mInputs.Clear();
 		GlobalStatic.VEvaluator.Rand.GetRand(mRandomSeed);
@@ -47,7 +46,7 @@ internal class CtrlZ
 	// Called on clicking on a file to load.
 	public void OnLoad(int aSaveFile)
 	{
-		if (!mEnabled) return;
+		if (!Config.Config.Ctrl_Z_Enabled) return;
 		if (mRewindInProgress) return;
 		mLastSave = aSaveFile;
 		mInputs.Clear();
