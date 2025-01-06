@@ -2240,6 +2240,10 @@ internal sealed class VariableEvaluator : IDisposable
 				bWriter.WriteString("");//saveMes
 				varData.SaveGlobalToStreamBinary(bWriter);
 				bWriter.WriteEOF();
+				#region EMのデータがSAVEGLOBALに対応してなかったのを修正
+				varData.SaveGlobalEMDataToStreamBinary(bWriter);
+				bWriter.WriteEOF();
+				#endregion
 				bWriter.Close();
 			}
 			else
