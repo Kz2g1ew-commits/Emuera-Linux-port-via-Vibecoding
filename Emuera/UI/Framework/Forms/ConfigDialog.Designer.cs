@@ -65,6 +65,7 @@
 			label23 = new System.Windows.Forms.Label();
 			comboBox6 = new System.Windows.Forms.ComboBox();
 			textBox2 = new System.Windows.Forms.TextBox();
+			checkBox27 = new System.Windows.Forms.CheckBox();
 			tabPageView = new System.Windows.Forms.TabPage();
 			flowLayoutPanel17 = new System.Windows.Forms.FlowLayoutPanel();
 			label18 = new System.Windows.Forms.Label();
@@ -230,7 +231,6 @@
 			flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
 			flowLayoutPanel3 = new System.Windows.Forms.FlowLayoutPanel();
 			flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
-			checkBox27 = new System.Windows.Forms.CheckBox();
 			tabControl.SuspendLayout();
 			tabEnvironment.SuspendLayout();
 			flowLayoutPanel13.SuspendLayout();
@@ -543,6 +543,12 @@
 			resources.ApplyResources(textBox2, "textBox2");
 			textBox2.Name = "textBox2";
 			// 
+			// checkBox27
+			// 
+			resources.ApplyResources(checkBox27, "checkBox27");
+			checkBox27.Name = "checkBox27";
+			checkBox27.UseVisualStyleBackColor = true;
+			// 
 			// tabPageView
 			// 
 			tabPageView.Controls.Add(flowLayoutPanel17);
@@ -815,29 +821,29 @@
 			// 
 			// colorBoxBG
 			// 
-			resources.ApplyResources(colorBoxBG, "colorBoxBG");
 			colorBoxBG.ButtonText = "背景色";
+			resources.ApplyResources(colorBoxBG, "colorBoxBG");
 			colorBoxBG.Name = "colorBoxBG";
 			colorBoxBG.SelectingColor = System.Drawing.Color.Transparent;
 			// 
 			// colorBoxFG
 			// 
-			resources.ApplyResources(colorBoxFG, "colorBoxFG");
 			colorBoxFG.ButtonText = "文字色";
+			resources.ApplyResources(colorBoxFG, "colorBoxFG");
 			colorBoxFG.Name = "colorBoxFG";
 			colorBoxFG.SelectingColor = System.Drawing.Color.Transparent;
 			// 
 			// colorBoxSelecting
 			// 
-			resources.ApplyResources(colorBoxSelecting, "colorBoxSelecting");
 			colorBoxSelecting.ButtonText = "選択中文字色";
+			resources.ApplyResources(colorBoxSelecting, "colorBoxSelecting");
 			colorBoxSelecting.Name = "colorBoxSelecting";
 			colorBoxSelecting.SelectingColor = System.Drawing.Color.Transparent;
 			// 
 			// colorBoxBacklog
 			// 
-			resources.ApplyResources(colorBoxBacklog, "colorBoxBacklog");
 			colorBoxBacklog.ButtonText = "履歴文字色";
+			resources.ApplyResources(colorBoxBacklog, "colorBoxBacklog");
 			colorBoxBacklog.Name = "colorBoxBacklog";
 			colorBoxBacklog.SelectingColor = System.Drawing.Color.Transparent;
 			// 
@@ -1592,15 +1598,15 @@
 			// 
 			// rikaiColorBoxBG
 			// 
-			resources.ApplyResources(rikaiColorBoxBG, "rikaiColorBoxBG");
 			rikaiColorBoxBG.ButtonText = "Background Color";
+			resources.ApplyResources(rikaiColorBoxBG, "rikaiColorBoxBG");
 			rikaiColorBoxBG.Name = "rikaiColorBoxBG";
 			rikaiColorBoxBG.SelectingColor = System.Drawing.Color.Transparent;
 			// 
 			// rikaiColorBoxText
 			// 
-			resources.ApplyResources(rikaiColorBoxText, "rikaiColorBoxText");
 			rikaiColorBoxText.ButtonText = "Text Color";
+			resources.ApplyResources(rikaiColorBoxText, "rikaiColorBoxText");
 			rikaiColorBoxText.Name = "rikaiColorBoxText";
 			rikaiColorBoxText.SelectingColor = System.Drawing.Color.Transparent;
 			// 
@@ -1657,12 +1663,6 @@
 			flowLayoutPanel2.Controls.Add(buttonReboot);
 			flowLayoutPanel2.Controls.Add(buttonCancel);
 			flowLayoutPanel2.Name = "flowLayoutPanel2";
-			// 
-			// checkBox27
-			// 
-			resources.ApplyResources(checkBox27, "checkBox27");
-			checkBox27.Name = "checkBox27";
-			checkBox27.UseVisualStyleBackColor = true;
 			// 
 			// ConfigDialog
 			// 
