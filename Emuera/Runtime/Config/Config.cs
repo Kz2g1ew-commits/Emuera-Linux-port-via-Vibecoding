@@ -171,6 +171,8 @@ internal static class Config
 		RikaiUseSeparateBoxes = instance.GetConfigValue<bool>(ConfigCode.RikaiUseSeparateBoxes);
 		#endregion
 
+		Ctrl_Z_Enabled = instance.GetConfigValue<bool>(ConfigCode.Ctrl_Z_Enabled);
+
 
 		UseLanguage lang = instance.GetConfigValue<UseLanguage>(ConfigCode.useLanguage);
 		switch (lang)
@@ -636,4 +638,6 @@ internal static class Config
 	public static Color RikaiColorText { get; private set; }
 	public static bool RikaiUseSeparateBoxes { get; private set; }
 	#endregion
+
+	public static bool Ctrl_Z_Enabled { get; private set; }
 }

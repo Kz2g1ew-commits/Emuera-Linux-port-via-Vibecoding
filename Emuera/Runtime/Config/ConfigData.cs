@@ -170,6 +170,8 @@ internal sealed class ConfigData
 		configArray.Add(new ConfigItem<bool>(ConfigCode.RikaiUseSeparateBoxes, "翻訳中の語句を強調表示する", "Rikai- Use Separate Boxes", true));
 		#endregion
 
+		configArray.Add(new ConfigItem<bool>(ConfigCode.Ctrl_Z_Enabled, "Ctrl-Zで元に戻す機能を有効にする", "Enable undo with ctrl-z", false));
+
 		debugArray.Add(new ConfigItem<bool>(ConfigCode.DebugShowWindow, "起動時にデバッグウインドウを表示する", "Show debug window on startup", true));
 		debugArray.Add(new ConfigItem<bool>(ConfigCode.DebugWindowTopMost, "デバッグウインドウを最前面に表示する", "Debug window always on top", true));
 		debugArray.Add(new ConfigItem<int>(ConfigCode.DebugWindowWidth, "デバッグウィンドウ幅", "Debug window width", 400));

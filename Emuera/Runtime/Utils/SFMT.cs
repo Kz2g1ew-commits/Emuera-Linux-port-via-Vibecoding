@@ -254,7 +254,7 @@ public sealed class MTRandom
 #endif
 
 	private const int N = MEXP / 128 + 1;
-	private const int N32 = N * 4;
+	public const int N32 = N * 4;
 
 	/// <summary>
 	/// 内部状態ベクトル。

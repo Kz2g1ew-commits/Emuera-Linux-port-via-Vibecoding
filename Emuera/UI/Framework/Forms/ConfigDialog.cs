@@ -555,6 +555,7 @@ namespace MinorShift.Emuera.Forms
 			setColorBox(rikaiColorBoxText, ConfigCode.RikaiColorText);
 			rikaiDictFilenameTextBox.Text = Config.RikaiFilename;
 
+			setCheckBox(checkBox27, ConfigCode.Ctrl_Z_Enabled);
 
 		}
 
@@ -753,6 +754,7 @@ namespace MinorShift.Emuera.Forms
 			config.GetConfigItem(ConfigCode.RikaiColorText).SetValue(rikaiColorBoxText.SelectingColor);
 			config.GetConfigItem(ConfigCode.RikaiUseSeparateBoxes).SetValue(rikaiCheckBoxSeparateBoxes.Checked);
 
+			config.GetConfigItem(ConfigCode.Ctrl_Z_Enabled).SetValue(checkBox27.Checked);
 
 			config.SaveConfig();
 

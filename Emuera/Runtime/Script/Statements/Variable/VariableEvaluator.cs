@@ -22,6 +22,8 @@ internal sealed class VariableEvaluator : IDisposable
 	readonly ConstantData constant;
 	readonly VariableData varData;
 	MTRandom rand = new();
+	public MTRandom Rand { get { return rand; } }
+
 	Random _newRand = new();
 
 	public VariableData VariableData { get { return varData; } }

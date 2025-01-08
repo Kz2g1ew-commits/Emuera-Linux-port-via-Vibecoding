@@ -169,6 +169,7 @@ internal enum ConfigCode
 	RikaiColorText,
 	RikaiUseSeparateBoxes,
 	#endregion
+	Ctrl_Z_Enabled,
 	#region EM_私家版_Emuera多言語化改造
 	EnglishConfigOutput,
 	EmueraLang,

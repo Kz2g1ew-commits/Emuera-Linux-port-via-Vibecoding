@@ -4,6 +4,7 @@ using MinorShift.Emuera.GameView;
 using MinorShift.Emuera.Runtime.Script.Data;
 using MinorShift.Emuera.Runtime.Script.Statements;
 using MinorShift.Emuera.Runtime.Script.Statements.Variable;
+using MinorShift.Emuera.Runtime.Utils;
 using System;
 using System.Collections.Generic;
 using System.Drawing.Text;
@@ -46,6 +47,8 @@ internal static class GlobalStatic
 	#region EE_フォントファイル対応
 	public static PrivateFontCollection Pfc = new();
 	#endregion
+
+	public static CtrlZ ctrlZ = new();
 
 #if DEBUG
 	public static List<FunctionLabelLine> StackList = [];
