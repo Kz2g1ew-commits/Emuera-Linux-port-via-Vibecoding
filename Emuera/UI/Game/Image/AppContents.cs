@@ -355,8 +355,8 @@ static class AppContents
 		//新規スプライト定義
 		ASprite image = new SpriteF(name, parentImage, rect, pos, size);
 
-		if (Config.DisplayReport)
-			ParserMediator.SingleLine(string.Format(Lang.SystemLine.CreateFromCSV.Text, arg2, name));
+		//if (Config.DisplayReport)
+		//	ParserMediator.SingleLine(string.Format(Lang.SystemLine.CreateFromCSV.Text, arg2, name));
 		return image;
 	}
 }
