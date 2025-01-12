@@ -830,24 +830,26 @@ internal sealed class ConstantData
 		ret = 0;
 		if (string.IsNullOrEmpty(key))
 			return false;
-		Dictionary<string, int> dic;
-		try
-		{
-			// dic = GetKeywordDictionary(out string errPos, code, index);
-			dic = GetKeywordDictionary(out string errPos, code, index, null);
 
-			//ここで見つからなかったら下の処理でも通す
-			if (dic.TryGetValue(key, out ret))
-				return dic.TryGetValue(key, out ret);
-		}
-		catch { }
-		if (!string.IsNullOrEmpty(varname))
 		{
-			if (!erdNameToIntDics.ContainsKey(varname))
-				return false;
-			return erdNameToIntDics[varname].TryGetValue(key, out ret);
+			//ここで見つからなかったら下の処理でも通す
+			Dictionary<string, int> dic = GetKeywordDictionary(out string errPos, code, index, null);
+			if (dic != null)
+			{
+				var found = dic.TryGetValue(key, out ret);
+				if (found)
+					return true;
+			}
 		}
-		return false;
+		{
+			if (string.IsNullOrEmpty(varname))
+			{
+				return false;
+			}
+			bool found = erdNameToIntDics.TryGetValue(varname, out Dictionary<string, int> dic);
+			if (!found) return false;
+			return dic.TryGetValue(key, out ret);
+		}
 	}
 	#endregion
 	#region EE_ERDNAME
@@ -856,24 +858,17 @@ internal sealed class ConstantData
 		ret = "";
 		if (value < 0)
 			return false;
-		Dictionary<string, int> dic;
-		if (!string.IsNullOrEmpty(varname))
-		{
-			if (!erdNameToIntDics.ContainsKey(varname))
-				return false;
-			dic = erdNameToIntDics[varname];
-			try
-			{
-				ret = dic.First(x => x.Value == value).Key;
-			}
-			catch
-			{
-				return false;
-			}
-			if (!string.IsNullOrEmpty(ret))
-				return true;
-		}
-		return false;
+		if (string.IsNullOrEmpty(varname))
+			return false;
+
+		if (!erdNameToIntDics.TryGetValue(varname, out Dictionary<string, int> dic))
+			return false;
+
+		var keyValuePair = dic.FirstOrDefault(x => x.Value == value);
+		if (string.IsNullOrEmpty(keyValuePair.Key))
+			return false;
+		ret = keyValuePair.Key;
+		return true;
 	}
 	#endregion
 
