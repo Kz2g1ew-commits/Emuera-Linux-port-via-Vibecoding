@@ -53,6 +53,8 @@ partial class MainWindow
 		ヘルプHToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 		コンフィグCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 		EmuVerToolStripTextBox = new System.Windows.Forms.ToolStripTextBox();
+		LanguageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+		JapaneseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 		openFileDialog = new System.Windows.Forms.OpenFileDialog();
 		saveFileDialog = new System.Windows.Forms.SaveFileDialog();
 		folderSelectDialog = new System.Windows.Forms.FolderBrowserDialog();
@@ -113,7 +115,7 @@ partial class MainWindow
 		// 
 		// menuStrip
 		// 
-		menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { fileToolStripMenuItem, デバッグToolStripMenuItem, ツールToolStripMenuItem, ヘルプHToolStripMenuItem, EmuVerToolStripTextBox });
+		menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { fileToolStripMenuItem, デバッグToolStripMenuItem, ツールToolStripMenuItem, ヘルプHToolStripMenuItem, EmuVerToolStripTextBox, LanguageToolStripMenuItem });
 		menuStrip.Location = new System.Drawing.Point(0, 0);
 		menuStrip.Name = "menuStrip";
 		menuStrip.Size = new System.Drawing.Size(657, 24);
@@ -271,6 +273,20 @@ partial class MainWindow
 		EmuVerToolStripTextBox.Size = new System.Drawing.Size(250, 20);
 		EmuVerToolStripTextBox.Text = "Emuera Ver. 0.000+v00.0";
 		EmuVerToolStripTextBox.TextBoxTextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+		// 
+		// LanguageToolStripMenuItem
+		// 
+		LanguageToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { JapaneseToolStripMenuItem });
+		LanguageToolStripMenuItem.Name = "LanguageToolStripMenuItem";
+		LanguageToolStripMenuItem.Size = new System.Drawing.Size(60, 20);
+		LanguageToolStripMenuItem.Text = "言語 (&L)";
+		// 
+		// JapaneseToolStripMenuItem
+		// 
+		JapaneseToolStripMenuItem.Name = "JapaneseToolStripMenuItem";
+		JapaneseToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+		JapaneseToolStripMenuItem.Text = "日本語";
+		JapaneseToolStripMenuItem.Click += JapaneseToolStripMenuItem_Click;
 		// 
 		// openFileDialog
 		// 
@@ -542,13 +558,6 @@ partial class MainWindow
 		実行.Text = "実行";
 		実行.Click += 実行_Click;
 		// 
-		// toolTipButton
-		// 
-		//toolTipButton.BackColor = System.Drawing.Color.White;
-		//toolTipButton.OwnerDraw = true;
-		//toolTipButton.Draw += toolTipButton_Draw;
-		//toolTipButton.Popup += toolTipButton_Popup;
-		// 
 		// timerKeyMacroChanged
 		// 
 		timerKeyMacroChanged.Tick += timerKeyMacroChanged_Tick;
@@ -683,5 +692,7 @@ partial class MainWindow
 	private System.Windows.Forms.ToolStripMenuItem ウィンドウ幅のロックToolStripMenuItem;
 	private System.Windows.Forms.ToolStripMenuItem デバッグモードで再起動ToolStripMenuItem;
 	private System.Windows.Forms.ToolStripMenuItem クリップボードにコピーToolStripMenuItem;
+	private System.Windows.Forms.ToolStripMenuItem LanguageToolStripMenuItem;
+	private System.Windows.Forms.ToolStripMenuItem JapaneseToolStripMenuItem;
 }
 

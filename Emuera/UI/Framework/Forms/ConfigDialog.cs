@@ -714,18 +714,14 @@ namespace MinorShift.Emuera.Forms
 			config.GetConfigItem(ConfigCode.ZipSaveData).SetValue(checkBox32.Checked);
 			#endregion
 			#region EM_私家版_多言語化改造
-			if (comboBox7.SelectedIndex == 0)
+			string language = comboBox7.SelectedIndex == 0? Lang.DefaultLanguage : comboBox7.SelectedItem as string;
+			if (language != Config.EmueraLang)
 			{
-				config.GetConfigItem(ConfigCode.EmueraLang).SetValue(string.Empty);
-				ConfigData.Instance.GetConfigItem(ConfigCode.EmueraLang).SetValue(string.Empty);
-			}
-			else
-			{
-				config.GetConfigItem(ConfigCode.EmueraLang).SetValue(comboBox7.SelectedItem as string);
-				ConfigData.Instance.GetConfigItem(ConfigCode.EmueraLang).SetValue(comboBox7.SelectedItem as string);
+				config.GetConfigItem(ConfigCode.EmueraLang).SetValue(language);
+				ConfigData.Instance.GetConfigItem(ConfigCode.EmueraLang).SetValue(language);
+				Config.UpdateLangSetting(config);
 			}
 			config.GetConfigItem(ConfigCode.EnglishConfigOutput).SetValue(checkBox33.Checked);
-			Config.UpdateLangSetting(config);
 			#endregion
 			#region EE_AnchorのCB機能移植
 			config.GetConfigItem(ConfigCode.CBIgnoreTags).SetValue(checkBoxCBIgnoreTags.Checked);

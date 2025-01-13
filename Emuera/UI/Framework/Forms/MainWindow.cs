@@ -29,6 +29,9 @@ namespace MinorShift.Emuera.Forms
 				デバッグモードで再起動ToolStripMenuItem.Visible = false;
 				デバッグToolStripMenuItem.Visible = true;
 			}
+			#region EM_私家版_Emuera多言語化改造
+			SetLanguageOptions();
+			#endregion
 
 			mainPicBox.SetStyle();
 			initControlSizeAndLocation();
@@ -127,13 +130,15 @@ namespace MinorShift.Emuera.Forms
 			デバッグToolStripMenuItem.Text = Lang.UI.MainWindow.Debug.Text;
 			デバッグウインドウを開くToolStripMenuItem.Text = Lang.UI.MainWindow.Debug.OpenDebugWindow.Text;
 			デバッグ情報の更新ToolStripMenuItem.Text = Lang.UI.MainWindow.Debug.UpdateDebugInfo.Text;
-			
+
 			ツールToolStripMenuItem.Text = Lang.UI.MainWindow.Tools.Text;
 			ウィンドウ幅のロックToolStripMenuItem.Text = Lang.UI.MainWindow.Tools.LockWindowWidth.Text;
 			クリップボードにコピーToolStripMenuItem.Text = Lang.UI.MainWindow.Tools.CopyToClipboard.Text;
 
 			ヘルプHToolStripMenuItem.Text = Lang.UI.MainWindow.Help.Text;
 			コンフィグCToolStripMenuItem.Text = Lang.UI.MainWindow.Help.Config.Text;
+
+			LanguageToolStripMenuItem.Text = Lang.UI.MainWindow.Language.Text;
 
 			マクロToolStripMenuItem.Text = Lang.UI.MainWindow.ContextMenu.KeyMacro.Text;
 			for (int i = 0; i < マクロToolStripMenuItem.DropDownItems.Count; i++)
@@ -881,6 +886,7 @@ namespace MinorShift.Emuera.Forms
 				Lang.ReloadLang();
 				KeyMacro.ResetNames();
 				TranslateUI();
+				ResetCheckedLanguage();
 			}
 		}
 
@@ -1507,7 +1513,7 @@ namespace MinorShift.Emuera.Forms
 		
 		private void クリップボードにコピーToolStripMenuItem_Click_1(object sender, EventArgs e)
 		{
-			if(クリップボードにコピーToolStripMenuItem.Checked)
+			if (クリップボードにコピーToolStripMenuItem.Checked)
 				GlobalStatic.Console.CBProc.Init();
 			else
 				GlobalStatic.Console.CBProc.Reset();
@@ -1515,6 +1521,45 @@ namespace MinorShift.Emuera.Forms
 			Config.SetConfig(ConfigData.Instance);
 			ConfigData.Instance.SaveConfig();
 		}
+		#region EM_私家版_多言語化改造
+		private void SetLanguageOptions()
+		{
+			if(Config.EmueraLang == Lang.DefaultLanguage)
+				JapaneseToolStripMenuItem.Checked = true;
+			foreach (var lang in Lang.GetLangList())
+			{
+				var language = new ToolStripMenuItem();
+				language.Text = lang;
+				language.Checked = Config.EmueraLang == lang;
+				language.Click += (_, _) =>
+				{
+					if (Config.EmueraLang == lang)
+						return;
+					Config.SetLanguageSetting(ConfigData.Instance, lang);
+					Lang.ReloadLang();
+					ResetCheckedLanguage();
+					TranslateUI();
+				};
+				LanguageToolStripMenuItem.DropDownItems.Add(language);
+			}
+		}
 
+		public void ResetCheckedLanguage()
+		{
+			foreach (ToolStripMenuItem item in LanguageToolStripMenuItem.DropDownItems)
+			{
+				item.Checked = Config.EmueraLang == item.Text;
+			}
+		}
+		private void JapaneseToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (Config.EmueraLang == Lang.DefaultLanguage)
+				return;
+			Config.SetLanguageSetting(ConfigData.Instance, Lang.DefaultLanguage);
+			Lang.ReloadLang();
+			ResetCheckedLanguage();
+			TranslateUI();
+		}
+		#endregion
 	}
 }

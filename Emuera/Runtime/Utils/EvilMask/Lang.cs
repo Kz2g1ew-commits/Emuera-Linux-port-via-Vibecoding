@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Xml;
+using MinorShift.Emuera.Runtime.Config;
 
 namespace MinorShift.Emuera.Runtime.Utils.EvilMask;
 
@@ -89,6 +92,12 @@ internal sealed partial class Lang
 			{
 				public static string Text { get { return trClass[typeof(Help)].Text; } }
 				[Managed] public static TranslatableString Config { get; } = new TranslatableString("設定(&C)");
+			}
+			
+			[Translate("言語 (&L)"), Managed]
+			public sealed class Language
+			{
+				public static string Text { get { return trClass[typeof(Language)].Text; } }
 			}
 
 			[Managed]
@@ -1323,25 +1332,26 @@ internal sealed partial class Lang
 	[GeneratedRegex(@".*emuera.*\.xml")]
 	private static partial Regex LangFileRegex();
 	
-	public static void LoadLanguageFile()
+	private static void AddLanguageFile(string path)
+	{
+		XmlDocument xml = LoadXmlFile(path);
+		var langName = xml.SelectSingleNode("/lang/name")?.InnerText.Trim();
+		var culture = xml.SelectSingleNode("/lang/culture")?.InnerText.Trim();
+		if (langName == null)
+			return;
+		langList.TryAdd(langName, path);
+		if(culture != null)
+			localeList.TryAdd(culture, langName);
+	}
+
+	public static void LoadLanguageFiles()
 	{
 		foreach (var pair in trItems) pair.Value.Clear();
 		if (Directory.Exists(langDir))
 		{
 			foreach (var path in Directory.EnumerateFiles(langDir, "emuera.*.xml", SearchOption.TopDirectoryOnly))
 			{
-				XmlDocument xml = new();
-				try
-				{
-					xml.Load(path);
-				}
-				catch
-				{
-					continue;
-				}
-				var langName = GetLanguage(xml);
-				if(langName != null && langList.TryAdd(langName, path) && Config.Config.EmueraLang == langName)
-					loadLangXML(xml);
+				AddLanguageFile(path);
 			}
 		}
 		
@@ -1352,32 +1362,39 @@ internal sealed partial class Lang
 		{
 			if(!LangFileRegex().IsMatch(path))
 				continue;
-			using var stream = assembly.GetManifestResourceStream(path);
-			if(stream == null)
-				continue;
-			XmlDocument xml = new();
-			try
-			{
-				xml.Load(stream);
-			}
-			catch
-			{
-				continue;
-			}
-			var langName = GetLanguage(xml);
-			if(langName != null && langList.TryAdd(langName, path) && Config.Config.EmueraLang == langName)
-				loadLangXML(xml);
+			AddLanguageFile(path);
 		}
 		langNames = new string[langList.Count];
 		langList.Keys.CopyTo(langNames, 0);
-		return;
+	}
 
-		string GetLanguage(XmlDocument xml)
+	public static void SetLanguage()
+	{
+		if (Config.Config.EmueraLang == DefaultLanguage)
+        	return;
+
+		if (CurrentCulture.Name.StartsWith(("ja-")))
 		{
-			var node = xml.SelectSingleNode("/lang/name");
-			var langName = node?.InnerText.Trim();
-			return langName;
+			Config.Config.SetLanguageSetting(ConfigData.Instance, DefaultLanguage);
+			return;
 		}
+
+		if (langList.TryGetValue(Config.Config.EmueraLang, out string lang))
+		{
+			loadLangXML(LoadXmlFile(lang));
+			return;
+		}
+
+		foreach (var culture in localeList)
+		{
+			if (CurrentCulture.Name.StartsWith(culture.Key))
+			{
+				Config.Config.SetLanguageSetting(ConfigData.Instance, culture.Value);
+				loadLangXML(LoadXmlFile(langList[culture.Value]));
+				return;
+			}
+		}
+		Config.Config.SetLanguageSetting(ConfigData.Instance, DefaultLanguage);
 	}
 	static void loadLangXML(XmlDocument xml)
 	{
@@ -1394,27 +1411,46 @@ internal sealed partial class Lang
 				trItems[attr.Value].Set(nodes[i].InnerText);
 		}
 	}
-	static public void ReloadLang()
+	
+	public static void ReloadLang()
 	{
-		if (Config.Config.EmueraLang == string.Empty)
+		if (Config.Config.EmueraLang == DefaultLanguage)
 		{
 			foreach (var item in trItems) item.Value.Clear();
 			return;
 		}
-		if (langList.ContainsKey(Config.Config.EmueraLang))
+
+		if (!langList.TryGetValue(Config.Config.EmueraLang, out string path))
+			return;
+
+		XmlDocument xml;
+		try
 		{
-			var path = langList[Config.Config.EmueraLang];
-			XmlDocument xml = new();
-			try
-			{
-				xml.Load(path);
-			}
-			catch
-			{
-				return;
-			}
-			loadLangXML(xml);
+			xml = LoadXmlFile(path);
 		}
+		catch
+		{
+			return;
+		}
+		loadLangXML(xml);
+	}
+
+	private static XmlDocument LoadXmlFile(string path)
+	{
+		XmlDocument xml = new();
+		if (path.StartsWith("MinorShift"))
+		{
+			var assembly = Assembly.GetExecutingAssembly();
+			using var stream = assembly.GetManifestResourceStream(path);
+			if (stream == null)
+				throw new FileNotFoundException(path);
+			xml.Load(stream);
+		}
+		else
+		{
+			xml.Load(path);
+		}
+		return xml;
 	}
 	static public string[] GetLangList()
 	{
@@ -1436,7 +1472,7 @@ internal sealed partial class Lang
 		var root = xml.CreateElement("lang");
 		xml.AppendChild(root);
 		var name = xml.CreateElement("name");
-		name.InnerText = "日本語";
+		name.InnerText = DefaultLanguage;
 		root.AppendChild(name);
 		foreach (var item in trItems)
 		{
@@ -1454,6 +1490,7 @@ internal sealed partial class Lang
 	static readonly string langDir = Path.Combine(Program.ExeDir, "lang") + Path.DirectorySeparatorChar;
 
 	static readonly Dictionary<string, string> langList = [];
+	static readonly Dictionary<string, string> localeList = [];
 	public static string MFont { get; private set; }
 	static string[] langNames;
 	static readonly Dictionary<string, TranslatableString> trItems = [];
@@ -1501,4 +1538,7 @@ internal sealed partial class Lang
 			}
 		}
 	}
+
+	private static CultureInfo CurrentCulture => Thread.CurrentThread.CurrentUICulture;
+	public const string DefaultLanguage = "日本語";
 }

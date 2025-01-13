@@ -241,6 +241,12 @@ internal static class Config
 		EnglishConfigOutput = instance.GetConfigValue<bool>(ConfigCode.EnglishConfigOutput);
 		EmueraLang = instance.GetConfigValue<string>(ConfigCode.EmueraLang);
 	}
+	public static void SetLanguageSetting(ConfigData instance, string lang)
+	{
+		instance.GetConfigItem(ConfigCode.EmueraLang).SetValue(lang);
+		UpdateLangSetting(instance);
+		instance.SaveConfig();
+	}
 	#endregion
 
 	public static Font DefaultFont { get { return FontFactory.GetFont("", FontStyle.Regular); } }

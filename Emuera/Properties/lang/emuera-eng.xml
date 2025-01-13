@@ -1,6 +1,7 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
 <lang>
     <name>English</name>
+    <culture>en</culture>
     <tr id="UI.MainWindow.FileFilter"><![CDATA[ERB file]]></tr>
     <tr id="UI.MainWindow.File"><![CDATA[File(&F)]]></tr>
     <tr id="UI.MainWindow.File.Restart"><![CDATA[Restart(&R)]]></tr>
@@ -21,6 +22,7 @@
     <tr id="UI.MainWindow.Tools.CopyToClipboard"><![CDATA[Copy Text to Clipboard]]></tr>
     <tr id="UI.MainWindow.Help"><![CDATA[Help(&H)]]></tr>
     <tr id="UI.MainWindow.Help.Config"><![CDATA[Setting(&C)]]></tr>
+    <tr id="UI.MainWindow.Language"><![CDATA[Language(&L)]]></tr>
     <tr id="UI.MainWindow.ContextMenu.KeyMacro"><![CDATA[Macro]]></tr>
     <tr id="UI.MainWindow.ContextMenu.Cut"><![CDATA[Cut]]></tr>
     <tr id="UI.MainWindow.ContextMenu.Copy"><![CDATA[Copy]]></tr>
