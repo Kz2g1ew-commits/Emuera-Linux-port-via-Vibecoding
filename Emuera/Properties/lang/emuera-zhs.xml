@@ -1,6 +1,7 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
 <lang>
     <name>简体中文</name>
+    <culture>zh-hans</culture>
     <mfont>微软雅黑</mfont>
     <tr id="UI.MainWindow.FileFilter"><![CDATA[ERB 文件]]></tr>
     <tr id="UI.MainWindow.File"><![CDATA[文件(&F)]]></tr>
@@ -21,6 +22,7 @@
     <tr id="UI.MainWindow.Tools.CopyToClipboard"><![CDATA[复制到剪贴板]]></tr>
     <tr id="UI.MainWindow.Help"><![CDATA[帮助(&H)]]></tr>
     <tr id="UI.MainWindow.Help.Config"><![CDATA[设置(&C)]]></tr>
+    <tr id="UI.MainWindow.Language"><![CDATA[语言(&L)]]></tr>
     <tr id="UI.MainWindow.ContextMenu.KeyMacro"><![CDATA[按键宏]]></tr>
     <tr id="UI.MainWindow.ContextMenu.Cut"><![CDATA[剪切]]></tr>
     <tr id="UI.MainWindow.ContextMenu.Copy"><![CDATA[复制]]></tr>

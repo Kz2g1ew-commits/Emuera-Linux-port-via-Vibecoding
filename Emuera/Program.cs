@@ -150,7 +150,8 @@ static partial class Program
 		}
 
 		#region EM_私家版_Emuera多言語化改造
-		Lang.LoadLanguageFile();
+		Lang.LoadLanguageFiles();
+		Lang.SetLanguage();
 		#endregion
 		#region EM_私家版_Icon指定機能
 		Icon icon = null;
