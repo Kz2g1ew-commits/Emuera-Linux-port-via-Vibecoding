@@ -772,6 +772,8 @@ internal sealed partial class EmueraConsole : IDisposable
 	readonly Stopwatch _genericTimerStopwatch = new();//現在のタイマーを開始した時のミリ秒数（WinmmTimer.TickCount基準）
 	long timer_endTime;//現在のタイマーを終了する時のTickCountミリ秒数
 	bool isTimeout;
+	long timeDisplayCount;
+	bool inputed;
 	public bool IsTimeOut { get { return isTimeout; } }
 
 	/// <summary>
@@ -785,7 +787,9 @@ internal sealed partial class EmueraConsole : IDisposable
 		if (inputReq.DisplayTime)
 		{
 			var remainingMs = inputReq.Timelimit - _genericTimerStopwatch.ElapsedMilliseconds;
-			PrintSingleLine(trsl.Remaining.Text + $"{remainingMs} ms");
+			PrintSingleLine(trsl.Remaining.Text + $"{remainingMs / 1000.0f:0.0}");
+			timeDisplayCount = 0;
+			inputed = false;
 		}
 	}
 	private void setTimer()
@@ -817,7 +821,9 @@ internal sealed partial class EmueraConsole : IDisposable
 		if (inputReq.DisplayTime)
 		{
 			var remainingMs = inputReq.Timelimit - _genericTimerStopwatch.ElapsedMilliseconds;
-			window.Invoke(() => changeLastLine(trsl.Remaining.Text + $"{remainingMs / 1000.0f:0.0}"));
+			timeDisplayCount++;
+			if (timeDisplayCount%10 == 0 && !inputed)
+				window.Invoke(() => changeLastLine(trsl.Remaining.Text + $"{remainingMs / 1000.0f:0.0}"));
 		}
 	}
 
@@ -1074,6 +1080,7 @@ internal sealed partial class EmueraConsole : IDisposable
 			stopTimer();
 		}
 		Print(str);
+		inputed = true;
 		PrintFlush(false);
 		#region EM_textbox位置指定拡張
 		// 入力成功した
