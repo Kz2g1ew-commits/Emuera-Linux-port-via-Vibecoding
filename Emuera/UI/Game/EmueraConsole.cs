@@ -426,8 +426,11 @@ internal sealed partial class EmueraConsole : IDisposable
 		StreamWriter logWriter = null;
 		try
 		{
-			using var fs = new FileStream(Program.ExeDir + "time.log", FileMode.OpenOrCreate);
-			logWriter = new StreamWriter(fs);
+			if (Config.DisplayReport)
+			{
+				using var fs = new FileStream(Program.ExeDir + "time.log", FileMode.OpenOrCreate);
+				logWriter = new StreamWriter(fs);
+			}
 		}
 		catch
 		{

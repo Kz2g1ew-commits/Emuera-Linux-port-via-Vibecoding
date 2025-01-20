@@ -136,8 +136,10 @@ static partial class Program
 
 		Application.SetCompatibleTextRenderingDefault(false);
 
+		/*試験的に消してみる
 		ProfileOptimization.SetProfileRoot(exeDir ?? ExeDir);
 		ProfileOptimization.StartProfile("profile");
+		*/
 
 		ConfigData.Instance.LoadConfig();
 		JSONConfig.Load();
