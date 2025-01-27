@@ -47,6 +47,10 @@ internal sealed class ErbLoader
 		//checkScript();の時点でExpressionPerserがProcess.instance.LabelDicを必要とするから。
 		labelDic = labelDictionary;
 		labelDic.Initialized = false;
+		#region EE_ファイル読み込み順拡張
+		var firstDir = Directory.GetDirectories(erbDir, "*#*", Config.Config.SearchSubdirectory ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+		List<string> loadedFiles = new List<string>();
+		#endregion
 		var erbFiles = Config.Config.GetFiles(erbDir, "*.ERB");
 		List<string> isOnlyEvent = [];
 		noError = true;
@@ -54,10 +58,35 @@ internal sealed class ErbLoader
 		try
 		{
 			labelDic.RemoveAll();
+			#region EE_ファイル読み込み順拡張
+			foreach (var dir in firstDir)
+			{
+				var firstErbFiles = Config.Config.GetFiles(dir, "*.ERB");
+				foreach (var erb in firstErbFiles)
+				{
+
+					string filename = erb.Key;
+					string file = erb.Value;
+					loadedFiles.Add(file);
+
+#if DEBUG
+					if (displayReport)
+						output.PrintSystemLine(string.Format(trsl.ElapsedTimeLoad.Text, (DateTime.Now - starttime).TotalMilliseconds, filename));
+#else
+					if (displayReport)
+						output.PrintSystemLine(string.Format(trsl.LoadingFile.Text, filename));
+#endif
+					await Task.Run(() => loadErb(file, filename, isOnlyEvent));
+				};
+			};
+			#endregion
+
 			foreach (var erb in erbFiles)
 			{
 				string filename = erb.Key;
 				string file = erb.Value;
+				if (loadedFiles.Contains(file))
+					continue;
 #if DEBUG
 				if (displayReport)
 					output.PrintSystemLine(string.Format(trsl.ElapsedTimeLoad.Text, (DateTime.Now - starttime).TotalMilliseconds, filename));
