@@ -85,10 +85,13 @@ internal static class HtmlManager
 		Stack<HTMLI> beginStack = new(), endStack = new();
 
 		length = length * Config.FontSize / 2;
-
+		str = Unescape(str);
 		int found = -1, last = 0, delbr = 0;
+		bool content = false;
 		while (true)
 		{
+			string tstr;
+			int tmp;
 			found = str.IndexOf('<', last);
 			if (found != last)
 			{
@@ -98,14 +101,13 @@ internal static class HtmlManager
 				while (arr.Count > 0)
 					if (arr.Peek().isStyleTag) suff += arr.Pop().tag;
 					else arr.Pop();
-				int tmp;
-				string tstr;
 				if (found < 0)
 					tstr = str.Substring(last, str.Length - last);
 				else
 					tstr = str.Substring(last, found - last);
 				tmp = GetSubStr(pref, suff, tstr, ref length);
 				last += tmp + 1;
+				content = true;
 				if (found < 0 || tmp < tstr.Length) break;
 			}
 			else last++;
@@ -122,9 +124,22 @@ internal static class HtmlManager
 				if (fspace < 0) fspace = found;
 				string tag = str.Substring(last, fspace - last);
 				if (tag == "br") { delbr = 1; break; }
-				bool ist = tag == "b" || tag == "i" || tag == "s";
-				beginStack.Push(new HTMLI('<' + str.Substring(last, found - last) + '>', ist));
-				endStack.Push(new HTMLI("</" + tag + '>', ist));
+				//These have their own size and need to be handled separately
+				if (tag is "img" or "shape")
+				{
+					var pos = last - 1;
+					tstr = str.Substring(pos, found-pos+1);
+					tmp = HtmlLength(tstr);
+					length -= tmp;
+					//If there is no space and the line has content, exclude the figure
+					if (length < 0 && content) break;
+				}
+				else
+				{
+					bool ist = tag == "b" || tag == "i" || tag == "s";
+					beginStack.Push(new HTMLI(string.Concat("<", str.AsSpan(last, found - last), ">"), ist));
+					endStack.Push(new HTMLI("</" + tag + '>', ist));
+				}
 			}
 			last = found + 1;
 		}
