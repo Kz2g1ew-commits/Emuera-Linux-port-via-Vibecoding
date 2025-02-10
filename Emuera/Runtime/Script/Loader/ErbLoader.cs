@@ -61,7 +61,7 @@ internal sealed class ErbLoader
 			#region EE_ファイル読み込み順拡張
 			foreach (var dir in firstDir)
 			{
-				var firstErbFiles = Config.Config.GetFiles(dir, "*.ERB");
+				var firstErbFiles = Config.Config.GetFiles(dir, erbDir, "*.ERB");
 				foreach (var erb in firstErbFiles)
 				{
 

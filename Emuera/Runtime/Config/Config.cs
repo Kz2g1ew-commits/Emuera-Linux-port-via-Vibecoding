@@ -371,6 +371,11 @@ internal static class Config
 		return getFiles(rootdir, rootdir, pattern, !SearchSubdirectory, SortWithFilename);
 	}
 
+	public static List<KeyValuePair<string, string>> GetFiles(string dir, string rootdir, string pattern)
+	{
+		return getFiles(dir, rootdir, pattern, !SearchSubdirectory, SortWithFilename);
+	}
+
 	//KeyValuePair<相対パス, 完全パス>のリストを返す。
 	private static List<KeyValuePair<string, string>> getFiles(string dir, string rootdir, string pattern, bool toponly, bool sort)
 	{
