@@ -2380,15 +2380,38 @@ internal sealed partial class EmueraConsole : IDisposable
 
 	//pointing = curLine.GetPointingButton(pointX);
 	breakfor:
-		if ((pointing == null) || (pointing.Generation != lastButtonGeneration))
-			canSelect = false;
-		else if (!pointing.IsButton)
-			canSelect = false;
-		else if (state == ConsoleState.WaitInput && !pointing.IsInteger)
+		#region EE_ボタン判定の改善
+		if (pointingStrings.Count > 0)
 		{
-			if ((inputReq.InputType == InputType.IntValue) || (inputReq.InputType == InputType.IntButton))
-				canSelect = false;
+			foreach (var p in pointingStrings)
+			{
+				if ((p == null) || (p.Generation != lastButtonGeneration))
+					continue;
+				else if (!p.IsButton)
+					continue;
+				else if (state == ConsoleState.WaitInput && !p.IsInteger)
+				{
+					if ((inputReq.InputType == InputType.IntValue) || (inputReq.InputType == InputType.IntButton))
+						continue;
+				}
+				pointing = p;
+				goto end;
+			}
+			canSelect = false;
 		}
+		else
+		{
+			if ((pointing == null) || (pointing.Generation != lastButtonGeneration))
+				canSelect = false;
+			else if (!pointing.IsButton)
+				canSelect = false;
+			else if (state == ConsoleState.WaitInput && !pointing.IsInteger)
+			{
+				if ((inputReq.InputType == InputType.IntValue) || (inputReq.InputType == InputType.IntButton))
+					canSelect = false;
+			}
+		}
+	#endregion
 	end:
 		if (canSelect)
 			select = pointing;
@@ -2464,6 +2487,9 @@ internal sealed partial class EmueraConsole : IDisposable
 		} //if rikaichan.enabled
 	rikaichan_end:
 		#endregion
+
+		if (pointingStrings.Count!= 0)
+			select = select;
 
 		return needRefresh;
 	}
