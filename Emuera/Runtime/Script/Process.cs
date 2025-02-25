@@ -41,6 +41,7 @@ internal sealed partial class Process(EmueraConsole view)
 	public VariableEvaluator VEvaluator { get { return vEvaluator; } }
 	private ExpressionMediator exm;
 	private GameBase gamebase;
+	public GameBase gameBase { get { return gamebase; } }
 	readonly EmueraConsole console = view;
 	private IdentifierDictionary idDic;
 	ProcessState state;

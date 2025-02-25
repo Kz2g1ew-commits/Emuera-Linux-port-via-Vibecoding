@@ -1,4 +1,5 @@
 ﻿using MinorShift.Emuera.Runtime.Config;
+using MinorShift.Emuera.Runtime.Script.Data;
 using MinorShift.Emuera.Runtime.Script.Statements;
 using MinorShift.Emuera.Runtime.Utils;
 using MinorShift.Emuera.Runtime.Utils.EvilMask;
@@ -820,6 +821,12 @@ internal sealed partial class EmueraConsole : IDisposable
 		{
 			builder.AppendLine(trsl.EnvironmentInformation.Text);
 			builder.AppendLine(AssemblyData.EmueraVersionText);
+			builder.AppendLine();
+			builder.AppendLine(trsl.Variant.Text);
+			if (string.IsNullOrEmpty(process.gameBase.ScriptTitle))
+				builder.AppendLine(trsl.NotDefinedGameBase.Text);
+			else
+				builder.AppendLine(process.gameBase.ScriptTitle + " " + process.gameBase.ScriptVersionText);
 
 			var patchVersionsPath = Path.Combine(Program.ExeDir, "patch_versions");
 			if (Directory.Exists(patchVersionsPath))

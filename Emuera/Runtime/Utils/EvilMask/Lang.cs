@@ -1323,6 +1323,8 @@ internal sealed partial class Lang
 		[Managed] public static TranslatableString PatchVersion { get; } = new TranslatableString("# パッチバージョン");
 		[Managed] public static TranslatableString Log { get; } = new TranslatableString("# ログ");
 		[Managed] public static TranslatableString CreateFromCSV { get; } = new TranslatableString("ファイル「{0}」からスプライト「{1}」を生成・・・");
+		[Managed] public static TranslatableString Variant { get; } = new TranslatableString("# バリアント");
+		[Managed] public static TranslatableString NotDefinedGameBase { get; } = new TranslatableString("GameBase未定義");
 		//[Managed] public static TranslatableString { get; } = new TranslatableString("");
 		//[Managed] public static TranslatableString { get; } = new TranslatableString("");
 		//[Managed] public static TranslatableString { get; } = new TranslatableString("");
