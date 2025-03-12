@@ -9,6 +9,7 @@ using System.CommandLine;
 using System.CommandLine.Parsing;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Runtime;
 using System.Windows.Forms;
@@ -47,6 +48,10 @@ static partial class Program
 	{
 		// memo: Shift-JISを扱うためのおまじない
 		System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+
+		CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+		CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+
 		var rootCommand = new RootCommand("Emuera");
 
 		#region eee_カレントディレクトリー
