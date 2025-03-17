@@ -351,6 +351,7 @@ namespace MinorShift.Emuera.Runtime.Utils.PluginSystem
 			RESULTS = new GlobalString1dWrapper(expressionMediator.VEvaluator.VariableData.GetVarTokenDic()["RESULTS"], expressionMediator, VariableCode.RESULTS);
 			GLOBALS = new GlobalString1dWrapper(expressionMediator.VEvaluator.VariableData.GetVarTokenDic()["GLOBALS"], expressionMediator, VariableCode.GLOBALS);
 
+			NO = new GlobalConstInt1dWrapper(expressionMediator.VEvaluator.VariableData.GetVarTokenDic()["NO"], expressionMediator, VariableCode.NO);
 			ITEMPRICE = new GlobalConstInt1dWrapper(expressionMediator.VEvaluator.VariableData.GetVarTokenDic()["ITEMPRICE"], expressionMediator, VariableCode.ITEMPRICE);
 
 			ABLNAME = new GlobalConstString1dWrapper(expressionMediator.VEvaluator.VariableData.GetVarTokenDic()["ABLNAME"], expressionMediator, VariableCode.ABLNAME);
@@ -436,7 +437,8 @@ namespace MinorShift.Emuera.Runtime.Utils.PluginSystem
 		public GlobalString1dWrapper STR;
 		public GlobalString1dWrapper RESULTS;
 		public GlobalString1dWrapper GLOBALS;
-
+		
+		public GlobalConstInt1dWrapper NO;
 		public GlobalConstInt1dWrapper ITEMPRICE;
 
 		public GlobalConstString1dWrapper ABLNAME;
