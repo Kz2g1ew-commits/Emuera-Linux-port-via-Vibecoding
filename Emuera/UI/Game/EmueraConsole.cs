@@ -1026,7 +1026,7 @@ internal sealed partial class EmueraConsole : IDisposable
 					{
 						foreach (ConsoleButtonString button in line.Buttons)
 						{
-							if (button.Generation == lastButtonGeneration && (button.Input.ToString() == str || button.Inputs == str))
+							if (button.Generation == lastButtonGeneration && ((button.IsInteger && button.Input.ToString() == str) || button.Inputs == str))
 							{
 								process.InputString(str);
 								goto loopendstr;
