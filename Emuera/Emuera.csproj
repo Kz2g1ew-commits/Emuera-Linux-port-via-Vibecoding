@@ -24,7 +24,7 @@
         <RootNamespace>MinorShift.Emuera</RootNamespace>
         <ApplicationManifest>emuera.manifest</ApplicationManifest>
         <Version>1.824.0</Version>
-        <InformationalVersion>1.824+v22+EMv18+EEv53</InformationalVersion>
+        <InformationalVersion>1.824+v22+EMv18+EEv53fix</InformationalVersion>
         <Copyright>Copyright (C) 2008- MinorShift, 妊）|дﾟ)の中の人</Copyright>
     </PropertyGroup>
 
@@ -50,19 +50,18 @@
         <Optimize>true</Optimize>
     </PropertyGroup>
 
+    <ItemGroup Condition="$(Configuration.Contains('NAudio'))">
+      <Compile Remove="Runtime/Utils/Sound.WMP.cs" />
+      <PackageReference Include="NAudio.Core" Version="2.2.1" />
+      <PackageReference Include="NAudio.Wasapi" Version="2.2.1" />
+      <PackageReference Include="NAudio.Vorbis" Version="1.5.0" />
+    </ItemGroup>
 
     <Choose>
         <When Condition="$(Configuration.Contains('NAudio'))">
             <PropertyGroup>
                 <InformationalVersion>$(InformationalVersion) NAudio</InformationalVersion>
             </PropertyGroup>
-
-            <ItemGroup Condition="$(Configuration.Contains('NAudio'))">
-                <Compile Remove="Runtime/Utils/Sound.WMP.cs" />
-                <PackageReference Include="NAudio.Core" Version="2.2.1" />
-                <PackageReference Include="NAudio.Wasapi" Version="2.2.1" />
-                <PackageReference Include="NAudio.Vorbis" Version="1.5.0" />
-            </ItemGroup>
         </When>
         <Otherwise>
             <ItemGroup>
