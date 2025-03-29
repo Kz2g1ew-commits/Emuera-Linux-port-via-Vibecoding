@@ -189,17 +189,25 @@ static class AppContents
 	// used for clean ConstImage from memory
 	static public void UnloadTempLoadedConstImageNames()
 	{
-		foreach (ConstImage img in tempLoadedConstImages)
-			img.Dispose();
-		tempLoadedConstImages.Clear();
+		//EE_画像読み込みスレッドの最適化
+		lock (tempLoadedConstImages)
+		{
+			foreach (ConstImage img in tempLoadedConstImages)
+				img.Dispose();
+			tempLoadedConstImages.Clear();
+		}
 	}
 	// used for clean GraphicsImage from memory
 	static public void UnloadTempLoadedGraphicsImageNames()
 	{
-		foreach (GraphicsImage img in tempLoadedGraphicsImages)
-			if (img.useImgList)
-				img.UnLoad();
-		tempLoadedGraphicsImages.Clear();
+		//EE_画像読み込みスレッドの最適化
+		lock (tempLoadedGraphicsImages)
+		{
+			foreach (GraphicsImage img in tempLoadedGraphicsImages)
+				if (img.useImgList)
+					img.UnLoad();
+			tempLoadedGraphicsImages.Clear();
+		}
 	}
 	/// <summary>
 	/// resourcesフォルダ中のcsvの1行を読んで新しいリソースを作る(or既存のアニメーションスプライトに1フレーム追加する)
