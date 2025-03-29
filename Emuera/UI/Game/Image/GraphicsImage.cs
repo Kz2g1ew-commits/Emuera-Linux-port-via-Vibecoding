@@ -85,7 +85,8 @@ internal sealed class GraphicsImage : AbstractImage
 		size = new Size(x, y);
 		g = Graphics.FromImage(RealBitmap);
 		drawImgList = [];
-		AppContents.tempLoadedGraphicsImages.Add(this);
+		lock (AppContents.tempLoadedGraphicsImages)
+			AppContents.tempLoadedGraphicsImages.Add(this);
 	}
 	internal void GCreateFromF(Bitmap bmp, bool useGDI)
 	{
@@ -743,7 +744,8 @@ internal sealed class GraphicsImage : AbstractImage
 		foreach (Tuple<ASprite, Rectangle> tuple in drawImgList)
 			tuple.Item1.GraphicsDraw(g, tuple.Item2);
 
-		AppContents.tempLoadedGraphicsImages.Add(this);
+		lock (AppContents.tempLoadedGraphicsImages)
+			AppContents.tempLoadedGraphicsImages.Add(this);
 		return;
 	}
 

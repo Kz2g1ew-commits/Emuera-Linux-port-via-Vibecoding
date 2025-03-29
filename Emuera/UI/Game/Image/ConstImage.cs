@@ -28,7 +28,8 @@ internal sealed class ConstImage : AbstractImage
 			Filepath = filepath;
 			Width = RealBitmap.Width;
 			Height = RealBitmap.Height;
-			AppContents.tempLoadedConstImages.Add(this);
+			lock (AppContents.tempLoadedConstImages)
+				AppContents.tempLoadedConstImages.Add(this);
 			RealIsCreated = true;
 			return;
 		}
@@ -50,7 +51,8 @@ internal sealed class ConstImage : AbstractImage
 			{
 				return;
 			}
-			AppContents.tempLoadedConstImages.Add(this);
+			lock (AppContents.tempLoadedConstImages)
+				AppContents.tempLoadedConstImages.Add(this);
 		}
 		catch
 		{
