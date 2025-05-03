@@ -5,6 +5,7 @@ using MinorShift.Emuera.Runtime.Utils;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
 using trerror = MinorShift.Emuera.Runtime.Utils.EvilMask.Lang.Error;
@@ -313,7 +314,7 @@ internal static partial class LexicalAnalyzer
 				break;
 			}
 		}
-		return double.Parse(st.SubstringROS(start, st.CurrentPosition - start));
+		return double.Parse(st.SubstringROS(start, st.CurrentPosition - start), CultureInfo.InvariantCulture);
 	}
 
 	/// <summary>
