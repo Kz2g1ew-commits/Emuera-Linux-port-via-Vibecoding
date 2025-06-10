@@ -708,6 +708,8 @@ internal sealed class ConstantData
 				relationDic.Add(tmpl.Callname, (int)tmpl.No);
 			if (!string.IsNullOrEmpty(tmpl.Nickname) && !relationDic.ContainsKey(tmpl.Nickname))
 				relationDic.Add(tmpl.Nickname, (int)tmpl.No);
+			if (!string.IsNullOrEmpty(tmpl.Mastername) && !relationDic.ContainsKey(tmpl.Mastername))
+				relationDic.Add(tmpl.Mastername, (int)tmpl.No);
 		}
 	}
 	#region EE_ERD
