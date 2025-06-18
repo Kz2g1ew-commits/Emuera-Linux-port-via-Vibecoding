@@ -64,7 +64,7 @@ class ConsoleDivPart : AConsoleDisplayNode
 		Depth = depth;
 		IsRelative = isRelative;
 		
-		ShiftChildrenX();
+		ShiftChildrenX(PointX + xOffset + divXOffset);
 	}
 	int pointX;
 	int xOffset;
@@ -78,11 +78,12 @@ class ConsoleDivPart : AConsoleDisplayNode
 		get { return pointX; }
 		set
 		{
+			var diff = value - pointX;
 			pointX = value;
 			#region EE_div各要素の修正
 			//foreach (var child in children)
 			//    child.ShiftPositionX(value + xOffset + divXOffset);
-			ShiftChildrenX();
+			ShiftChildrenX(diff);
 			#endregion
 		}
 	}
@@ -176,13 +177,13 @@ class ConsoleDivPart : AConsoleDisplayNode
 		graph.ResetClip();
 	}
 
-	private void ShiftChildrenX()
-    {
-        foreach (var child in children)
-            child.ShiftPositionX(PointX + xOffset + divXOffset);
-    }
+    private void ShiftChildrenX(int diff)
+	{
+		foreach (var child in children)
+			child.ShiftPositionX(diff);
+	}
 
-public override void SetWidth(StringMeasure sm, float subPixel)
+	public override void SetWidth(StringMeasure sm, float subPixel)
 	{
 	}
 

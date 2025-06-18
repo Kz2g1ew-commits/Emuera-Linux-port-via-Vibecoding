@@ -380,6 +380,8 @@ enum FunctionCode
 	SKIPLOG,
 	BINPUT,
 	BINPUTS,
+	ONEBINPUT,
+	ONEBINPUTS,
 	#endregion
 
 	#region EM

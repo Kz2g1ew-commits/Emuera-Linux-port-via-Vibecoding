@@ -2419,6 +2419,202 @@ internal sealed partial class FunctionIdentifier
 	}
 	#endregion
 
+	#region EE_ONEBINPUT
+	private sealed class ONEBINPUT_Instruction : AInstruction
+	{
+		public ONEBINPUT_Instruction()
+		{
+			ArgBuilder = ArgumentParser.GetArgumentBuilder(FunctionArgType.SP_INPUT);
+			flag = IS_PRINT | IS_INPUT;
+		}
+
+		public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
+		{
+			//実行時点で描画されてないときがあるのでやっておく
+			if (!exm.Console.PrintBuffer.IsEmpty)
+				exm.Console.NewLine();
+			exm.Console.RefreshStrings(true);
+			SpInputsArgument arg = (SpInputsArgument)func.Argument;
+			InputRequest req = new()
+			{
+				InputType = InputType.IntButton,
+				OneInput = true
+			};
+			if (arg.Def != null)
+			{
+				long def;
+				def = arg.Def.GetIntValue(exm);
+				req.HasDefValue = true;
+				req.DefIntValue = def;
+			}
+			if (arg.Mouse != null)
+			{
+				req.MouseInput = arg.Mouse.GetIntValue(exm) != 0;
+			}
+			exm.Console.Window.ApplyTextBoxChanges();
+			int count = 0;
+			if (arg.CanSkip != null && GlobalStatic.Console.MesSkip)
+			{
+				if (arg.Mouse.GetIntValue(exm) == 0)
+					GlobalStatic.VEvaluator.RESULT = arg.Def.GetIntValue(exm);
+				else
+					GlobalStatic.VEvaluator.RESULT_ARRAY[1] = arg.Def.GetIntValue(exm);
+			}
+			else
+			{
+				foreach (ConsoleDisplayLine line in Enumerable.Reverse(exm.Console.DisplayLineList).ToList())
+				{
+					foreach (ConsoleButtonString button in line.Buttons)
+					{
+						if (button.Generation != 0 && button.Generation != exm.Console.LastButtonGeneration)
+							goto loopep;
+						else if (button.IsButton && button.IsInteger)
+							count++;
+					}
+				}
+			loopep:
+				List<AConsoleDisplayNode> ep;
+				foreach (var value in exm.Console.EscapedParts)
+				{
+					ep = value.Value;
+					foreach (var part in ep)
+					{
+						if (part is ConsoleDivPart div)
+						{
+							foreach (ConsoleDisplayLine line in Enumerable.Reverse(div.Children).ToList())
+							{
+								foreach (ConsoleButtonString button in line.Buttons)
+								{
+									if (button.IsButton && button.IsInteger)
+									{
+										count++;
+										goto loopend;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		loopend:
+			if (count == 0)
+			{
+				if (arg.Def == null)
+					throw new CodeEE(string.Format(trerror.NothingButtonBinput.Text, "ONEBINPUT"));
+				else
+				{
+					GlobalStatic.VEvaluator.RESULT = arg.Def.GetIntValue(exm);
+					return;
+				}
+			}
+			exm.Console.WaitInput(req);
+		}
+	}
+	private sealed class ONEBINPUTS_Instruction : AInstruction
+	{
+		public ONEBINPUTS_Instruction()
+		{
+			ArgBuilder = ArgumentParser.GetArgumentBuilder(FunctionArgType.SP_INPUTS);
+			flag = IS_PRINT | IS_INPUT;
+		}
+
+		public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
+		{
+			//ExpressionArgument arg = (ExpressionArgument)func.Argument;
+			//InputRequest req = new InputRequest();
+			//req.InputType = InputType.StrValue;
+			//if (arg.Term != null)
+			//{
+			//	string def;
+			//	if (arg.IsConst)
+			//		def = arg.ConstStr;
+			//	else
+			//		def = arg.Term.GetStrValue(exm);
+			//	req.HasDefValue = true;
+			//	req.DefStrValue = def;
+			//}
+			//実行時点で描画されてないときがあるのでやっておく
+			if (!exm.Console.PrintBuffer.IsEmpty)
+				exm.Console.NewLine();
+			exm.Console.RefreshStrings(true);
+			SpInputsArgument arg = (SpInputsArgument)func.Argument;
+			InputRequest req = new()
+			{
+				InputType = InputType.StrButton,
+				OneInput = true
+			};
+			if (arg.Def != null)
+			{
+				string def;
+				def = arg.Def.GetStrValue(exm);
+				req.HasDefValue = true;
+				req.DefStrValue = def;
+			}
+			if (arg.Mouse != null)
+			{
+				req.MouseInput = arg.Mouse.GetIntValue(exm) != 0;
+			}
+			exm.Console.Window.ApplyTextBoxChanges();
+			int count = 0;
+			if (arg.CanSkip != null && GlobalStatic.Console.MesSkip)
+			{
+				if (arg.Mouse.GetIntValue(exm) == 0)
+					GlobalStatic.VEvaluator.RESULTS = arg.Def.GetStrValue(exm);
+				else
+					GlobalStatic.VEvaluator.RESULTS_ARRAY[1] = arg.Def.GetStrValue(exm);
+			}
+			else
+			{
+				foreach (ConsoleDisplayLine line in Enumerable.Reverse(exm.Console.DisplayLineList).ToList())
+				{
+					foreach (ConsoleButtonString button in line.Buttons)
+					{
+						if (button.Generation != 0 && button.Generation != exm.Console.LastButtonGeneration)
+							goto loopep;
+						else if (button.IsButton)
+							count++;
+					}
+				}
+			loopep:
+				List<AConsoleDisplayNode> ep;
+				foreach (var value in exm.Console.EscapedParts)
+				{
+					ep = value.Value;
+					foreach (var part in ep)
+					{
+						if (part is ConsoleDivPart div)
+						{
+							foreach (ConsoleDisplayLine line in Enumerable.Reverse(div.Children).ToList())
+							{
+								foreach (ConsoleButtonString button in line.Buttons)
+								{
+									if (button.IsButton)
+									{
+										count++;
+										goto loopend;
+									}
+								}
+							}
+						}
+					}
+				}
+
+			}
+		loopend:
+			if (count == 0)
+			{
+				if (arg.Def == null)
+					throw new CodeEE(string.Format(trerror.NothingButtonBinput.Text, "ONEBINPUTS"));
+				else
+				{
+					GlobalStatic.VEvaluator.RESULTS = arg.Def.GetStrValue(exm);
+					return;
+				}
+			}
+			exm.Console.WaitInput(req);
+		}
+	}
+	#endregion
 	#region EM_DT
 	private sealed class DT_COLUMN_OPTIONS_Instruction : AInstruction
 	{
