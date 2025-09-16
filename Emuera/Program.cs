@@ -75,6 +75,8 @@ static partial class Program
 			name: "-GenLang",
 			description: "言語ファイルテンプレ生成"
 		);
+		genLangOption.AddAlias("-genlang");
+		genLangOption.AddAlias("-GENLANG");
 		rootCommand.AddOption(genLangOption);
 
 		var filesArg = new Argument<string[]>(
