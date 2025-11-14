@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using System.ComponentModel;
 
 namespace MinorShift.Emuera.Forms
 {
@@ -66,11 +67,13 @@ namespace MinorShift.Emuera.Forms
 			button1.Text = Lang.UI.DebugDialog.Close.Text;
 		}
 
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 		public string ConsoleText
 		{
 			get { return textBoxConsole.Text; }
 			set { textBoxConsole.Text = value; }
 		}
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 		public string TraceText
 		{
 			get { return textBoxTrace.Text; }

@@ -14,6 +14,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using trmb = MinorShift.Emuera.Runtime.Utils.EvilMask.Lang.MessageBox;
+using System.ComponentModel;
 
 namespace MinorShift.Emuera.Forms
 {
@@ -172,6 +173,7 @@ namespace MinorShift.Emuera.Forms
 		TextBoxInfo textBoxInfo, nextTextBoxInfo;
 		enum TextBoxState { Unchanged, WatingToChange, Changed, ScrollBack };
 		TextBoxState textBoxState;
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 		public bool TextBoxIgnoreScrollBarChanges { get; set; }
 		public bool TextBoxPosChanged { get { return textBoxState == TextBoxState.Changed; } }
 		public bool TextBoxPosScrolledBack { get { return textBoxState == TextBoxState.ScrollBack; } }

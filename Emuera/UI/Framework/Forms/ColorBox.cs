@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using System.ComponentModel;
 
 namespace MinorShift.Emuera.Forms
 {
@@ -10,11 +11,13 @@ namespace MinorShift.Emuera.Forms
 		{
 			InitializeComponent();
 		}
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 		public Color SelectingColor
 		{
 			get { return pictureBox1.BackColor; }
 			set { pictureBox1.BackColor = value; }
 		}
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 		public string ButtonText
 		{
 			get { return button.Text; }

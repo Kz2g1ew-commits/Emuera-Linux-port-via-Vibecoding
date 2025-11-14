@@ -2,20 +2,17 @@
 
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net8.0-windows</TargetFramework>
+        <TargetFramework>net10.0-windows</TargetFramework>
         <RuntimeIdentifiers>win-x64;win-x86</RuntimeIdentifiers>
         <Platforms>x64;x86</Platforms>
         <UseWindowsForms>true</UseWindowsForms>
         <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
-        <LangVersion>12.0</LangVersion>
         <Nullable>disable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Configurations>Debug;Release;Debug-NAudio;Release-NAudio</Configurations>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <DebugSymbols>true</DebugSymbols>
         <AnalysisMode>Minimum</AnalysisMode>
-
-        <TieredCompilation>false</TieredCompilation>
-
     </PropertyGroup>
 
     <PropertyGroup>
@@ -24,7 +21,7 @@
         <RootNamespace>MinorShift.Emuera</RootNamespace>
         <ApplicationManifest>emuera.manifest</ApplicationManifest>
         <Version>1.824.0</Version>
-        <InformationalVersion>1.824+v22+EMv18+EEv53fix</InformationalVersion>
+        <InformationalVersion>1.824+v24+EMv18+EEv53fix</InformationalVersion>
         <Copyright>Copyright (C) 2008- MinorShift, 妊）|дﾟ)の中の人</Copyright>
     </PropertyGroup>
 
@@ -36,34 +33,37 @@
         <PublishTrimmed>false</PublishTrimmed>
         <SelfContained>false</SelfContained>
         <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
-        <TieredCompilation>false</TieredCompilation>
+        <TieredCompilation>true</TieredCompilation>
       <!--
         <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
         -->
     </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Debug-NAudio' ">
-        <DefineConstants>DEBUG</DefineConstants>
-        <DebugSymbols>true</DebugSymbols>
-        <Optimize>false</Optimize>
-    </PropertyGroup>
-
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release-NAudio' ">
-        <Optimize>true</Optimize>
-    </PropertyGroup>
-
-    <ItemGroup Condition="$(Configuration.Contains('NAudio'))">
-      <Compile Remove="Runtime/Utils/Sound.WMP.cs" />
-      <PackageReference Include="NAudio.Core" Version="2.2.1" />
-      <PackageReference Include="NAudio.Wasapi" Version="2.2.1" />
-      <PackageReference Include="NAudio.Vorbis" Version="1.5.0" />
-    </ItemGroup>
+    <Choose>
+        <When Condition="$(Configuration.Contains('Debug'))">
+            <PropertyGroup>
+                <DefineConstants>DEBUG</DefineConstants>
+                <Optimize>false</Optimize>
+            </PropertyGroup>
+        </When>
+        <When Condition="$(Configuration.Contains('Release'))">
+            <PropertyGroup>
+                <Optimize>true</Optimize>
+            </PropertyGroup>
+        </When>
+    </Choose>
 
     <Choose>
         <When Condition="$(Configuration.Contains('NAudio'))">
             <PropertyGroup>
                 <InformationalVersion>$(InformationalVersion) NAudio</InformationalVersion>
             </PropertyGroup>
+            <ItemGroup>
+              <Compile Remove="Runtime/Utils/Sound.WMP.cs" />
+              <PackageReference Include="NAudio.Core" Version="2.2.1" />
+              <PackageReference Include="NAudio.Wasapi" Version="2.2.1" />
+              <PackageReference Include="NAudio.Vorbis" Version="1.5.0" />
+            </ItemGroup>
         </When>
         <Otherwise>
             <ItemGroup>
@@ -81,7 +81,7 @@
             </ItemGroup>
         </Otherwise>
     </Choose>
-    
+
     <ItemGroup>
       <Compile Remove="artifacts\**" />
       <EmbeddedResource Remove="artifacts\**" />
@@ -105,7 +105,7 @@
             <LastGenOutput>Settings.Designer.cs</LastGenOutput>
         </None>
     </ItemGroup>
-    
+
     <Choose>
         <When Condition="'$(Platform)' == 'x64'">
             <ItemGroup>
@@ -132,7 +132,7 @@
             </ItemGroup>
         </When>
     </Choose>
-    
+
     <ItemGroup>
       <PackageReference Include="Enums.NET" Version="4.0.2" />
       <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
