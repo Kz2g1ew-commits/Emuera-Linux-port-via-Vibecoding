@@ -34,6 +34,7 @@
         <SelfContained>false</SelfContained>
         <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
         <TieredCompilation>true</TieredCompilation>
+        <ServerGarbageCollection>true</ServerGarbageCollection>
       <!--
         <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
         -->

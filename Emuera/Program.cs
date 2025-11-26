@@ -55,8 +55,6 @@ static partial class Program
 		var rootCommand = new RootCommand("Emuera");
 
 		#region eee_カレントディレクトリー
-		WorkingDir = AssemblyData.WorkingDir;
-
 		var exeDirOption = new Option<string>(
 			name: "--ExeDir",
 			description: "与えられたフォルダのEraを起動します"
@@ -97,7 +95,7 @@ static partial class Program
 		}
 		else
 		{
-			SetDirPaths(WorkingDir);
+			SetDirPaths(AssemblyData.WorkingDir);
 		}
 
 		#endregion
@@ -366,7 +364,6 @@ static partial class Program
 	/// 実行ファイルのディレクトリ。最後にPath.DirectorySeparatorCharを付けたstring
 	/// </summary>
 	public static string ExeDir { get; private set; }
-	public static string WorkingDir { get; private set; }
 	#endregion
 	public static string CsvDir { get; private set; }
 	public static string ErbDir { get; private set; }
