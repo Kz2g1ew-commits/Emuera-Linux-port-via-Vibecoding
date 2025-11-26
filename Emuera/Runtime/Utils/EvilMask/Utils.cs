@@ -220,7 +220,7 @@ internal sealed class Utils
 		{
 			return null;
 		}
-		return path;
+		return Path.Combine(Program.ExeDir + path);
 	}
 	public static void MixedNum4ToInt4(MixedNum[] mnums, ref int[] nums)
 	{

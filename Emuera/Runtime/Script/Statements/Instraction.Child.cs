@@ -1245,7 +1245,7 @@ internal sealed partial class FunctionIdentifier
 			var manager = PluginManager.GetInstance();
 			if (!manager.HasMethod(arg.ConstStr))
 			{
-				ParserMediator.Warn(string.Format("No native method {0} found", arg.ConstStr), func, 2, true, false);
+				ParserMediator.Warn(string.Format(trerror.MethodNotFound.Text, arg.ConstStr), func, 2, true, false);
 				return;
 			}
 
@@ -2705,7 +2705,7 @@ internal sealed partial class FunctionIdentifier
 			else
 				datFilename = soundArg.Str.GetStrValue(exm);
 			int repeat = soundArg.Opt != null ? (int)Math.Max(soundArg.Opt.GetIntValue(exm), 1) : 1;
-			string filepath = Path.GetFullPath(".\\sound\\" + datFilename);
+			string filepath = Path.GetFullPath(Program.SoundDir + datFilename);
 			try
 			{
 				if (File.Exists(filepath))
@@ -2768,7 +2768,7 @@ internal sealed partial class FunctionIdentifier
 				datFilename = arg.ConstStr;
 			else
 				datFilename = arg.Term.GetStrValue(exm);
-			string filepath = Path.GetFullPath(".\\sound\\" + datFilename);
+			string filepath = Path.GetFullPath(Program.SoundDir + datFilename);
 
 			try
 			{

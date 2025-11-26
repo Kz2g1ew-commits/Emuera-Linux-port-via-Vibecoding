@@ -61,6 +61,8 @@ static partial class Program
 			name: "--ExeDir",
 			description: "与えられたフォルダのEraを起動します"
 		);
+		exeDirOption.AddAlias("-exedir");
+		exeDirOption.AddAlias("-EXEDIR");
 		rootCommand.AddOption(exeDirOption);
 
 		var debugModeOption = new Option<bool>(
@@ -87,11 +89,15 @@ static partial class Program
 
 		var result = rootCommand.Parse(args);
 
-		//実行ディレクトリが引数で与えられた場合
+		//実行ディレクトリが引数で与えられた場合t
 		var exeDir = result.GetValueForOption(exeDirOption);
 		if (exeDir != null)
 		{
 			SetDirPaths(exeDir);
+		}
+		else
+		{
+			SetDirPaths(WorkingDir);
 		}
 
 		#endregion
@@ -150,11 +156,13 @@ static partial class Program
 		JSONConfig.Load();
 
 		//WMPも終了しておく
+		/*
 		FunctionIdentifier.bgm.close();
 		for (int i = 0; i < FunctionIdentifier.sound.Length; i++)
 		{
 			if (FunctionIdentifier.sound[i] != null) FunctionIdentifier.sound[i].close();
 		}
+		*/
 
 		#region EM_私家版_Emuera多言語化改造
 		Lang.LoadLanguageFiles();
@@ -334,6 +342,9 @@ static partial class Program
 		DebugDir = Path.Combine(ExeDir, "debug") + Path.DirectorySeparatorChar;
 		DatDir = Path.Combine(ExeDir, "dat") + Path.DirectorySeparatorChar;
 		ContentDir = Path.Combine(ExeDir, "resources") + Path.DirectorySeparatorChar;
+		#region EE_PLAYSOUND系
+		SoundDir = Path.Combine(ExeDir, "sound") + Path.DirectorySeparatorChar;
+		#endregion
 		#region EE_フォントファイル対応
 		FontDir = Path.Combine(ExeDir, "font") + Path.DirectorySeparatorChar;
 		#endregion
@@ -364,7 +375,7 @@ static partial class Program
 	public static string ContentDir { get; private set; }
 	public static string ExeName { get; private set; }
 	#region EE_PLAYSOUND系
-	//public static string? MusicDir { get; private set; }
+	public static string SoundDir { get; private set; }
 	#endregion
 	#region EE_フォントファイル対応
 	public static string FontDir { get; private set; }
