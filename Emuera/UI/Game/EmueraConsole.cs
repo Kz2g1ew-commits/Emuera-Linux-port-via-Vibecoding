@@ -1800,16 +1800,19 @@ internal sealed partial class EmueraConsole : IDisposable
 			if (!string.IsNullOrEmpty(title))
 			{
 				title = title.Replace("<br>", Environment.NewLine);
-				if (tooltip_duration == 0 || window.ToolTip.OwnerDraw == true)
-				{
-					window.ToolTip.SetToolTip(window.MainPicBox, title);
-				}
-				else
-				{
+				//if (tooltip_duration == 0 || window.ToolTip.OwnerDraw == true)
+				//{
+				//	//window.ToolTip.SetToolTip(window.MainPicBox, title);
+				//	Point mousePos = window.MainPicBox.PointToClient(Control.MousePosition);
+				//	window.ToolTip.Show(title, window.MainPicBox, new Point(mousePos.X + 30, mousePos.Y - 18));
+				//}
+				//else
+				//{
+				Point mousePos = window.MainPicBox.PointToClient(Control.MousePosition);
+				Point p = new Point(mousePos.X + 2, mousePos.Y + Cursor.Current.Size.Height);
 					if (window.ToolTip.InitialDelay == 0)
 					{
-						Point mousePos = window.MainPicBox.PointToClient(Control.MousePosition);
-						window.ToolTip.Show(title, window.MainPicBox, new Point(mousePos.X, mousePos.Y + 18), tooltip_duration);
+						window.ToolTip.Show(title, window.MainPicBox, p, tooltip_duration);
 					}
 					else
 					{
@@ -1823,13 +1826,12 @@ internal sealed partial class EmueraConsole : IDisposable
 								MoveMouse(GetMousePosition());
 								if (lastPointingString == savedPointingString)
 								{
-									Point mousePos = window.MainPicBox.PointToClient(Control.MousePosition);
-									window.ToolTip.Show(title, window.MainPicBox, new Point(mousePos.X, mousePos.Y + 18), tooltip_duration);
+									window.ToolTip.Show(title, window.MainPicBox, p, tooltip_duration);
 								}
 							}, null);
 						});
 					}
-				}
+				//}
 				tooltipUsed = true;
 			}
 			lastPointingString = pointingString;
