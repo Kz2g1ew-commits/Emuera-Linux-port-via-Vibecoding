@@ -242,6 +242,11 @@ internal static partial class FunctionMethodCreator
 			try
 			{
 				files = Directory.EnumerateFiles(dir, pattern, option).ToArray();
+				for (int i = 0; i < files.Length; i++)
+				{
+					files[i] = Path.GetRelativePath(dir, files[i]);
+				}
+
 			}
 			catch
 			{
