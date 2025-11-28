@@ -1810,6 +1810,8 @@ internal sealed partial class EmueraConsole : IDisposable
 				//{
 				Point mousePos = window.MainPicBox.PointToClient(Control.MousePosition);
 				Point p = new Point(mousePos.X + 2, mousePos.Y + Cursor.Current.Size.Height);
+				Point absoluteP = Cursor.Position;
+				if (absoluteP.Y + tooltip_size.Height > Screen.FromPoint(mousePos).WorkingArea.Height) { p.Y -= Cursor.Current.Size.Height*2; }
 					if (window.ToolTip.InitialDelay == 0)
 					{
 						window.ToolTip.Show(title, window.MainPicBox, p, tooltip_duration);
@@ -1884,7 +1886,7 @@ internal sealed partial class EmueraConsole : IDisposable
 			TextRenderer.DrawText(e.Graphics, e.ToolTipText, f, e.Bounds, window.ToolTip.ForeColor, window.ToolTip.BackColor, tooltip_format);
 		}
 	}
-
+	Size tooltip_size;
 	private void ToolTip_Popup(object sender, PopupEventArgs e)
 	{
 		if (tooltip_img && int.TryParse((sender as ToolTip).GetToolTip(e.AssociatedControl), out int i))
@@ -1909,6 +1911,7 @@ internal sealed partial class EmueraConsole : IDisposable
 	foundfont:
 		var size = TextRenderer.MeasureText((sender as ToolTip).GetToolTip(e.AssociatedControl), f, new Size(int.MaxValue, int.MaxValue), tooltip_format);
 		e.ToolTipSize = new Size(size.Width, size.Height);
+		tooltip_size = e.ToolTipSize;
 	}
 
 	public void CustomToolTip(bool b)
