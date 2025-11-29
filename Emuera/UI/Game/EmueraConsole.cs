@@ -1832,7 +1832,10 @@ internal sealed partial class EmueraConsole : IDisposable
 									Point p = new Point(mousePos.X + 2, mousePos.Y + Cursor.Current.Size.Height);
 									Point absoluteP = Cursor.Position;
 									if (absoluteP.Y + tooltip_size.Height > Screen.FromPoint(mousePos).WorkingArea.Height) p.Y -= Cursor.Current.Size.Height * 2; 
-									window.ToolTip.Show(title, window.MainPicBox, p, tooltip_duration);
+									if (tooltip_duration == 0)
+										window.ToolTip.Show(title, window.MainPicBox, p);
+									else
+										window.ToolTip.Show(title, window.MainPicBox, p, tooltip_duration);
 								}
 							}, null);
 						});

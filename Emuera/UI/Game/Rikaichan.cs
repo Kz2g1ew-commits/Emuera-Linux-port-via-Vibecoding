@@ -44,7 +44,7 @@ partial class Rikaichan
 		enabled = Config.RikaiEnabled;
 		if (!enabled) return;
 
-		var rikaiFilename = Program.ExeDir + Config.RikaiFilename;
+		var rikaiFilename = Path.Combine(Program.ExeDir, Config.RikaiFilename);
 
 		if (!File.Exists(rikaiFilename))
 		{
