@@ -1800,6 +1800,7 @@ internal sealed partial class EmueraConsole : IDisposable
 			if (!string.IsNullOrEmpty(title))
 			{
 				title = title.Replace("<br>", Environment.NewLine);
+				#region EE_ツールチップ拡張での位置調整
 				//if (tooltip_duration == 0 || window.ToolTip.OwnerDraw == true)
 				//{
 				//	//window.ToolTip.SetToolTip(window.MainPicBox, title);
@@ -1808,32 +1809,36 @@ internal sealed partial class EmueraConsole : IDisposable
 				//}
 				//else
 				//{
-				Point mousePos = window.MainPicBox.PointToClient(Control.MousePosition);
-				Point p = new Point(mousePos.X + 2, mousePos.Y + Cursor.Current.Size.Height);
-				Point absoluteP = Cursor.Position;
-				if (absoluteP.Y + tooltip_size.Height > Screen.FromPoint(mousePos).WorkingArea.Height) { p.Y -= Cursor.Current.Size.Height*2; }
-					if (window.ToolTip.InitialDelay == 0)
-					{
-						window.ToolTip.Show(title, window.MainPicBox, p, tooltip_duration);
-					}
-					else
-					{
-						System.Threading.SynchronizationContext context = System.Threading.SynchronizationContext.Current;
+				//if (window.ToolTip.InitialDelay == 0)
+				//{
+				//	window.ToolTip.Show(title, window.MainPicBox, p, tooltip_duration);
+				//}
+				//else
+				//{
+				System.Threading.SynchronizationContext context = System.Threading.SynchronizationContext.Current;
 						Task.Run(async () =>
 						{
 							ConsoleButtonString savedPointingString = pointingString;
-							await Task.Delay(window.ToolTip.InitialDelay);
+							if (window.ToolTip.InitialDelay == 0)
+								await Task.Delay(500);
+							else
+								await Task.Delay(window.ToolTip.InitialDelay);
 							context.Post((state) =>
 							{
 								MoveMouse(GetMousePosition());
 								if (lastPointingString == savedPointingString)
 								{
+									Point mousePos = window.MainPicBox.PointToClient(Control.MousePosition);
+									Point p = new Point(mousePos.X + 2, mousePos.Y + Cursor.Current.Size.Height);
+									Point absoluteP = Cursor.Position;
+									if (absoluteP.Y + tooltip_size.Height > Screen.FromPoint(mousePos).WorkingArea.Height) p.Y -= Cursor.Current.Size.Height * 2; 
 									window.ToolTip.Show(title, window.MainPicBox, p, tooltip_duration);
 								}
 							}, null);
 						});
-					}
 				//}
+				//}
+				#endregion
 				tooltipUsed = true;
 			}
 			lastPointingString = pointingString;
