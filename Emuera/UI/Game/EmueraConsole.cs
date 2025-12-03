@@ -1819,9 +1819,9 @@ internal sealed partial class EmueraConsole : IDisposable
 						Task.Run(async () =>
 						{
 							ConsoleButtonString savedPointingString = pointingString;
-							if (window.ToolTip.InitialDelay == 0)
-								await Task.Delay(500);
-							else
+							if (window.ToolTip.InitialDelay != 0)
+							//	await Task.Delay(500);
+							//else
 								await Task.Delay(window.ToolTip.InitialDelay);
 							context.Post((state) =>
 							{
