@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
-using MinorShift.Emuera.UI.Game;
 using System.Runtime.CompilerServices;
+using MinorShift.Emuera.Runtime.Utils;
 
 namespace MinorShift.Emuera.Runtime.Script.Statements;
 
@@ -10,7 +9,7 @@ internal partial class ClipboardProcessor
 {
 	private readonly bool classicMode; // New Lines Only mode
 
-	private readonly Forms.MainWindow mainWin;
+	private readonly Action<Action> invokeOnUiThread;
 
 	private bool minTimePassed; //Has enough time passed since the last Clipboard update?
 	private bool postWaiting; //Is there text waiting to be sent to clipboard?
@@ -25,21 +24,11 @@ internal partial class ClipboardProcessor
 	private CircularBuffer<string> lineBuffer; //Buffer for processed strings ready for clipboard
 
 	private bool Initialized;
-
-	internal enum CBTriggers
-	{
-		LeftClick,
-		MiddleClick,
-		DoubleLeftClick,
-		AnyKeyWait,
-		InputWait,
-	}
-
-	public ClipboardProcessor(Forms.MainWindow parent)
+	public ClipboardProcessor(Action<Action> uiInvoke)
 	{
 		classicMode = Config.Config.CBNewLinesOnly;
 
-		mainWin = parent;
+		invokeOnUiThread = uiInvoke ?? (action => action());
 
 		minTimePassed = true;
 		postWaiting = false;
@@ -129,12 +118,12 @@ internal partial class ClipboardProcessor
 	}
 
 	//FIXIT - Autoprocess old lines or just ditch?
-	public void AddLine(ConsoleDisplayLine inputLine, bool left)
+	public void AddLine(object inputLine, bool left)
 	{
 		if (!Config.Config.CBUseClipboard) return;
 
 		NewLineCount++;
-		string processed = ProcessLine(inputLine.ToString());
+		string processed = ProcessLine(inputLine?.ToString() ?? string.Empty);
 		lineBuffer.Enqueue(processed);
 	}
 
@@ -230,7 +219,7 @@ internal partial class ClipboardProcessor
 		if (newText == OldText) return;
 		try
 		{
-			mainWin.Invoke(() => Clipboard.SetDataObject(newText, false, 3, 200));
+			invokeOnUiThread(() => RuntimeHost.SetClipboardText(newText));
 			if (ScrollPos == 0) OldNewLineCount = NewLineCount;
 			NewLineCount = 0;
 			OldText = newText;

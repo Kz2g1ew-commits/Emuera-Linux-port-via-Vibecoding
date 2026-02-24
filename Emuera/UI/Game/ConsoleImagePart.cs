@@ -213,7 +213,7 @@ sealed class ConsoleImagePart : AConsoleDisplayNode
 			if (mode == TextDrawingMode.GRAPHICS)
 				graph.DrawString(AltText, Config.DefaultFont, new SolidBrush(Config.ForeColor), new Point(PointX, pointY));
 			else
-				System.Windows.Forms.TextRenderer.DrawText(graph, AltText.AsSpan(), Config.DefaultFont, new Point(PointX, pointY), Config.ForeColor, System.Windows.Forms.TextFormatFlags.NoPrefix);
+				UiPlatformBridge.DrawTextNoPrefix(graph, AltText.AsSpan(), Config.DefaultFont, new Point(PointX, pointY), Config.ForeColor);
 		}
 	}
 }

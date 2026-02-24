@@ -43,10 +43,12 @@ namespace MinorShift.Emuera.UI.Game;
 /// </summary>
 internal static class HtmlManager
 {
+	private static readonly StringMeasure FallbackMeasure = new();
+
 	#region EM_私家版_HtmlManager機能拡張
 	public static int HtmlLength(string s)
 	{
-		ConsoleDisplayLine[] lines = Html2DisplayLine(s, GlobalStatic.Console.StrMeasure, null);
+		ConsoleDisplayLine[] lines = Html2DisplayLine(s, FallbackMeasure, null);
 		int len = 0;
 		if (lines.Length <= 0) return 0;
 		foreach (var btn in lines[0].Buttons) len += btn.Width;

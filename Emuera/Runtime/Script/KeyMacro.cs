@@ -1,4 +1,5 @@
 ﻿using MinorShift.Emuera.Sub;
+using MinorShift.Emuera.Runtime.Utils;
 using System;
 using System.IO;
 using trmk = MinorShift.Emuera.Runtime.Utils.EvilMask.Lang.KeyMacro;
@@ -8,8 +9,8 @@ namespace MinorShift.Emuera.Runtime.Script;
 internal static class KeyMacro
 {
 	#region eee_カレントディレクトリー
-	//readonly static string macroPath = Program.ExeDir + "macro.txt";
-	readonly static string macroPath = Program.ExeDir + "macro.txt";
+	//readonly static string macroPath = RuntimeEnvironment.ExeDir + "macro.txt";
+	readonly static string macroPath = RuntimeFileSearch.ResolveFilePath(Path.Combine(RuntimeEnvironment.ExeDir, "macro.txt"));
 	#endregion
 	public const string gID = "グループ";
 	public const int MaxGroup = 10;

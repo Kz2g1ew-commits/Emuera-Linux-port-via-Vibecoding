@@ -40,7 +40,7 @@ internal class CtrlZ
 		if (!Config.Config.Ctrl_Z_Enabled) return;
 		mLastSave = mLastSaveExpected;
 		mInputs.Clear();
-		GlobalStatic.VEvaluator.Rand.GetRand(mRandomSeed);
+		RuntimeGlobals.VEvaluator?.Rand.GetRand(mRandomSeed);
 	}
 
 	// Called on clicking on a file to load.
@@ -50,6 +50,6 @@ internal class CtrlZ
 		if (mRewindInProgress) return;
 		mLastSave = aSaveFile;
 		mInputs.Clear();
-		GlobalStatic.VEvaluator.Rand.GetRand(mRandomSeed);
+		RuntimeGlobals.VEvaluator?.Rand.GetRand(mRandomSeed);
 	}
 }

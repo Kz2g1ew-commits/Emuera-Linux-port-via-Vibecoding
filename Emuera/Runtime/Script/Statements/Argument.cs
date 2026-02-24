@@ -54,10 +54,6 @@ internal sealed class SpPrintImgArgument : Argument
 #region EM_DT
 internal sealed class SpDtColumnOptions : Argument
 {
-	public enum DTOptions
-	{
-		Default,
-	};
 	public SpDtColumnOptions(AExpression dt, AExpression column, DTOptions[] opts, AExpression[] values)
 	{
 		Values = values;
@@ -234,16 +230,6 @@ internal sealed class SpTInputsArgument : Argument
 	readonly public AExpression CanSkip;
 	#endregion
 }
-
-//難読化用属性。enum.ToString()やenum.Parse()を行うなら(Exclude=true)にすること。
-//[global::System.Reflection.Obfuscation(Exclude = false)]
-internal enum SortOrder
-{
-	UNDEF = 0,
-	ASCENDING = 1,
-	DESENDING = 2,
-}
-
 internal sealed class SpSortcharaArgument : Argument
 {
 	public SpSortcharaArgument(VariableTerm var, SortOrder order)

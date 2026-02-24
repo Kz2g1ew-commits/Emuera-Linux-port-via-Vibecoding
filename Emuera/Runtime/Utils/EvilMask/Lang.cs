@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml;
 using MinorShift.Emuera.Runtime.Config;
+using MinorShift.Emuera.Runtime.Utils;
 
 namespace MinorShift.Emuera.Runtime.Utils.EvilMask;
 
@@ -1351,10 +1352,10 @@ internal sealed partial class Lang
 		foreach (var pair in trItems) pair.Value.Clear();
 		if (Directory.Exists(langDir))
 		{
-			foreach (var path in Directory.EnumerateFiles(langDir, "emuera.*.xml", SearchOption.TopDirectoryOnly))
-			{
-				AddLanguageFile(path);
-			}
+				foreach (var path in RuntimeFileSearch.GetFiles(langDir, "emuera.*.xml", SearchOption.TopDirectoryOnly))
+				{
+					AddLanguageFile(path);
+				}
 		}
 		
 		var assembly = Assembly.GetExecutingAssembly();
@@ -1489,7 +1490,7 @@ internal sealed partial class Lang
 		writer.Flush();
 	}
 
-	static readonly string langDir = Path.Combine(Program.ExeDir, "lang") + Path.DirectorySeparatorChar;
+	static readonly string langDir = Path.Combine(RuntimeEnvironment.ExeDir, "lang") + Path.DirectorySeparatorChar;
 
 	static readonly Dictionary<string, string> langList = [];
 	static readonly Dictionary<string, string> localeList = [];

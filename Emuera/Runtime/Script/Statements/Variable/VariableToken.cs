@@ -1352,11 +1352,11 @@ internal sealed partial class VariableData
 		}
 		public override string GetStrValue(ExpressionMediator exm, long[] arguments)
 		{
-			return GlobalStatic.Console.GetWindowTitle();
+			return RuntimeHost.GetWindowTitle();
 		}
 		public override void SetValue(string value, long[] arguments)
 		{
-			GlobalStatic.Console.SetWindowTitle(value);
+			RuntimeHost.SetWindowTitle(value);
 		}
 	}
 
@@ -1382,7 +1382,7 @@ internal sealed partial class VariableData
 		}
 		public override string GetStrValue(ExpressionMediator exm, long[] arguments)
 		{
-			return exm.Console.getDefStBar();
+			return RuntimeHost.ResolveDrawLineString(Config.DrawLineString);
 		}
 	}
 
@@ -1467,7 +1467,7 @@ internal sealed partial class VariableData
 		}
 		public override long GetIntValue(ExpressionMediator exm, long[] arguments)
 		{
-			return Convert.ToInt64(GlobalStatic.Console.IsTimeOut);
+			return Convert.ToInt64(exm.Console.IsTimeOut);
 		}
 	}
 

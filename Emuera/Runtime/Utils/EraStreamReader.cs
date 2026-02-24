@@ -1,7 +1,7 @@
-﻿using MinorShift.Emuera.Runtime.Config;
-using MinorShift.Emuera.Runtime.Script.Parser;
+﻿using MinorShift.Emuera.Runtime.Script.Parser;
 using MinorShift.Emuera.Runtime.Utils;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,14 +12,18 @@ namespace MinorShift.Emuera.Sub;
 
 internal sealed partial class EraStreamReader : IDisposable
 {
-	public EraStreamReader(bool useRename)
+	public EraStreamReader(bool useRename, IReadOnlyDictionary<string, string> renameDic = null, string continuationBreakReplacement = " ")
 	{
-		this.useRename = useRename;
+		this.renameDic = renameDic;
+		this.useRename = useRename && renameDic != null;
+		this.continuationBreakReplacement = continuationBreakReplacement ?? " ";
 	}
 
 	string filepath;
 	string filename;
 	readonly bool useRename;
+	readonly IReadOnlyDictionary<string, string> renameDic;
+	readonly string continuationBreakReplacement;
 	int curNo;
 	int nextNo = 1;
 	string[] _fileLines;
@@ -62,8 +66,9 @@ internal sealed partial class EraStreamReader : IDisposable
 		filename = name.ToString();
 		curNo = 0;
 		nextNo = 0;
-		_fileLines = Preload.GetFileLines(path);
-		return true;
+		if (!Preload.TryGetFileLines(path, out _fileLines))
+			return false;
+		return _fileLines.Length > 0 || File.Exists(path);
 	}
 
 
@@ -105,7 +110,7 @@ internal sealed partial class EraStreamReader : IDisposable
 				while (match.Success)
 				{
 					//この段階でマッチしないパターンもある
-					if (ParserMediator.RenameDic.TryGetValue(match.Value, out var targetStr))
+					if (renameDic.TryGetValue(match.Value, out var targetStr))
 					{
 						line = line.Replace(match.Value, targetStr);
 					}
@@ -148,7 +153,7 @@ internal sealed partial class EraStreamReader : IDisposable
 				var match = regexRenameIdentifer().Match(line);
 				while (match.Success)
 				{
-					if (ParserMediator.RenameDic.TryGetValue(match.Value, out var targetStr))
+					if (renameDic.TryGetValue(match.Value, out var targetStr))
 					{
 						line = line.Replace(match.Value, targetStr);
 					}
@@ -173,7 +178,7 @@ internal sealed partial class EraStreamReader : IDisposable
 					throw new CodeEE(trerror.UnexpectedContinuation.Text, new ScriptPosition(filename, curNo));
 			}
 			b.Append(line);
-			b.Append(Config.ReplaceContinuationBR.Replace("\"", ""));
+			b.Append(continuationBreakReplacement);
 		}
 		st = new CharStream(b.ToString());
 		LexicalAnalyzer.SkipWhiteSpace(st);

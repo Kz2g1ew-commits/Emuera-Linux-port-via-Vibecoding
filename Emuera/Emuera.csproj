@@ -6,6 +6,7 @@
         <RuntimeIdentifiers>win-x64;win-x86</RuntimeIdentifiers>
         <Platforms>x64;x86</Platforms>
         <UseWindowsForms>true</UseWindowsForms>
+        <EnableWindowsTargeting>true</EnableWindowsTargeting>
         <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
         <Nullable>disable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -55,7 +56,7 @@
     </Choose>
 
     <Choose>
-        <When Condition="$(Configuration.Contains('NAudio'))">
+        <When Condition="$(Configuration.Contains('NAudio')) Or '$(OS)' != 'Windows_NT'">
             <PropertyGroup>
                 <InformationalVersion>$(InformationalVersion) NAudio</InformationalVersion>
             </PropertyGroup>
@@ -84,6 +85,18 @@
     </Choose>
 
     <ItemGroup>
+      <Compile Remove="Runtime/Utils/CtrlZ.cs" />
+      <Compile Remove="Runtime/Script/IDebugRuntimeProcess.cs" />
+      <Compile Remove="Runtime/Script/IRuntimeProcess.cs" />
+      <Compile Remove="Runtime/Script/Parser/SubWord.cs" />
+      <Compile Remove="Runtime/Script/Parser/Word.cs" />
+      <Compile Remove="Runtime/Script/Parser/WordCollection.cs" />
+      <Compile Remove="Runtime/Script/Statements/Expression/OperatorCode.cs" />
+      <Compile Remove="Runtime/Script/Statements/FunctionArgType.cs" />
+      <Compile Remove="Runtime/Script/Statements/BuiltInFunctionCode.cs" />
+      <Compile Remove="Runtime/Script/Statements/Variable/VariableCode.cs" />
+      <Compile Remove="Runtime/Script/Statements/CircularBuffer.cs" />
+      <Compile Remove="Runtime/Config/ConfigCode.cs" />
       <Compile Remove="artifacts\**" />
       <EmbeddedResource Remove="artifacts\**" />
       <None Remove="artifacts\**" />
@@ -133,6 +146,9 @@
             </ItemGroup>
         </When>
     </Choose>
+    <ItemGroup>
+      <ProjectReference Include="..\Emuera.RuntimeCore\Emuera.RuntimeCore.csproj" />
+    </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="Enums.NET" Version="4.0.2" />

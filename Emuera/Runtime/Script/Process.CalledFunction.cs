@@ -2,6 +2,7 @@
 using MinorShift.Emuera.GameData.Variable;
 using MinorShift.Emuera.GameProc;
 using MinorShift.Emuera.Runtime.Config;
+using MinorShift.Emuera.Runtime.Script.Data;
 using MinorShift.Emuera.Runtime.Script.Statements;
 using MinorShift.Emuera.Runtime.Script.Statements.Expression;
 using MinorShift.Emuera.Runtime.Script.Statements.Function;
@@ -44,7 +45,7 @@ internal sealed class UserDefinedFunctionArgument
 				if (vTerm.Identifier.IsCharacterData)
 				{
 					long charaNo = vTerm.GetElementInt(0, exm);
-					if (charaNo < 0 || charaNo >= GlobalStatic.VariableData.CharacterList.Count)
+					if (charaNo < 0 || charaNo >= exm.VEvaluator.VariableData.CharacterList.Count)
 						throw new CodeEE(string.Format(trerror.OoRCharaVarArg.Text, vTerm.Identifier.Name, "1", charaNo.ToString()));
 					TransporterRef[i] = (Array)vTerm.Identifier.GetArrayChara((int)charaNo);
 				}
@@ -108,14 +109,21 @@ internal sealed class CalledFunction
 
 	public static CalledFunction CallFunction(Process parent, string label, LogicalLine retAddress)
 	{
+		return CallFunction(parent?.LabelDictionary, label, retAddress);
+	}
+
+	public static CalledFunction CallFunction(LabelDictionary labelDictionary, string label, LogicalLine retAddress)
+	{
+		if (labelDictionary == null)
+			return null;
 		CalledFunction called = new(label)
 		{
 			Finished = false
 		};
-		FunctionLabelLine labelline = parent.LabelDictionary.GetNonEventLabel(label);
+		FunctionLabelLine labelline = labelDictionary.GetNonEventLabel(label);
 		if (labelline == null)
 		{
-			if (parent.LabelDictionary.GetEventLabels(label) != null)
+			if (labelDictionary.GetEventLabels(label) != null)
 			{
 				throw new CodeEE(string.Format(trerror.CallToEventFunc.Text, label, Config.Config.GetConfigName(ConfigCode.CompatiCallEvent)));
 			}

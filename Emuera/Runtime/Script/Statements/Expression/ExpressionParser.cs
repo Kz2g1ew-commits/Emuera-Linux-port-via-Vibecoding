@@ -11,35 +11,6 @@ using trerror = MinorShift.Emuera.Runtime.Utils.EvilMask.Lang.Error;
 
 namespace MinorShift.Emuera.Runtime.Script.Statements.Expression;
 
-internal enum ArgsEndWith
-{
-	None,
-	EoL,
-	RightParenthesis,//)終端
-	RightBracket,//]終端
-}
-
-internal enum TermEndWith
-{
-	None = 0x0000,
-	EoL = 0x0001,
-	Comma = 0x0002,//','終端
-	RightParenthesis = 0x0004,//')'終端
-	RightBracket = 0x0008,//')'終端
-	Assignment = 0x0010,//')'終端
-
-
-	#region EM_私家版_HTMLパラメータ拡張
-	KeyWordPx = 0x0020,//'px'終端
-	#endregion
-
-	RightParenthesis_Comma = RightParenthesis | Comma,//',' or ')'終端
-	RightBracket_Comma = RightBracket | Comma,//',' or ']'終端
-	Comma_Assignment = Comma | Assignment,//',' or '='終端
-	RightParenthesis_Comma_Assignment = RightParenthesis | Comma | Assignment,//',' or ')' or '='終端
-	RightBracket_Comma_Assignment = RightBracket | Comma | Assignment,//',' or ']' or '='終端
-}
-
 internal static class ExpressionParser
 {
 	#region public Reduce
@@ -223,7 +194,7 @@ internal static class ExpressionParser
 			wc.ShiftNext();
 			subId = subidWT.Code;
 		}
-		return GlobalStatic.IdentifierDictionary.GetVariableToken(idStr, subId, true);
+		return RuntimeGlobals.IdentifierDictionary.GetVariableToken(idStr, subId, true);
 	}
 
 
@@ -253,17 +224,14 @@ internal static class ExpressionParser
 				throw new CodeEE(trerror.SBracketsFuncNotImprement.Text);
 			//引数を処理
 			var args = ReduceArguments(wc, ArgsEndWith.RightParenthesis, false);
-			AExpression mToken = GlobalStatic.IdentifierDictionary.GetFunctionMethod(GlobalStatic.LabelDictionary, idStr, args, false);
+			AExpression mToken = RuntimeGlobals.IdentifierDictionary.GetFunctionMethod(RuntimeGlobals.LabelDictionary, idStr, args, false);
 			if (mToken == null)
 			{
-				if (!Program.AnalysisMode)
-					GlobalStatic.IdentifierDictionary.ThrowException(idStr, true);
+				if (!RuntimeEnvironment.AnalysisMode)
+					RuntimeGlobals.IdentifierDictionary.ThrowException(idStr, true);
 				else
 				{
-					if (GlobalStatic.tempDic.TryGetValue(idStr, out long value))
-						GlobalStatic.tempDic[idStr] = ++value;
-					else
-						GlobalStatic.tempDic.Add(idStr, 1);
+					RuntimeHost.IncrementAnalysisLabelCounter(idStr);
 					return new NullTerm(0);
 				}
 			}
@@ -280,10 +248,10 @@ internal static class ExpressionParser
 					return VariableParser.ReduceVariable(id, wc);
 			}
 			//idStrが変数名でない場合、
-			AExpression refToken = GlobalStatic.IdentifierDictionary.GetFunctionMethod(GlobalStatic.LabelDictionary, idStr, null, false);
+			AExpression refToken = RuntimeGlobals.IdentifierDictionary.GetFunctionMethod(RuntimeGlobals.LabelDictionary, idStr, null, false);
 			if (refToken != null)//関数参照と名前が一致したらそれを返す。実際に使うとエラー
 				return refToken;
-			if (varCode != VariableCode.__NULL__ && GlobalStatic.ConstantData.isDefined(varCode, idStr))//連想配列的な可能性アリ
+			if (varCode != VariableCode.__NULL__ && RuntimeGlobals.ConstantData.isDefined(varCode, idStr))//連想配列的な可能性アリ
 				return new SingleStrTerm(idStr);
 			#region EE_ERD
 			else if (varId != null)
@@ -294,26 +262,26 @@ internal static class ExpressionParser
 					case VariableCode.VARS:
 					case VariableCode.CVAR:
 					case VariableCode.CVARS:
-						if (GlobalStatic.ConstantData.isUserDefined(varId.Name, idStr, 1))//ユーザー定義変数は名前付けられるようになったので通す
+						if (RuntimeGlobals.ConstantData.isUserDefined(varId.Name, idStr, 1))//ユーザー定義変数は名前付けられるようになったので通す
 							return new SingleStrTerm(idStr);
 						break;
 					case VariableCode.VAR2D:
 					case VariableCode.VARS2D:
 					case VariableCode.CVAR2D:
 					case VariableCode.CVARS2D:
-						if (GlobalStatic.ConstantData.isUserDefined(varId.Name, idStr, 2))//ユーザー定義変数は名前付けられるようになったので通す
+						if (RuntimeGlobals.ConstantData.isUserDefined(varId.Name, idStr, 2))//ユーザー定義変数は名前付けられるようになったので通す
 							return new SingleStrTerm(idStr);
 						break;
 					case VariableCode.VAR3D:
 					case VariableCode.VARS3D:
-						if (GlobalStatic.ConstantData.isUserDefined(varId.Name, idStr, 3))//ユーザー定義変数は名前付けられるようになったので通す
+						if (RuntimeGlobals.ConstantData.isUserDefined(varId.Name, idStr, 3))//ユーザー定義変数は名前付けられるようになったので通す
 							return new SingleStrTerm(idStr);
 						break;
 				}
 			}
 			#endregion
 
-			GlobalStatic.IdentifierDictionary.ThrowException(idStr, false);
+			RuntimeGlobals.IdentifierDictionary.ThrowException(idStr, false);
 		}
 		throw new ExeEE(trerror.ThrowFailed.Text);//ここまででthrowかreturnのどちらかをするはず。
 	}
@@ -445,7 +413,7 @@ internal static class ExpressionParser
 							if (op == OperatorCode.Equal || op == OperatorCode.Greater || op == OperatorCode.Less
 							|| op == OperatorCode.GreaterEqual || op == OperatorCode.LessEqual || op == OperatorCode.NotEqual)
 							{
-								ParserMediator.Warn(trerror.ComparisonOpContinuous.Text, GlobalStatic.Process.GetScaningLine(), 0, false, false);
+								ParserMediator.Warn(trerror.ComparisonOpContinuous.Text, RuntimeGlobals.CurrentScanningLine, 0, false, false);
 							}
 						}
 						stack.Add(op);

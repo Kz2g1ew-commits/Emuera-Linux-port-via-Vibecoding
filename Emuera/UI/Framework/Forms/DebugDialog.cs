@@ -1,8 +1,6 @@
-﻿using MinorShift.Emuera.GameProc;
-using MinorShift.Emuera.GameView;
+﻿using MinorShift.Emuera.UI.Game;
 using MinorShift.Emuera.Runtime.Config;
-using MinorShift.Emuera.Runtime.Script.Parser;
-using MinorShift.Emuera.Runtime.Script.Statements.Expression;
+using MinorShift.Emuera.Runtime.Script;
 using MinorShift.Emuera.Runtime.Utils;
 using MinorShift.Emuera.Runtime.Utils.EvilMask;
 using System;
@@ -14,7 +12,7 @@ using System.ComponentModel;
 
 namespace MinorShift.Emuera.Forms
 {
-	public partial class DebugDialog : Form
+	public partial class DebugDialog : Form, IDebugConfigDialogHost
 	{
 		public DebugDialog()
 		{
@@ -34,10 +32,15 @@ namespace MinorShift.Emuera.Forms
 			checkBoxTopMost.Checked = TopMost;
 			loadWatchList();
 		}
-		private Process emuera;
-		private EmueraConsole mainConsole;
+		private IDebugRuntimeProcess emuera;
+		private IDebugDialogConsoleHost mainConsole;
+		public bool IsWindowCreated => Created;
+		public int WindowWidth => Width;
+		public int WindowHeight => Height;
+		public int WindowPositionX => Location.X;
+		public int WindowPositionY => Location.Y;
 
-		internal void SetParent(EmueraConsole console, Process process)
+		internal void SetParent(IDebugDialogConsoleHost console, IDebugRuntimeProcess process)
 		{
 			emuera = process;
 			mainConsole = console;
@@ -122,7 +125,7 @@ namespace MinorShift.Emuera.Forms
 
 		private void updateVarWatch()
 		{
-			GlobalStatic.Process.saveCurrentState(false);
+			emuera?.saveCurrentState(false);
 			for (int i = 0; i < listViewWatch.Items.Count - 1; i++)
 			{//無名のアイテムを削除
 				if (listViewWatch.Items[i].Text.Length == 0)
@@ -141,24 +144,18 @@ namespace MinorShift.Emuera.Forms
 			{
 				lvi.SubItems[1].Text = getValueString(lvi.Text);
 			}
-			GlobalStatic.Process.clearMethodStack();
-			GlobalStatic.Process.loadPrevState();
+			emuera?.clearMethodStack();
+			emuera?.loadPrevState();
 			Update();
 		}
 		private string getValueString(string str)
 		{
-			if ((emuera == null) || (GlobalStatic.EMediator == null))
-				return "";
-			if (string.IsNullOrEmpty(str))
+			if (emuera == null || string.IsNullOrEmpty(str))
 				return "";
 			mainConsole.RunERBFromMemory = true;
 			try
 			{
-				CharStream st = new(str);
-				WordCollection wc = LexicalAnalyzer.Analyse(st, LexEndWith.EoL, LexAnalyzeFlag.None);
-				AExpression term = ExpressionParser.ReduceExpressionTerm(wc, TermEndWith.EoL);
-				SingleTerm value = term.GetValue(GlobalStatic.EMediator);
-				return value.ToString();
+				return emuera.EvaluateExpressionForDebugWatch(str);
 			}
 			catch (CodeEE e)
 			{
@@ -172,7 +169,6 @@ namespace MinorShift.Emuera.Forms
 			{
 				mainConsole.RunERBFromMemory = false;
 			}
-
 		}
 		private void listViewWatch_AfterLabelEdit(object sender, LabelEditEventArgs e)
 		{

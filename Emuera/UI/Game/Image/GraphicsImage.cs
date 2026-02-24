@@ -139,7 +139,7 @@ internal sealed class GraphicsImage : AbstractImage
 		Font usingFont = font;
 		var format = new StringFormat(StringFormat.GenericTypographic);
 		if (usingFont == null)
-			usingFont = new(Config.FontName, 100, GlobalStatic.Console.StringStyle.FontStyle, GraphicsUnit.Pixel);
+			usingFont = new(Config.FontName, 100, Config.DefaultFont.Style, GraphicsUnit.Pixel);
 		GraphicsPath gp =
 			new();
 		//一部のフォントで描画がずれる問題修正

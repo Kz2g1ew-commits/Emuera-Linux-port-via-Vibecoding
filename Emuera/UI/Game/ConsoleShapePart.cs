@@ -196,7 +196,7 @@ internal sealed class ConsoleErrorShapePart : ConsoleShapePart
 		if (mode == TextDrawingMode.GRAPHICS)
 			graph.DrawString(Text, Config.DefaultFont, new SolidBrush(Config.ForeColor), new Point(PointX, pointY));
 		else
-			System.Windows.Forms.TextRenderer.DrawText(graph, Text.AsSpan(), Config.DefaultFont, new Point(PointX, pointY), Config.ForeColor, System.Windows.Forms.TextFormatFlags.NoPrefix);
+			UiPlatformBridge.DrawTextNoPrefix(graph, Text.AsSpan(), Config.DefaultFont, new Point(PointX, pointY), Config.ForeColor);
 	}
 	public override void SetWidth(StringMeasure sm, float subPixel)
 	{

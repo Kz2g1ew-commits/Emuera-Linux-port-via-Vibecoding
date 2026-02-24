@@ -4,7 +4,6 @@ using MinorShift.Emuera.Runtime.Utils;
 using MinorShift.Emuera.Sub;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using trerror = MinorShift.Emuera.Runtime.Utils.EvilMask.Lang.Error;
 
@@ -18,9 +17,9 @@ namespace MinorShift.Emuera.Runtime.Config;
 internal sealed class ConfigData
 {
 	#region eee_カレントディレクトリー
-	readonly static string configPath = Program.ExeDir + "emuera.config";
+	private static string ResolveConfigPath() => RuntimeFileSearch.ResolveFilePath(Path.Combine(RuntimeEnvironment.ExeDir, "emuera.config"));
 	#endregion
-	readonly static string configdebugPath = Program.DebugDir + "debug.config";
+	private static string ResolveDebugConfigPath() => RuntimeFileSearch.ResolveFilePath(Path.Combine(RuntimeEnvironment.DebugDir, "debug.config"));
 
 	static ConfigData() { }
 	private static ConfigData instance = new();
@@ -66,10 +65,10 @@ internal sealed class ConfigData
 		configArray.Add(new ConfigItem<string>(ConfigCode.FontName, "フォント名", "Font name", "ＭＳ ゴシック"));
 		configArray.Add(new ConfigItem<int>(ConfigCode.FontSize, "フォントサイズ", "Font size", 18));
 		configArray.Add(new ConfigItem<int>(ConfigCode.LineHeight, "一行の高さ", "Line height", 19));
-		configArray.Add(new ConfigItem<Color>(ConfigCode.ForeColor, "文字色", "Text color", Color.FromArgb(192, 192, 192)));//LIGHTGRAY
-		configArray.Add(new ConfigItem<Color>(ConfigCode.BackColor, "背景色", "Background color", Color.FromArgb(0, 0, 0)));//BLACK
-		configArray.Add(new ConfigItem<Color>(ConfigCode.FocusColor, "選択中文字色", "Highlight color", Color.FromArgb(255, 255, 0)));//YELLOW
-		configArray.Add(new ConfigItem<Color>(ConfigCode.LogColor, "履歴文字色", "History log color", Color.FromArgb(192, 192, 192)));//LIGHTGRAY//Color.FromArgb(128, 128, 128));//GRAY
+		configArray.Add(new ConfigItem<RuntimeColor>(ConfigCode.ForeColor, "文字色", "Text color", new RuntimeColor(192, 192, 192)));//LIGHTGRAY
+		configArray.Add(new ConfigItem<RuntimeColor>(ConfigCode.BackColor, "背景色", "Background color", new RuntimeColor(0, 0, 0)));//BLACK
+		configArray.Add(new ConfigItem<RuntimeColor>(ConfigCode.FocusColor, "選択中文字色", "Highlight color", new RuntimeColor(255, 255, 0)));//YELLOW
+		configArray.Add(new ConfigItem<RuntimeColor>(ConfigCode.LogColor, "履歴文字色", "History log color", new RuntimeColor(192, 192, 192)));//LIGHTGRAY
 		configArray.Add(new ConfigItem<int>(ConfigCode.FPS, "フレーム毎秒", "FPS", 5));
 		configArray.Add(new ConfigItem<int>(ConfigCode.SkipFrame, "最大スキップフレーム数", "Skip frames", 3));
 		configArray.Add(new ConfigItem<int>(ConfigCode.ScrollHeight, "スクロール行数", "Lines per scroll", 1));
@@ -165,8 +164,8 @@ internal sealed class ConfigData
 		#region EmuEra-Rikaichan related settings
 		configArray.Add(new ConfigItem<bool>(ConfigCode.RikaiEnabled, "Rikaichanを使用する", "Rikai- Enabled", false));
 		configArray.Add(new ConfigItem<string>(ConfigCode.RikaiFilename, "Rikaichanのファイルパス", "Rikai- Dictionary Filename", "Emuera-Rikai-edict.txt-eucjp"));
-		configArray.Add(new ConfigItem<Color>(ConfigCode.RikaiColorBack, "ポップアップの背景色", "Rikai- Back Color", Color.FromArgb(0, 0, 0x8B))); ////Color.DarkBlue
-		configArray.Add(new ConfigItem<Color>(ConfigCode.RikaiColorText, "ポップアップの文字色", "Rikai- Text Color", Color.FromArgb(0xFF, 0xFF, 0xFF))); ////Color.White
+		configArray.Add(new ConfigItem<RuntimeColor>(ConfigCode.RikaiColorBack, "ポップアップの背景色", "Rikai- Back Color", new RuntimeColor(0, 0, 0x8B)));
+		configArray.Add(new ConfigItem<RuntimeColor>(ConfigCode.RikaiColorText, "ポップアップの文字色", "Rikai- Text Color", new RuntimeColor(0xFF, 0xFF, 0xFF)));
 		configArray.Add(new ConfigItem<bool>(ConfigCode.RikaiUseSeparateBoxes, "翻訳中の語句を強調表示する", "Rikai- Use Separate Boxes", true));
 		#endregion
 
@@ -365,6 +364,16 @@ internal sealed class ConfigData
 		//throw new ExeEE("GetConfigValueのCodeまたは型が不適切");
 	}
 
+	public RuntimeColor GetConfigRuntimeColor(ConfigCode code)
+	{
+		return GetConfigValue<RuntimeColor>(code);
+	}
+
+	public int GetConfigColorRgb24(ConfigCode code)
+	{
+		return GetConfigRuntimeColor(code).ToRgb24();
+	}
+
 	#region getitem
 	public AConfigItem GetItem(ConfigCode code)
 	{
@@ -515,8 +524,7 @@ internal sealed class ConfigData
 			case ConfigCode.FocusColor://"選択中文字色"
 			case ConfigCode.LogColor://"履歴文字色"
 				{
-					Color color = item.GetValue<Color>();
-					term = new SingleLongTerm(((color.R * 256) + color.G) * 256 + color.B);
+					term = new SingleLongTerm(Instance.GetConfigColorRgb24(item.Code));
 				}
 				break;
 
@@ -608,13 +616,14 @@ internal sealed class ConfigData
 
 	public bool SaveConfig()
 	{
+		string configPath = ResolveConfigPath();
 		StreamWriter writer = null;
 
 		try
 		{
 			#region EM_私家版_Emuera多言語化改造
-			// writer = new StreamWriter(configPath, false, Config.Encode);
-			writer = new StreamWriter(configPath, false, Config.Encode);
+				// writer = new StreamWriter(configPath, false, Config.Encode);
+				writer = new StreamWriter(configPath, false, Config.Encode);
 
 			// for (int i = 0; i < configArray.Length; i++)
 			for (int i = 0; i < configArray.Count; i++)
@@ -687,12 +696,13 @@ internal sealed class ConfigData
 
 	public bool LoadConfig()
 	{
-		string defaultConfigPath = Program.CsvDir + "_default.config";
-		string fixedConfigPath = Program.CsvDir + "_fixed.config";
+		string configPath = ResolveConfigPath();
+		string defaultConfigPath = RuntimeFileSearch.ResolveFilePath(Path.Combine(RuntimeEnvironment.CsvDir, "_default.config"));
+		string fixedConfigPath = RuntimeFileSearch.ResolveFilePath(Path.Combine(RuntimeEnvironment.CsvDir, "_fixed.config"));
 		if (!File.Exists(defaultConfigPath))
-			defaultConfigPath = Program.CsvDir + "default.config";
+			defaultConfigPath = RuntimeFileSearch.ResolveFilePath(Path.Combine(RuntimeEnvironment.CsvDir, "default.config"));
 		if (!File.Exists(fixedConfigPath))
-			fixedConfigPath = Program.CsvDir + "fixed.config";
+			fixedConfigPath = RuntimeFileSearch.ResolveFilePath(Path.Combine(RuntimeEnvironment.CsvDir, "fixed.config"));
 
 		loadConfig(defaultConfigPath, false);
 		loadConfig(configPath, false);
@@ -714,6 +724,7 @@ internal sealed class ConfigData
 
 	private bool loadConfig(string confPath, bool fix)
 	{
+		confPath = RuntimeFileSearch.ResolveFilePath(confPath);
 		if (!File.Exists(confPath))
 			return false;
 		using var eReader = new EraStreamReader(false);
@@ -773,7 +784,7 @@ internal sealed class ConfigData
 						((ConfigItem<string>)item).Value = tokens[1];
 						continue;
 					}
-					if (item.Code == ConfigCode.MaxLog && Program.AnalysisMode)
+					if (item.Code == ConfigCode.MaxLog && RuntimeEnvironment.AnalysisMode)
 					{
 						//解析モード時はここを上書きして十分な長さを確保する
 						tokens[1] = "10000";
@@ -844,12 +855,13 @@ internal sealed class ConfigData
 
 	public bool SaveDebugConfig()
 	{
+		string configdebugPath = ResolveDebugConfigPath();
 		StreamWriter writer = null;
 		try
 		{
 			#region EM_私家版_Emuera多言語化改造
-			// writer = new StreamWriter(configdebugPath, false, Config.Encode);
-			writer = new StreamWriter(configdebugPath, false, Config.Encode);
+				// writer = new StreamWriter(configdebugPath, false, Config.Encode);
+				writer = new StreamWriter(configdebugPath, false, Config.Encode);
 
 			// for (int i = 0; i < debugArray.Length; i++)
 			for (int i = 0; i < debugArray.Count; i++)
@@ -875,6 +887,7 @@ internal sealed class ConfigData
 
 	public bool LoadDebugConfig()
 	{
+		string configdebugPath = ResolveDebugConfigPath();
 		using var eReader = new EraStreamReader(false);
 		if (!File.Exists(configdebugPath))
 			goto err;

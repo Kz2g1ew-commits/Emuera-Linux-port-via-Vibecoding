@@ -2,10 +2,9 @@
 using MinorShift.Emuera.Runtime.Config;
 using MinorShift.Emuera.Runtime.Script;
 using MinorShift.Emuera.Runtime.Utils;
-using MinorShift.Emuera.UI.Game;
-using MinorShift.Emuera.UI.Game.Image;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using trerror = MinorShift.Emuera.Runtime.Utils.EvilMask.Lang.Error;
 using trsl = MinorShift.Emuera.Runtime.Utils.EvilMask.Lang.SystemLine;
 
@@ -100,6 +99,31 @@ internal sealed partial class Process
 
 	}
 
+	private void PrintTemporaryLineSafe(string text)
+	{
+		RuntimeHost.PrintTemporaryLine(text);
+	}
+
+	private void DeleteLineSafe(int argNum)
+	{
+		RuntimeHost.DeleteLine(argNum);
+	}
+
+	private void PrintErrorButtonSystemSafe(string str, ScriptPosition? pos, int level = 0)
+	{
+		RuntimeHost.PrintErrorButton(str, pos, level);
+	}
+
+	private void MarkUpdatedGeneration()
+	{
+		RuntimeHost.MarkUpdatedGeneration();
+	}
+
+	private void DisableOutputLog()
+	{
+		RuntimeHost.DisableOutputLog();
+	}
+
 	void setWait()
 	{
 		console.ReadAnyKey();
@@ -137,7 +161,7 @@ internal sealed partial class Process
 			if (flowinputString)
 				exm.VEvaluator.RESULTS = req.DefStrValue;
 		}
-		else if (flowinputCanSkip && GlobalStatic.Console.MesSkip)
+		else if (flowinputCanSkip && console.MesSkip)
 		{
 			systemResult = req.DefIntValue;
 			if (flowinputString)
@@ -175,34 +199,34 @@ internal sealed partial class Process
 			if (ClearCommands())
 				return;
 		skipPrint = false;
-		console.ResetStyle();
+		RuntimeHost.ResetStyle();
 		deleteAllPrevState();
-		if (Program.AnalysisMode)
+		if (RuntimeEnvironment.AnalysisMode)
 		{
 			console.PrintSystemLine(trsl.AnalysisCompleted.Text);
 			#region EE_OUTPUTLOG
-			// console.OutputLog(Program.ExeDir + "Analysis.log");
-			console.OutputSystemLog(Program.ExeDir + "Analysis.log");
+			// console.OutputLog(RuntimeEnvironment.ExeDir + "Analysis.log");
+			RuntimeHost.OutputSystemLog(Path.Combine(RuntimeEnvironment.ExeDir, "Analysis.log"));
 			#endregion
-			console.noOutputLog = true;
+			DisableOutputLog();
 			console.PrintSystemLine(trsl.PressEnterOrClick.Text);
-			System.Media.SystemSounds.Asterisk.Play();
-			console.ThrowTitleError(false);
+			RuntimeHost.PlayNotifyTone();
+			RuntimeHost.ThrowTitleError(false);
 			return;
 		}
 		if ((!noError) && (!Config.CompatiErrorLine))
 		{
-			console.PrintErrorButton(trsl.ExitBecauseCanNotInterpreted1.Text, null, 3);
+			PrintErrorButtonSystemSafe(trsl.ExitBecauseCanNotInterpreted1.Text, null, 3);
 			console.PrintSystemLine(string.Format(trsl.ExitBecauseCanNotInterpreted2.Text, Config.GetConfigName(ConfigCode.CompatiErrorLine)));
 			console.PrintSystemLine(trsl.ExitBecauseCanNotInterpreted3.Text);
 			#region EE_OUTPUTLOG
-			// console.OutputLog(Program.ExeDir + "emuera.log");
-			console.OutputSystemLog(Program.ExeDir + "emuera.log");
+			// console.OutputLog(RuntimeEnvironment.ExeDir + "emuera.log");
+			RuntimeHost.OutputSystemLog(Path.Combine(RuntimeEnvironment.ExeDir, "emuera.log"));
 			#endregion
-			console.noOutputLog = true;
+			DisableOutputLog();
 			console.PrintSystemLine(trsl.PressEnterOrClick.Text);
-			System.Media.SystemSounds.Asterisk.Play();
-			console.ThrowTitleError(true);
+			RuntimeHost.PlayNotifyTone();
+			RuntimeHost.ThrowTitleError(true);
 			return;
 		}
 		if (callFunction("SYSTEM_TITLE", false, false))
@@ -211,9 +235,9 @@ internal sealed partial class Process
 			return;
 		}
 		//標準のタイトル画面
-		console.PrintBar();
+		RuntimeHost.PrintBar();
 		console.NewLine();
-		console.Alignment = DisplayLineAlignment.CENTER;
+		RuntimeHost.SetAlignment(RuntimeDisplayLineAlignment.CENTER);
 		console.PrintSingleLine(gamebase.ScriptTitle);
 		if (gamebase.ScriptVersion != 0)
 			console.PrintSingleLine(gamebase.ScriptVersionText);
@@ -221,9 +245,9 @@ internal sealed partial class Process
 		console.PrintSingleLine("(" + gamebase.ScriptYear + ")");
 		console.NewLine();
 		console.PrintSingleLine(gamebase.ScriptDetail);
-		console.Alignment = DisplayLineAlignment.LEFT;
+		RuntimeHost.SetAlignment(RuntimeDisplayLineAlignment.LEFT);
 
-		console.PrintBar();
+		RuntimeHost.PrintBar();
 		console.NewLine();
 		console.PrintSingleLine("[0] " + Config.TitleMenuString0);
 		console.PrintSingleLine("[1] " + Config.TitleMenuString1);
@@ -248,7 +272,7 @@ internal sealed partial class Process
 			if (gamebase.DefaultCharacter > 0)
 				//vEvaluator.AddCharacter(gamebase.DefaultCharacter, false);
 				vEvaluator.AddCharacterFromCsvNo(gamebase.DefaultCharacter);
-			console.PrintBar();
+			RuntimeHost.PrintBar();
 			console.NewLine();
 			beginFirst();
 		}
@@ -265,9 +289,9 @@ internal sealed partial class Process
 		}
 		else//入力が正しくないならもう一回選択肢を書き直し、正しい選択を要求する。
 		{//RESUELASTLINEと同様の処理を行うように変更
-			console.deleteLine(1);
-			console.PrintTemporaryLine(trerror.InvalidValue.Text);
-			console.updatedGeneration = true;
+			DeleteLineSafe(1);
+			PrintTemporaryLineSafe(trerror.InvalidValue.Text);
+			MarkUpdatedGeneration();
 			openingInput();
 			//beginTitle();
 		}
@@ -369,9 +393,9 @@ internal sealed partial class Process
 					console.PrintC(getTrainComString(lastCalledComable, lastAddCom), true);
 					printComCount++;
 					if ((Config.PrintCPerLine > 0) && (printComCount % Config.PrintCPerLine == 0))
-						console.PrintFlush(false);
+						RuntimeHost.PrintFlush(false);
 				}
-				console.RefreshStrings(false);
+				RuntimeHost.RefreshStrings(false);
 			}
 		}
 		//ComAbleXXの呼び出し。train.csvに定義されていないものはスキップ、ComAbleXXが見つからなければREUTRN 1と同様に扱う。
@@ -391,11 +415,11 @@ internal sealed partial class Process
 					console.PrintC(getTrainComString(lastCalledComable, lastAddCom), true);
 					printComCount++;
 					if ((Config.PrintCPerLine > 0) && (printComCount % Config.PrintCPerLine == 0))
-						console.PrintFlush(false);
+						RuntimeHost.PrintFlush(false);
 				}
 				continue;
 			}
-			console.RefreshStrings(false);
+			RuntimeHost.RefreshStrings(false);
 			return;
 		}
 		//全部検索したら終了し、SHOW_USERCOMを呼び出す。
@@ -404,8 +428,8 @@ internal sealed partial class Process
 			state.SystemState = SystemStateCode.Train_CallShowUserCom;
 			//if (!isCTrain)
 			//{
-			console.PrintFlush(false);
-			console.RefreshStrings(false);
+			RuntimeHost.PrintFlush(false);
+			RuntimeHost.RefreshStrings(false);
 			callFunction("SHOW_USERCOM", true, false);
 			//}
 			//else
@@ -528,14 +552,14 @@ internal sealed partial class Process
 	bool needCheck = true;
 	void endCallEventComEnd()
 	{
-		if (console.LastLineIsTemporary && !isCTrain && needCheck)
+		if (RuntimeHost.IsLastLineTemporary() && !isCTrain && needCheck)
 		{
-			if (console.LastLineIsEmpty)
+			if (RuntimeHost.IsLastLineEmpty())
 			{
-				console.deleteLine(2);
-				console.PrintTemporaryLine(trerror.InvalidValue.Text);
+				DeleteLineSafe(2);
+				PrintTemporaryLineSafe(trerror.InvalidValue.Text);
 			}
-			console.updatedGeneration = true;
+			MarkUpdatedGeneration();
 			endCallShowUserCom();
 		}
 		else
@@ -613,9 +637,9 @@ internal sealed partial class Process
 			if (!callFunction(ablName, false, false))
 			{
 				//見つからなければ終了
-				console.deleteLine(1);
-				console.PrintTemporaryLine(trerror.InvalidValue.Text);
-				console.updatedGeneration = true;
+				DeleteLineSafe(1);
+				PrintTemporaryLineSafe(trerror.InvalidValue.Text);
+				MarkUpdatedGeneration();
 				endCallShowAblupSelect();
 			}
 		}
@@ -629,14 +653,14 @@ internal sealed partial class Process
 
 	void endCallAblupXX()
 	{
-		if (console.LastLineIsTemporary)
+		if (RuntimeHost.IsLastLineTemporary())
 		{
-			if (console.LastLineIsEmpty)
+			if (RuntimeHost.IsLastLineEmpty())
 			{
-				console.deleteLine(2);
-				console.PrintTemporaryLine("無効な値です");
+				DeleteLineSafe(2);
+				PrintTemporaryLineSafe("無効な値です");
 			}
-			console.updatedGeneration = true;
+			MarkUpdatedGeneration();
 			endCallShowAblupSelect();
 		}
 		else
@@ -750,16 +774,16 @@ internal sealed partial class Process
 				{
 					//console.Print("お金が足りません。");
 					//console.NewLine();
-					console.deleteLine(1);
-					console.PrintTemporaryLine(trerror.NotEnoughMoney.Text);
+					DeleteLineSafe(1);
+					PrintTemporaryLineSafe(trerror.NotEnoughMoney.Text);
 				}
 			}
 			else
 			{
 				//console.Print("売っていません。");
 				//console.NewLine();
-				console.deleteLine(1);
-				console.PrintTemporaryLine(trerror.OutOfStock.Text);
+				DeleteLineSafe(1);
+				PrintTemporaryLineSafe(trerror.OutOfStock.Text);
 			}
 			//購入に失敗した場合、endCallEventShop()に戻す。
 			//endCallEventShop();
@@ -780,14 +804,14 @@ internal sealed partial class Process
 
 	void endCallEventBuy()
 	{
-		if (console.LastLineIsTemporary)
+		if (RuntimeHost.IsLastLineTemporary())
 		{
-			if (console.LastLineIsEmpty)
+			if (RuntimeHost.IsLastLineEmpty())
 			{
-				console.deleteLine(2);
-				console.PrintTemporaryLine(trerror.InvalidValue.Text);
+				DeleteLineSafe(2);
+				PrintTemporaryLineSafe(trerror.InvalidValue.Text);
 			}
-			console.updatedGeneration = true;
+			MarkUpdatedGeneration();
 			endCallShowShop();
 		}
 		else
@@ -807,8 +831,8 @@ internal sealed partial class Process
 	}
 	void endSystemLoad()
 	{
-		AppContents.UnloadTempLoadedConstImageNames();
-		AppContents.UnloadTempLoadedGraphicsImageNames();
+		RuntimeHost.UnloadTempLoadedConstImages();
+		RuntimeHost.UnloadTempLoadedGraphicsImages();
 		state.SystemState = SystemStateCode.LoadData_CallEventLoad;
 		//EVENTLOADを呼び出してLoadData_CallEventLoadへ移行。
 		if (!callFunction("EVENTLOAD", false, true))
@@ -859,7 +883,7 @@ internal sealed partial class Process
 		int dataNo;
 		for (int i = 0; i < page; i++)
 		{
-			//console.PrintFlush(false);
+			//RuntimeHost.PrintFlush(false);
 			//console.Print(string.Format(trsl.DisplaySaveSlot.Text, i * 20, i * 20 + 19));
 		}
 		for (int i = 0; i < 20; i++)
@@ -868,7 +892,7 @@ internal sealed partial class Process
 			if (dataNo == dataIsAvailable.Length - 1)
 				break;
 			dataIsAvailable[dataNo] = false;
-			//console.PrintFlush(false);
+			//RuntimeHost.PrintFlush(false);
 			//console.Print(string.Format("[{0, 2}] ", dataNo));
 			if (!writeSavedataTextFrom_Silent(dataNo))
 				continue;
@@ -876,7 +900,7 @@ internal sealed partial class Process
 		}
 		for (int i = page; i < ((dataIsAvailable.Length - 2) / 20); i++)
 		{
-			//console.PrintFlush(false);
+			//RuntimeHost.PrintFlush(false);
 			//console.Print(string.Format(trsl.DisplaySaveSlot.Text, (i + 1) * 20, (i + 1) * 20 + 19));
 		}
 		//オートセーブの処理は別途切り出し（表示処理の都合上）
@@ -884,12 +908,12 @@ internal sealed partial class Process
 		if (state.SystemState != SystemStateCode.SaveGame_Begin)
 		{
 			dataNo = AutoSaveIndex;
-			//console.PrintFlush(false);
+			//RuntimeHost.PrintFlush(false);
 			//console.Print(string.Format("[{0, 2}] ", dataNo));
 			if (writeSavedataTextFrom_Silent(dataNo))
 				dataIsAvailable[^1] = true;
 		}
-		//console.RefreshStrings(false);
+		//RuntimeHost.RefreshStrings(false);
 		//描画全部終わり
 		//console.PrintSingleLine("[100] 戻る");
 		setWaitInput();
@@ -918,7 +942,7 @@ internal sealed partial class Process
 		int dataNo;
 		for (int i = 0; i < page; i++)
 		{
-			console.PrintFlush(false);
+			RuntimeHost.PrintFlush(false);
 			console.Print(string.Format(trsl.DisplaySaveSlot.Text, i * 20, i * 20 + 19));
 		}
 		for (int i = 0; i < 20; i++)
@@ -927,7 +951,7 @@ internal sealed partial class Process
 			if (dataNo == dataIsAvailable.Length - 1)
 				break;
 			dataIsAvailable[dataNo] = false;
-			console.PrintFlush(false);
+			RuntimeHost.PrintFlush(false);
 			console.Print(string.Format("[{0, 2}] ", dataNo));
 			if (!writeSavedataTextFrom(dataNo))
 				continue;
@@ -935,7 +959,7 @@ internal sealed partial class Process
 		}
 		for (int i = page; i < ((dataIsAvailable.Length - 2) / 20); i++)
 		{
-			console.PrintFlush(false);
+			RuntimeHost.PrintFlush(false);
 			console.Print(string.Format(trsl.DisplaySaveSlot.Text, (i + 1) * 20, (i + 1) * 20 + 19));
 		}
 		//オートセーブの処理は別途切り出し（表示処理の都合上）
@@ -943,12 +967,12 @@ internal sealed partial class Process
 		if (state.SystemState != SystemStateCode.SaveGame_Begin)
 		{
 			dataNo = AutoSaveIndex;
-			console.PrintFlush(false);
+			RuntimeHost.PrintFlush(false);
 			console.Print(string.Format("[{0, 2}] ", dataNo));
 			if (writeSavedataTextFrom(dataNo))
 				dataIsAvailable[^1] = true;
 		}
-		console.RefreshStrings(false);
+		RuntimeHost.RefreshStrings(false);
 		//描画全部終わり
 		console.PrintSingleLine("[100] 戻る");
 		setWaitInput();
@@ -984,15 +1008,15 @@ internal sealed partial class Process
 			available = dataIsAvailable[systemResult];
 		else
 		{//入力しなおし
-			console.deleteLine(1);
-			console.PrintTemporaryLine(trerror.InvalidValue.Text);
-			console.updatedGeneration = true;
+			DeleteLineSafe(1);
+			PrintTemporaryLineSafe(trerror.InvalidValue.Text);
+			MarkUpdatedGeneration();
 			setWaitInput();
 			return;
 		}
 		saveTarget = (int)systemResult;
 
-		GlobalStatic.ctrlZ.OnSavePrepare(saveTarget);
+		RuntimeHost.CtrlZOnSavePrepare(saveTarget);
 
 		//既存データがあるなら選択肢を表示してSaveGame_WaitInputOverwriteへ移行。
 		if (available)
@@ -1018,9 +1042,9 @@ internal sealed partial class Process
 		}
 		else if (systemResult != 0)//「はい」でもない
 		{//入力しなおし
-			console.deleteLine(1);
-			console.PrintTemporaryLine(trerror.InvalidValue.Text);
-			console.updatedGeneration = true;
+			DeleteLineSafe(1);
+			PrintTemporaryLineSafe(trerror.InvalidValue.Text);
+			MarkUpdatedGeneration();
 			setWaitInput();
 			return;
 		}
@@ -1038,7 +1062,7 @@ internal sealed partial class Process
 			console.ReadAnyKey();
 		}
 		
-		GlobalStatic.ctrlZ.OnSave();
+		RuntimeHost.CtrlZOnSave();
 
 		loadPrevState();
 	}
@@ -1074,9 +1098,9 @@ internal sealed partial class Process
 			available = dataIsAvailable[^1];
 		else
 		{//入力しなおし
-			console.deleteLine(1);
-			console.PrintTemporaryLine(trerror.InvalidValue.Text);
-			console.updatedGeneration = true;
+			DeleteLineSafe(1);
+			PrintTemporaryLineSafe(trerror.InvalidValue.Text);
+			MarkUpdatedGeneration();
 			setWaitInput();
 			return;
 		}
@@ -1093,7 +1117,7 @@ internal sealed partial class Process
 			return;
 		}
 
-		GlobalStatic.ctrlZ.OnLoad((int)systemResult);
+		RuntimeHost.CtrlZOnLoad((int)systemResult);
 
 		if (!vEvaluator.LoadFrom((int)systemResult))
 			throw new ExeEE(trerror.UnexpectedErrorInLoaddata.Text);
@@ -1110,7 +1134,7 @@ internal sealed partial class Process
 	void endReloaderb()
 	{
 		loadPrevState();
-		console.ReloadErbFinished();
+		RuntimeHost.ReloadErbFinished();
 	}
 
 	private bool writeSavedataTextFrom(int saveIndex)

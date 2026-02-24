@@ -1,4 +1,5 @@
 ﻿using MinorShift.Emuera.Runtime.Config;
+using MinorShift.Emuera.Runtime;
 using MinorShift.Emuera.Runtime.Script.Data;
 using MinorShift.Emuera.Runtime.Script.Statements.Variable;
 using MinorShift.Emuera.Runtime.Utils;
@@ -328,7 +329,7 @@ internal sealed partial class VariableData : IDisposable
 		varTokenDic.Add("WINDOW_TITLE", new WINDOW_TITLE_Token(VariableCode.WINDOW_TITLE, this));
 		varTokenDic.Add("MONEYLABEL", new MONEYLABEL_Token(VariableCode.MONEYLABEL, this));
 		varTokenDic.Add("DRAWLINESTR", new DRAWLINESTR_Token(VariableCode.DRAWLINESTR, this));
-		if (!Program.DebugMode)
+		if (!RuntimeEnvironment.DebugMode)
 		{
 			varTokenDic.Add("__FILE__", new EmptyStrToken(VariableCode.__FILE__, this));
 			varTokenDic.Add("__FUNCTION__", new EmptyStrToken(VariableCode.__FUNCTION__, this));
@@ -998,21 +999,21 @@ internal sealed partial class VariableData : IDisposable
 	#region EM_私家版_セーブ拡張
 	public void SaveGlobalEMDataToStreamBinary(EraBinaryDataWriter writer)
 	{
-		foreach (var key in GlobalStatic.ConstantData.GlobalSaveMaps)
+		foreach (var key in RuntimeGlobals.ConstantData.GlobalSaveMaps)
 		{
 			if (DataStringMaps.ContainsKey(key))
 			{
 				writer.WriteWithKey(key, DataStringMaps[key]);
 			}
 		}
-		foreach (var key in GlobalStatic.ConstantData.GlobalSaveXmls)
+		foreach (var key in RuntimeGlobals.ConstantData.GlobalSaveXmls)
 		{
 			if (DataXmlDocument.ContainsKey(key))
 			{
 				writer.WriteWithKey(key, DataXmlDocument[key]);
 			}
 		}
-		foreach (var key in GlobalStatic.ConstantData.GlobalSaveDTs)
+		foreach (var key in RuntimeGlobals.ConstantData.GlobalSaveDTs)
 		{
 			if (DataDataTables.ContainsKey(key))
 			{
@@ -1022,21 +1023,21 @@ internal sealed partial class VariableData : IDisposable
 	}
 	public void SaveEMDataToStreamBinary(EraBinaryDataWriter writer)
 	{
-		foreach (var key in GlobalStatic.ConstantData.SaveMaps)
+		foreach (var key in RuntimeGlobals.ConstantData.SaveMaps)
 		{
 			if (DataStringMaps.ContainsKey(key))
 			{
 				writer.WriteWithKey(key, DataStringMaps[key]);
 			}
 		}
-		foreach (var key in GlobalStatic.ConstantData.SaveXmls)
+		foreach (var key in RuntimeGlobals.ConstantData.SaveXmls)
 		{
 			if (DataXmlDocument.ContainsKey(key))
 			{
 				writer.WriteWithKey(key, DataXmlDocument[key]);
 			}
 		}
-		foreach (var key in GlobalStatic.ConstantData.SaveDTs)
+		foreach (var key in RuntimeGlobals.ConstantData.SaveDTs)
 		{
 			if (DataDataTables.ContainsKey(key))
 			{
@@ -1088,21 +1089,21 @@ internal sealed partial class VariableData : IDisposable
 	#region EE_RESETDATA、RESETGLOBAL、LOADDATA、LOADGLOBAL時にMap、Xml、DataTableを適切に削除するように
 	public void RemoveEMSaveData()
 	{
-		foreach (var key in GlobalStatic.ConstantData.SaveMaps)
+		foreach (var key in RuntimeGlobals.ConstantData.SaveMaps)
 		{
 			if (DataStringMaps.ContainsKey(key))
 			{
 				DataStringMaps[key].Clear();
 			}
 		}
-		foreach (var key in GlobalStatic.ConstantData.SaveXmls)
+		foreach (var key in RuntimeGlobals.ConstantData.SaveXmls)
 		{
 			if (DataXmlDocument.ContainsKey(key))
 			{
 				DataXmlDocument.Remove(key);
 			}
 		}
-		foreach (var key in GlobalStatic.ConstantData.SaveDTs)
+		foreach (var key in RuntimeGlobals.ConstantData.SaveDTs)
 		{
 			if (DataDataTables.ContainsKey(key))
 			{
@@ -1113,21 +1114,21 @@ internal sealed partial class VariableData : IDisposable
 
 	public void RemoveEMGlobalData()
 	{
-		foreach (var key in GlobalStatic.ConstantData.GlobalSaveMaps)
+		foreach (var key in RuntimeGlobals.ConstantData.GlobalSaveMaps)
 		{
 			if (DataStringMaps.ContainsKey(key))
 			{
 				DataStringMaps[key].Clear();
 			}
 		}
-		foreach (var key in GlobalStatic.ConstantData.GlobalSaveXmls)
+		foreach (var key in RuntimeGlobals.ConstantData.GlobalSaveXmls)
 		{
 			if (DataXmlDocument.ContainsKey(key))
 			{
 				DataXmlDocument.Remove(key);
 			}
 		}
-		foreach (var key in GlobalStatic.ConstantData.GlobalSaveDTs)
+		foreach (var key in RuntimeGlobals.ConstantData.GlobalSaveDTs)
 		{
 			if (DataDataTables.ContainsKey(key))
 			{
@@ -1137,21 +1138,21 @@ internal sealed partial class VariableData : IDisposable
 	}
 	public void RemoveEMStaticData()
 	{
-		foreach (var key in GlobalStatic.ConstantData.StaticMaps)
+		foreach (var key in RuntimeGlobals.ConstantData.StaticMaps)
 		{
 			if (DataStringMaps.ContainsKey(key))
 			{
 				DataStringMaps[key].Clear();
 			}
 		}
-		foreach (var key in GlobalStatic.ConstantData.StaticXmls)
+		foreach (var key in RuntimeGlobals.ConstantData.StaticXmls)
 		{
 			if (DataXmlDocument.ContainsKey(key))
 			{
 				DataXmlDocument.Remove(key);
 			}
 		}
-		foreach (var key in GlobalStatic.ConstantData.StaticDTs)
+		foreach (var key in RuntimeGlobals.ConstantData.StaticDTs)
 		{
 			if (DataDataTables.ContainsKey(key))
 			{
@@ -1169,8 +1170,8 @@ internal sealed partial class VariableData : IDisposable
 	{
 		KeyValuePair<string, EraSaveDataType> nameAndType = reader.ReadVariableCode();
 		VariableToken vToken = null;
-		if (nameAndType.Key != null && !GlobalStatic.IdentifierDictionary.getVarTokenIsForbid(nameAndType.Key))
-			vToken = GlobalStatic.IdentifierDictionary.GetVariableToken(nameAndType.Key, null, false);
+		if (nameAndType.Key != null && !RuntimeGlobals.IdentifierDictionary.getVarTokenIsForbid(nameAndType.Key))
+			vToken = RuntimeGlobals.IdentifierDictionary.GetVariableToken(nameAndType.Key, null, false);
 		if (vToken != null && (vToken.IsCharacterData || vToken.IsConst || vToken.IsPrivate || vToken.IsLocal || vToken.IsCalc))
 			vToken = null;
 		switch (nameAndType.Value)
@@ -1180,7 +1181,7 @@ internal sealed partial class VariableData : IDisposable
 				{
 					var key = reader.ReadString();
 					var dict = reader.ReadMap();
-					if (GlobalStatic.ConstantData.SaveMaps.Contains(key) || GlobalStatic.ConstantData.GlobalSaveMaps.Contains(key))
+					if (RuntimeGlobals.ConstantData.SaveMaps.Contains(key) || RuntimeGlobals.ConstantData.GlobalSaveMaps.Contains(key))
 					{
 						DataStringMaps[key] = dict;
 					}
@@ -1190,7 +1191,7 @@ internal sealed partial class VariableData : IDisposable
 				{
 					var key = reader.ReadString();
 					var doc = reader.ReadXml();
-					if (GlobalStatic.ConstantData.SaveXmls.Contains(key) || GlobalStatic.ConstantData.GlobalSaveXmls.Contains(key))
+					if (RuntimeGlobals.ConstantData.SaveXmls.Contains(key) || RuntimeGlobals.ConstantData.GlobalSaveXmls.Contains(key))
 					{
 						DataXmlDocument[key] = doc;
 					}
@@ -1200,7 +1201,7 @@ internal sealed partial class VariableData : IDisposable
 				{
 					var key = reader.ReadString();
 					var dt = reader.ReadDataTable();
-					if (GlobalStatic.ConstantData.SaveDTs.Contains(key) || GlobalStatic.ConstantData.GlobalSaveDTs.Contains(key))
+					if (RuntimeGlobals.ConstantData.SaveDTs.Contains(key) || RuntimeGlobals.ConstantData.GlobalSaveDTs.Contains(key))
 					{
 						DataDataTables[key] = dt;
 					}

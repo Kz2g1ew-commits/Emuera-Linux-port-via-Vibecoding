@@ -18,7 +18,7 @@ using System.ComponentModel;
 
 namespace MinorShift.Emuera.Forms
 {
-	internal sealed partial class MainWindow : Form
+	internal sealed partial class MainWindow : Form, IConsoleWindowHost, IConfigDialogHost
 	{
 		public MainWindow(string[] args)
 		{
@@ -98,12 +98,99 @@ namespace MinorShift.Emuera.Forms
 			#endregion
 		}
 		private ToolStripMenuItem[] macroMenuItems = new ToolStripMenuItem[KeyMacro.MaxFkey];
+		private readonly Dictionary<ConsoleToolTipDrawHandler, DrawToolTipEventHandler> toolTipDrawHandlerMap = [];
+		private readonly Dictionary<ConsoleToolTipPopupHandler, PopupEventHandler> toolTipPopupHandlerMap = [];
 		//private System.Diagnostics.FileVersionInfo emueraVer = System.Diagnostics.FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location);
-		public PictureBox MainPicBox { get { return mainPicBox; } }
-		public VScrollBar ScrollBar { get { return vScrollBar; } }
-		public RichTextBox TextBox { get { return richTextBox1; } }
-		public ToolTip ToolTip { get { return toolTipButton; } }
+		public Point GetMousePositionInClient() { return UiPlatformBridge.GetMousePositionInClient(mainPicBox); }
+		public bool IsPointInClient(Point point) { return UiPlatformBridge.IsPointInClient(mainPicBox, point); }
+		public void RemoveAllToolTips() { toolTipButton.RemoveAll(); }
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public int ToolTipInitialDelay { get { return toolTipButton.InitialDelay; } set { toolTipButton.InitialDelay = value; } }
+		public void ShowToolTip(string title, Point point, int duration)
+		{
+			if (duration == 0)
+				toolTipButton.Show(title, mainPicBox, point);
+			else
+				toolTipButton.Show(title, mainPicBox, point, duration);
+		}
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public bool ToolTipOwnerDraw { get { return toolTipButton.OwnerDraw; } set { toolTipButton.OwnerDraw = value; } }
+		public void AddToolTipDrawHandler(ConsoleToolTipDrawHandler handler)
+		{
+			if (handler == null || toolTipDrawHandlerMap.ContainsKey(handler))
+				return;
+			DrawToolTipEventHandler wrapped = (sender, e) =>
+			{
+				ConsoleToolTipDrawEventArgs args = new(
+					e.Graphics,
+					e.ToolTipText,
+					e.Bounds,
+					e.DrawBackground,
+					e.DrawBorder);
+				handler(sender, args);
+			};
+			toolTipDrawHandlerMap[handler] = wrapped;
+			toolTipButton.Draw += wrapped;
+		}
+		public void RemoveToolTipDrawHandler(ConsoleToolTipDrawHandler handler)
+		{
+			if (handler == null || !toolTipDrawHandlerMap.TryGetValue(handler, out DrawToolTipEventHandler wrapped))
+				return;
+			toolTipButton.Draw -= wrapped;
+			toolTipDrawHandlerMap.Remove(handler);
+		}
+		public void AddToolTipPopupHandler(ConsoleToolTipPopupHandler handler)
+		{
+			if (handler == null || toolTipPopupHandlerMap.ContainsKey(handler))
+				return;
+			PopupEventHandler wrapped = (sender, e) =>
+			{
+				ConsoleToolTipPopupEventArgs args = new(e.AssociatedControl, toolTipButton.GetToolTip(e.AssociatedControl), e.ToolTipSize);
+				handler(sender, args);
+				e.ToolTipSize = args.ToolTipSize;
+			};
+			toolTipPopupHandlerMap[handler] = wrapped;
+			toolTipButton.Popup += wrapped;
+		}
+		public void RemoveToolTipPopupHandler(ConsoleToolTipPopupHandler handler)
+		{
+			if (handler == null || !toolTipPopupHandlerMap.TryGetValue(handler, out PopupEventHandler wrapped))
+				return;
+			toolTipButton.Popup -= wrapped;
+			toolTipPopupHandlerMap.Remove(handler);
+		}
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public int ToolTipForeColorArgb { get { return toolTipButton.ForeColor.ToArgb(); } set { toolTipButton.ForeColor = Color.FromArgb(value); } }
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public int ToolTipBackColorArgb { get { return toolTipButton.BackColor.ToArgb(); } set { toolTipButton.BackColor = Color.FromArgb(value); } }
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public int ToolTipAutoPopDelay { get { return toolTipButton.AutoPopDelay; } set { toolTipButton.AutoPopDelay = value; } }
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public int ClientAreaWidth { get { return mainPicBox.Width; } }
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public int ClientAreaHeight { get { return mainPicBox.Height; } }
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public int WindowPositionX { get { return Location.X; } }
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public int WindowPositionY { get { return Location.Y; } }
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public int ScrollValue { get { return vScrollBar.Value; } set { vScrollBar.Value = value; } }
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public int ScrollMaximum { get { return vScrollBar.Maximum; } set { vScrollBar.Maximum = value; } }
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public bool ScrollEnabled { get { return vScrollBar.Enabled; } set { vScrollBar.Enabled = value; } }
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public string InputText { get { return richTextBox1.Text; } set { richTextBox1.Text = value; } }
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public int InputBackColorArgb { get { return richTextBox1.BackColor.ToArgb(); } set { richTextBox1.BackColor = Color.FromArgb(value); } }
+		public void UpdateClipboardRuntimeSettings(int maxCb, int scrollCount, int timerInterval)
+		{
+			console?.CBProc.SetMaxCB(maxCb);
+			console?.CBProc.SetScrollCount(scrollCount);
+			console?.CBProc.SetTimerInterval(timerInterval);
+		}
 		private EmueraConsole console;
+		internal EmueraConsole ConsoleHost => console;
 
 		#region EM_私家版_Icon指定機能
 		public void SetupIcon(Icon icon)
@@ -216,6 +303,16 @@ namespace MinorShift.Emuera.Forms
 		{
 			richTextBox1.Text = str;
 		}
+
+		public void HotkeyStateSet(nint key, nint value)
+		{
+			hotkeyState.HotkeyStateSet(key, value);
+		}
+
+		public void HotkeyStateInit(nint key)
+		{
+			hotkeyState.HotkeyStateInit(key);
+		}
 		#endregion
 
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -239,7 +336,7 @@ namespace MinorShift.Emuera.Forms
 					break;
 				case Keys.C when (keyData & Keys.Modifiers & Keys.Control) == Keys.Control:
 				case Keys.Insert when (keyData & Keys.Modifiers & Keys.Control) == Keys.Control:
-					if (string.IsNullOrEmpty(TextBox.SelectedText))
+					if (string.IsNullOrEmpty(richTextBox1.SelectedText))
 					{
 						var dialog = new ClipBoardDialog { StartPosition = FormStartPosition.CenterParent };
 						dialog.Setup(console);
@@ -341,7 +438,7 @@ namespace MinorShift.Emuera.Forms
 					else
 					{
 						if (Clipboard.GetDataObject().GetDataPresent(DataFormats.Text))
-							TextBox.Paste(DataFormats.GetFormat(DataFormats.UnicodeText));
+							richTextBox1.Paste(DataFormats.GetFormat(DataFormats.UnicodeText));
 						return true;
 					}
 				//else if (((int)keyData == (int)Keys.Control + (int)Keys.D) && Program.DebugMode)
@@ -576,14 +673,14 @@ namespace MinorShift.Emuera.Forms
 		{
 			if (Config.CBUseClipboard)
 			{
-				if (e.Button == MouseButtons.Left) console.CBProc.Check(ClipboardProcessor.CBTriggers.LeftClick);
-				else if (e.Button == MouseButtons.Middle) console.CBProc.Check(ClipboardProcessor.CBTriggers.MiddleClick);
+				if (e.Button == MouseButtons.Left) console.CBProc.Check(CBTriggers.LeftClick);
+				else if (e.Button == MouseButtons.Middle) console.CBProc.Check(CBTriggers.MiddleClick);
 			}
 		}
 
 		private void mainPicBox_MouseDoubleClickCBCheck(object sender, MouseEventArgs e)
 		{
-			if (Config.CBUseClipboard && e.Button == MouseButtons.Left) console.CBProc.Check(ClipboardProcessor.CBTriggers.DoubleLeftClick);
+			if (Config.CBUseClipboard && e.Button == MouseButtons.Left) console.CBProc.Check(CBTriggers.DoubleLeftClick);
 		}
 		#endregion
 		bool changeTextbyMouse;
@@ -596,10 +693,10 @@ namespace MinorShift.Emuera.Forms
 			if (console.IsWaitingPrimitive)
 			//			if (console.IsWaitingPrimitiveMouse)
 			{
-				console.MouseDown(e.Location, e.Button);
+				console.MouseDown(e.Location, (int)e.Button);
 				#region EM_私家版_INPUT系機能拡張
 				if (vScrollBar.Value == vScrollBar.Maximum && console.SelectingButton != null)
-					GlobalStatic.Process.InputInteger(6, console.SelectingButton.GetMappedColor(e.X, e.Y));
+					console.SetInputResultInteger(6, console.SelectingButton.GetMappedColor(e.X, e.Y));
 				#endregion
 				return;
 			}
@@ -637,25 +734,25 @@ namespace MinorShift.Emuera.Forms
 				if (e.Button == MouseButtons.Left || e.Button == MouseButtons.Right || e.Button == MouseButtons.Middle)
 				{
 					if (!isBacklog)
-						GlobalStatic.Process.InputInteger(3, console.SelectingButton.GetMappedColor(e.X, e.Y));
+						console.SetInputResultInteger(3, console.SelectingButton.GetMappedColor(e.X, e.Y));
 					if (modifiersWhileWaintingInputWithMouse != null)
 					{
-						GlobalStatic.Process.InputInteger(2, (long)modifiersWhileWaintingInputWithMouse);
+						console.SetInputResultInteger(2, (long)modifiersWhileWaintingInputWithMouse);
 					}
-					GlobalStatic.Process.InputString(1, str);
+					console.SetInputResultString(1, str);
 					if (e.Button == MouseButtons.Middle)
 					{
-						GlobalStatic.Process.InputInteger(1, 3);
+						console.SetInputResultInteger(1, 3);
 						console.PressEnterKey(false, str, true);
 					}
 					else if (e.Button == MouseButtons.Right)
 					{
-						GlobalStatic.Process.InputInteger(1, 2);
+						console.SetInputResultInteger(1, 2);
 						console.PressEnterKey(true, str, true);
 					}
 					else
 					{
-						GlobalStatic.Process.InputInteger(1, 1);
+						console.SetInputResultInteger(1, 1);
 						console.PressEnterKey(false, str, true);
 					}
 					return;
@@ -671,13 +768,13 @@ namespace MinorShift.Emuera.Forms
 				richTextBox1.Text = string.Empty;
 
 				if (str != null)
-					GlobalStatic.VEvaluator.RESULTS_ARRAY[1] = str;
+					console.SetInputResultString(1, str);
 				if (e.Button == MouseButtons.Left)
-					GlobalStatic.VEvaluator.RESULT_ARRAY[1] = 1;
+					console.SetInputResultInteger(1, 1);
 				if (e.Button == MouseButtons.Right)
-					GlobalStatic.VEvaluator.RESULT_ARRAY[1] = 2;
+					console.SetInputResultInteger(1, 2);
 				if (e.Button == MouseButtons.Middle)
-					GlobalStatic.VEvaluator.RESULT_ARRAY[1] = 3;
+					console.SetInputResultInteger(1, 3);
 				long result2 = 0;
 				if ((ModifierKeys & Keys.Shift) == Keys.Shift)
 					result2 += (long)Math.Pow(2, 16);
@@ -685,8 +782,8 @@ namespace MinorShift.Emuera.Forms
 					result2 += (long)Math.Pow(2, 17);
 				if ((ModifierKeys & Keys.Alt) == Keys.Alt)
 					result2 += (long)Math.Pow(2, 18);
-				GlobalStatic.VEvaluator.RESULT_ARRAY[2] = result2;
-				console.inputReq.Timelimit = 0;
+				console.SetInputResultInteger(2, result2);
+				console.ClearInputTimeLimit();
 
 				PressEnterKey(false, true);
 				return;
@@ -702,7 +799,7 @@ namespace MinorShift.Emuera.Forms
 					last_inputed = "";
 				//ミドルクリックならRESULT:1を1にする
 				if ((e.Button & MouseButtons.Middle) == MouseButtons.Middle)
-					GlobalStatic.VEvaluator.RESULT_ARRAY[1] = 3;
+					console.SetInputResultInteger(1, 3);
 				//右が押しっぱなしならスキップ追加。
 				if ((MouseButtons & MouseButtons.Right) == MouseButtons.Right)
 					PressEnterKey(true, true);
@@ -1035,8 +1132,8 @@ namespace MinorShift.Emuera.Forms
 			if (console != null)
 			{
 				//ほっとしても勝手に閉じるが、その場合はDebugDialogのClosingイベントが発生しない
-				if (Program.DebugMode && (console.DebugDialog != null) && console.DebugDialog.Created)
-					console.DebugDialog.Close();
+				if (Program.DebugMode)
+					console.CloseDebugDialog();
 				console.Dispose();
 				console = null;
 			}
@@ -1179,13 +1276,13 @@ namespace MinorShift.Emuera.Forms
 			if (console.IsWaitingPrimitive)
 			{
 				e.SuppressKeyPress = true;
-				console.PressPrimitiveKey(e.KeyCode, e.KeyData, e.Modifiers);
+				console.PressPrimitiveKey((int)e.KeyCode, (int)e.KeyData, (int)e.Modifiers);
 				return;
 			}
 			//HOTKEY STATE
 			{
 				//int res = hotkeyState.keyToNumberHardcoded(e);
-				int res = hotkeyState.keyToNumberRunInterpreter(e);
+				int res = hotkeyState.keyToNumberRunInterpreter((int)e.KeyData);
 				if (res != -1)
 				{
 					richTextBox1.Clear();
@@ -1287,8 +1384,8 @@ namespace MinorShift.Emuera.Forms
 		{
 			if (!Program.DebugMode)
 				return;
-			if ((console.DebugDialog != null) && console.DebugDialog.Created)
-				console.DebugDialog.UpdateData();
+			if (console.IsDebugDialogCreated)
+				console.UpdateDebugDialog();
 		}
 
 		private void AutoVerbMenu_Opened(object sender, EventArgs e)
@@ -1516,9 +1613,9 @@ namespace MinorShift.Emuera.Forms
 		private void クリップボードにコピーToolStripMenuItem_Click_1(object sender, EventArgs e)
 		{
 			if (クリップボードにコピーToolStripMenuItem.Checked)
-				GlobalStatic.Console.CBProc.Init();
+				console?.CBProc.Init();
 			else
-				GlobalStatic.Console.CBProc.Reset();
+				console?.CBProc.Reset();
 			ConfigData.Instance.GetConfigItem(ConfigCode.CBUseClipboard).SetValue(クリップボードにコピーToolStripMenuItem.Checked);
 			Config.SetConfig(ConfigData.Instance);
 			ConfigData.Instance.SaveConfig();

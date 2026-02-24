@@ -496,8 +496,8 @@ internal sealed class CharacterData : IDisposable
 			object array = null;
 			if (nameAndType.Key != null)
 			{
-				if (!GlobalStatic.IdentifierDictionary.getVarTokenIsForbid(nameAndType.Key))
-					vToken = GlobalStatic.IdentifierDictionary.GetVariableToken(nameAndType.Key, null, false);
+				if (!RuntimeGlobals.IdentifierDictionary.getVarTokenIsForbid(nameAndType.Key))
+					vToken = RuntimeGlobals.IdentifierDictionary.GetVariableToken(nameAndType.Key, null, false);
 				if (userDefineData)
 				{
 					array = vToken == null || !vToken.IsSavedata || !vToken.IsCharacterData || !(vToken is UserDefinedCharaVariableToken token)

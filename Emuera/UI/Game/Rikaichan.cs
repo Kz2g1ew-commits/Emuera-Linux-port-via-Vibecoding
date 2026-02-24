@@ -1,12 +1,10 @@
-﻿using MinorShift.Emuera.Forms;
-using MinorShift.Emuera.Runtime.Config;
+﻿using MinorShift.Emuera.Runtime.Config;
 using MinorShift.Emuera.UI.Game;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO; //for File
 using System.Text;
-using System.Windows.Forms; //for TextRenderer
 
 namespace MinorShift.Emuera.GameView;
 
@@ -48,7 +46,7 @@ partial class Rikaichan
 
 		if (!File.Exists(rikaiFilename))
 		{
-			MessageBox.Show($"{Config.RikaiFilename} not found, rikaichan can't work without that");
+			UiPlatformBridge.ShowInfo($"{Config.RikaiFilename} not found, rikaichan can't work without that");
 			// You need jmdict in edict format, not edict2 or xml, just edict. For now.
 			enabled = false;
 			return;
@@ -66,8 +64,11 @@ partial class Rikaichan
 		}
 		else
 		{
-			var dialog = new RikaiDialog(edict, ReceiveIndex);
-			dialog.Show();
+			if (!UiPlatformBridge.TryShowRikaiIndexDialog(edict, ReceiveIndex))
+			{
+				UiPlatformBridge.ShowInfo($"{Config.RikaiFilename}.ind not found and index dialog is unavailable on this UI backend.");
+				enabled = false;
+			}
 		}
 
 
@@ -893,7 +894,7 @@ partial class Rikaichan
 			while (j != 0)
 			{
 				var line = outputList2[firstlineind + j - 1];
-				TextRenderer.DrawText(graph, line, Config.DefaultFont, new Point(x_offset, y), Config.RikaiColorText, TextFormatFlags.NoPrefix);
+				UiPlatformBridge.DrawTextNoPrefix(graph, line.AsSpan(), Config.DefaultFont, new Point(x_offset, y), Config.RikaiColorText);
 				j--;
 				i++;
 				y -= 20;

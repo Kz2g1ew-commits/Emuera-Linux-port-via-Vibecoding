@@ -1,6 +1,6 @@
 ﻿using MinorShift.Emuera.GameData.Variable;
-using MinorShift.Emuera.GameView;
 using MinorShift.Emuera.Runtime.Config.JSON;
+using MinorShift.Emuera.Runtime.Script;
 using MinorShift.Emuera.Runtime.Script.Data;
 using MinorShift.Emuera.Runtime.Script.Statements.Expression;
 using MinorShift.Emuera.Runtime.Utils;
@@ -11,7 +11,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
 using trerror = MinorShift.Emuera.Runtime.Utils.EvilMask.Lang.Error;
 
 namespace MinorShift.Emuera.Runtime.Script.Statements.Variable;
@@ -34,7 +33,7 @@ internal sealed class VariableEvaluator : IDisposable
 		this.gamebase = gamebase;
 		this.constant = constant;
 		varData = new VariableData(gamebase, constant);
-		GlobalStatic.VariableData = varData;
+		RuntimeHost.SetVariableData(varData);
 	}
 	#region set/get
 
@@ -116,7 +115,7 @@ internal sealed class VariableEvaluator : IDisposable
 		}
 	}
 
-	public static void SetValueAll(FixedVariableTerm p, string srcValue, int start, int end)
+	public static void SetValueAll(FixedVariableTerm p, string srcValue, int start, int end, ExpressionMediator exm)
 	{
 		//呼び出し元で判定済み
 		//if (!p.Identifier.IsString)
@@ -127,7 +126,7 @@ internal sealed class VariableEvaluator : IDisposable
 		{
 			if (p.Identifier.Code == VariableCode.WINDOW_TITLE)
 			{
-				GlobalStatic.Console.SetWindowTitle(srcValue);
+				RuntimeHost.SetWindowTitle(srcValue);
 				return;
 			}
 			return;
@@ -184,7 +183,7 @@ internal sealed class VariableEvaluator : IDisposable
 		}
 	}
 
-	public void SetValueAllEachChara(FixedVariableTerm p, SingleTerm index, string srcValue, int start, int end)
+	public void SetValueAllEachChara(FixedVariableTerm p, SingleTerm index, string srcValue, int start, int end, ExpressionMediator exm)
 	{
 		if (!p.Identifier.IsString)
 			throw new CodeEE(string.Format(trerror.SetStrToInt.Text, p.Identifier.Name));
@@ -194,7 +193,7 @@ internal sealed class VariableEvaluator : IDisposable
 		{
 			if (p.Identifier.Code == VariableCode.WINDOW_TITLE)
 			{
-				GlobalStatic.Console.SetWindowTitle(srcValue);
+				RuntimeHost.SetWindowTitle(srcValue);
 				return;
 			}
 			//一応チェック済み
@@ -222,7 +221,7 @@ internal sealed class VariableEvaluator : IDisposable
 		}
 	}
 
-	public static long GetArraySum(FixedVariableTerm p, long index1, long index2)
+	public static long GetArraySum(FixedVariableTerm p, long index1, long index2, ExpressionMediator exm)
 	{
 		long sum = 0;
 
@@ -230,49 +229,49 @@ internal sealed class VariableEvaluator : IDisposable
 		{
 			if (p.Identifier.IsArray1D)
 			{
-				for (int i = (int)index1; i < (int)index2; i++)
-					sum += p.Identifier.GetIntValue(GlobalStatic.EMediator, [p.Index1, i]);
+					for (int i = (int)index1; i < (int)index2; i++)
+						sum += p.Identifier.GetIntValue(exm, [p.Index1, i]);
 			}
 			else
 			{
-				for (int i = (int)index1; i < (int)index2; i++)
-					sum += p.Identifier.GetIntValue(GlobalStatic.EMediator, [p.Index1, p.Index2, i]);
+					for (int i = (int)index1; i < (int)index2; i++)
+						sum += p.Identifier.GetIntValue(exm, [p.Index1, p.Index2, i]);
 			}
 		}
 		else
 		{
 			if (p.Identifier.IsArray1D)
 			{
-				for (int i = (int)index1; i < (int)index2; i++)
-					sum += p.Identifier.GetIntValue(GlobalStatic.EMediator, [i]);
+					for (int i = (int)index1; i < (int)index2; i++)
+						sum += p.Identifier.GetIntValue(exm, [i]);
 			}
 			else if (p.Identifier.IsArray2D)
 			{
-				for (int i = (int)index1; i < (int)index2; i++)
-					sum += p.Identifier.GetIntValue(GlobalStatic.EMediator, [p.Index1, i]);
+					for (int i = (int)index1; i < (int)index2; i++)
+						sum += p.Identifier.GetIntValue(exm, [p.Index1, i]);
 			}
 			else
 			{
-				for (int i = (int)index1; i < (int)index2; i++)
-					sum += p.Identifier.GetIntValue(GlobalStatic.EMediator, [p.Index1, p.Index2, i]);
+					for (int i = (int)index1; i < (int)index2; i++)
+						sum += p.Identifier.GetIntValue(exm, [p.Index1, p.Index2, i]);
 			}
 		}
 
 		return sum;
 	}
 
-	public static long GetArraySumChara(FixedVariableTerm p, long index1, long index2)
+	public static long GetArraySumChara(FixedVariableTerm p, long index1, long index2, ExpressionMediator exm)
 	{
 		long sum = 0;
 
 		for (int i = (int)index1; i < (int)index2; i++)
 		{
-			sum += p.Identifier.GetIntValue(GlobalStatic.EMediator, [i, p.Index2]);
+				sum += p.Identifier.GetIntValue(exm, [i, p.Index2]);
 		}
 		return sum;
 	}
 
-	public static string GetJoinedStr(FixedVariableTerm p, string delimiter, long index1, long length)
+	public static string GetJoinedStr(FixedVariableTerm p, string delimiter, long index1, long length, ExpressionMediator exm)
 	{
 		string sum = "";
 
@@ -284,80 +283,80 @@ internal sealed class VariableEvaluator : IDisposable
 			}
 			else if (p.Identifier.IsArray2D)
 			{
-				for (int i = 0; i < (int)length; i++)
-					sum += p.Identifier.GetStrValue(GlobalStatic.EMediator, [p.Index1, index1 + i]) + (i < (int)length - 1 ? delimiter : "");
+					for (int i = 0; i < (int)length; i++)
+						sum += p.Identifier.GetStrValue(exm, [p.Index1, index1 + i]) + (i < (int)length - 1 ? delimiter : "");
 			}
 			else
 			{
-				for (int i = 0; i < (int)length; i++)
-					sum += p.Identifier.GetStrValue(GlobalStatic.EMediator, [p.Index1, p.Index2, index1 + i]) + (i < (int)length - 1 ? delimiter : "");
+					for (int i = 0; i < (int)length; i++)
+						sum += p.Identifier.GetStrValue(exm, [p.Index1, p.Index2, index1 + i]) + (i < (int)length - 1 ? delimiter : "");
 			}
 		}
 		else
 		{
 			if (p.Identifier.IsArray1D)
 			{
-				for (int i = 0; i < (int)length; i++)
-					sum += p.Identifier.GetIntValue(GlobalStatic.EMediator, [index1 + i]).ToString() + (i < (int)length - 1 ? delimiter : "");
+					for (int i = 0; i < (int)length; i++)
+						sum += p.Identifier.GetIntValue(exm, [index1 + i]).ToString() + (i < (int)length - 1 ? delimiter : "");
 			}
 			else if (p.Identifier.IsArray2D)
 			{
-				for (int i = 0; i < (int)length; i++)
-					sum += p.Identifier.GetIntValue(GlobalStatic.EMediator, [p.Index1, index1 + i]).ToString() + (i < (int)length - 1 ? delimiter : "");
+					for (int i = 0; i < (int)length; i++)
+						sum += p.Identifier.GetIntValue(exm, [p.Index1, index1 + i]).ToString() + (i < (int)length - 1 ? delimiter : "");
 			}
 			else
 			{
-				for (int i = 0; i < (int)length; i++)
-					sum += p.Identifier.GetIntValue(GlobalStatic.EMediator, [p.Index1, p.Index2, index1 + i]).ToString() + (i < (int)length - 1 ? delimiter : "");
+					for (int i = 0; i < (int)length; i++)
+						sum += p.Identifier.GetIntValue(exm, [p.Index1, p.Index2, index1 + i]).ToString() + (i < (int)length - 1 ? delimiter : "");
 			}
 		}
 		return sum;
 	}
 
-	public static long GetMatch(FixedVariableTerm p, long target, long start, long end)
+	public static long GetMatch(FixedVariableTerm p, long target, long start, long end, ExpressionMediator exm)
 	{
 		long ret = 0;
 
 		for (int i = (int)start; i < (int)end; i++)
-			if (p.Identifier.GetIntValue(GlobalStatic.EMediator, p.Identifier.IsCharacterData ? [p.Index1, i] : [i]) == target)
+			if (p.Identifier.GetIntValue(exm, p.Identifier.IsCharacterData ? [p.Index1, i] : [i]) == target)
 				ret++;
 
 		return ret;
 	}
 
-	public static long GetMatch(FixedVariableTerm p, string target, long start, long end)
+	public static long GetMatch(FixedVariableTerm p, string target, long start, long end, ExpressionMediator exm)
 	{
 		long ret = 0;
 		bool targetIsNullOrEmpty = string.IsNullOrEmpty(target);
 
 		for (int i = (int)start; i < (int)end; i++)
-			if (p.Identifier.GetStrValue(GlobalStatic.EMediator, p.Identifier.IsCharacterData ? [p.Index1, i] : [i]) == target || targetIsNullOrEmpty && string.IsNullOrEmpty(p.Identifier.GetStrValue(GlobalStatic.EMediator, p.Identifier.IsCharacterData ? [p.Index1, i] : [i])))
+			if (p.Identifier.GetStrValue(exm, p.Identifier.IsCharacterData ? [p.Index1, i] : [i]) == target || targetIsNullOrEmpty && string.IsNullOrEmpty(p.Identifier.GetStrValue(exm, p.Identifier.IsCharacterData ? [p.Index1, i] : [i])))
 				ret++;
 
 		return ret;
 	}
 
-	public static long GetMatchChara(FixedVariableTerm p, long target, long start, long end)
+	public static long GetMatchChara(FixedVariableTerm p, long target, long start, long end, ExpressionMediator exm)
 	{
 		long ret = 0;
 
 		for (int i = (int)start; i < (int)end; i++)
 		{
-			if (p.Identifier.GetIntValue(GlobalStatic.EMediator, [i, p.Index2, p.Index3]) == target)
+				if (p.Identifier.GetIntValue(exm, [i, p.Index2, p.Index3]) == target)
 				ret++;
 		}
 
 		return ret;
 	}
 
-	public static long GetMatchChara(FixedVariableTerm p, string target, long start, long end)
+	public static long GetMatchChara(FixedVariableTerm p, string target, long start, long end, ExpressionMediator exm)
 	{
 		long ret = 0;
 		bool targetIsNullOrEmpty = string.IsNullOrEmpty(target);
 
 		for (int i = (int)start; i < (int)end; i++)
 		{
-			if (p.Identifier.GetStrValue(GlobalStatic.EMediator, [i, p.Index2, p.Index3]) == target || targetIsNullOrEmpty && string.IsNullOrEmpty(p.Identifier.GetStrValue(GlobalStatic.EMediator, [i, p.Index2, p.Index3])))
+				if (p.Identifier.GetStrValue(exm, [i, p.Index2, p.Index3]) == target || targetIsNullOrEmpty && string.IsNullOrEmpty(p.Identifier.GetStrValue(exm, [i, p.Index2, p.Index3])))
 				ret++;
 		}
 
@@ -454,13 +453,13 @@ internal sealed class VariableEvaluator : IDisposable
 		return -1;
 	}
 
-	public static long GetMaxArray(FixedVariableTerm p, long start, long end, bool isMax)
+	public static long GetMaxArray(FixedVariableTerm p, long start, long end, bool isMax, ExpressionMediator exm)
 	{
 		long value;
-		long ret = p.Identifier.GetIntValue(GlobalStatic.EMediator, p.Identifier.IsCharacterData ? [p.Index1, start] : [start]);
+		long ret = p.Identifier.GetIntValue(exm, p.Identifier.IsCharacterData ? [p.Index1, start] : [start]);
 		for (int i = (int)start + 1; i < (int)end; i++)
 		{
-			value = p.Identifier.GetIntValue(GlobalStatic.EMediator, p.Identifier.IsCharacterData ? [p.Index1, i] : [i]);
+			value = p.Identifier.GetIntValue(exm, p.Identifier.IsCharacterData ? [p.Index1, i] : [i]);
 			if (isMax)
 			{
 				if (value > ret)
@@ -475,15 +474,15 @@ internal sealed class VariableEvaluator : IDisposable
 		return ret;
 	}
 
-	public static long GetMaxArrayChara(FixedVariableTerm p, long start, long end, bool isMax)
+	public static long GetMaxArrayChara(FixedVariableTerm p, long start, long end, bool isMax, ExpressionMediator exm)
 	{
 		long ret;
 		long value;
 
-		ret = p.Identifier.GetIntValue(GlobalStatic.EMediator, [start, p.Index2, p.Index3]);
+		ret = p.Identifier.GetIntValue(exm, [start, p.Index2, p.Index3]);
 		for (int i = (int)start + 1; i < (int)end; i++)
 		{
-			value = p.Identifier.GetIntValue(GlobalStatic.EMediator, [i, p.Index2, p.Index3]);
+			value = p.Identifier.GetIntValue(exm, [i, p.Index2, p.Index3]);
 
 			if (isMax)
 			{
@@ -500,14 +499,14 @@ internal sealed class VariableEvaluator : IDisposable
 		return ret;
 	}
 
-	public static long GetInRangeArray(FixedVariableTerm p, long min, long max, long start, long end)
+	public static long GetInRangeArray(FixedVariableTerm p, long min, long max, long start, long end, ExpressionMediator exm)
 	{
 		long value;
 		long ret = 0;
 
 		for (int i = (int)start; i < (int)end; i++)
 		{
-			value = p.Identifier.GetIntValue(GlobalStatic.EMediator, p.Identifier.IsCharacterData ? [p.Index1, i] : [i]);
+			value = p.Identifier.GetIntValue(exm, p.Identifier.IsCharacterData ? [p.Index1, i] : [i]);
 			if (value >= min && value < max)
 				ret++;
 		}
@@ -515,14 +514,14 @@ internal sealed class VariableEvaluator : IDisposable
 		return ret;
 	}
 
-	public static long GetInRangeArrayChara(FixedVariableTerm p, long min, long max, long start, long end)
+	public static long GetInRangeArrayChara(FixedVariableTerm p, long min, long max, long start, long end, ExpressionMediator exm)
 	{
 		long ret = 0;
 		long value;
 
 		for (int i = (int)start; i < (int)end; i++)
 		{
-			value = p.Identifier.GetIntValue(GlobalStatic.EMediator, [i, p.Index2, p.Index3]);
+			value = p.Identifier.GetIntValue(exm, [i, p.Index2, p.Index3]);
 			if (value >= min && value < max)
 				ret++;
 		}
@@ -1209,7 +1208,7 @@ internal sealed class VariableEvaluator : IDisposable
 		if (sortorder == SortOrder.UNDEF)
 			sortorder = SortOrder.ASCENDING;
 		if (sortkey == null)
-			sortkey = GlobalStatic.VariableData.GetSystemVariableToken("NO");
+			sortkey = RuntimeGlobals.VariableData.GetSystemVariableToken("NO");
 		CharacterData masterChara = null;
 		CharacterData targetChara = null;
 		CharacterData assiChara = null;
@@ -1549,7 +1548,7 @@ internal sealed class VariableEvaluator : IDisposable
 	//PREVCOMは更新されない。スクリプトの方で更新する必要がある。
 	//Data側からEmueraConsoleを操作するのはここだけ。
 	//1756 ↑だったのは今は昔の話である
-	public void UpdateInUpcheck(EmueraConsole window, bool skipPrint)
+	public void UpdateInUpcheck(IScriptConsole window, bool skipPrint)
 	{
 		long[] up, down, param;
 		string[] paramname = constant.GetCsvNameList(VariableCode.PALAMNAME);
@@ -1605,7 +1604,7 @@ internal sealed class VariableEvaluator : IDisposable
 			down[i] = 0;
 	}
 
-	public void CUpdateInUpcheck(EmueraConsole window, long target, bool skipPrint)
+	public void CUpdateInUpcheck(IScriptConsole window, long target, bool skipPrint)
 	{
 		long[] up, down, param;
 		string[] paramname = constant.GetCsvNameList(VariableCode.PALAMNAME);
@@ -1769,14 +1768,14 @@ internal sealed class VariableEvaluator : IDisposable
 	#region File操作
 
 
-	private static string getSaveDataPathG() { return Config.Config.SavDir + "global.sav"; }
-	private static string getSaveDataPath(int index) { return string.Create(CultureInfo.InvariantCulture, $"{Config.Config.SavDir}save{index:00}.sav"); }
-	private static string getSaveDataPath(string s) { return $"{Config.Config.SavDir}save{s:00}.sav"; }
+	private static string getSaveDataPathG() { return Path.Combine(Config.Config.SavDir, "global.sav"); }
+	private static string getSaveDataPath(int index) { return Path.Combine(Config.Config.SavDir, string.Create(CultureInfo.InvariantCulture, $"save{index:00}.sav")); }
+	private static string getSaveDataPath(string s) { return Path.Combine(Config.Config.SavDir, $"save{s:00}.sav"); }
 
-	private static string getSaveDataPathV(int index) { return Program.DatDir + string.Format("var_{0:00}.dat", index); }
-	private static string getSaveDataPathC(int index) { return Program.DatDir + string.Format("chara_{0:00}.dat", index); }
-	private static string getSaveDataPathV(string s) { return Program.DatDir + "var_" + s + ".dat"; }
-	private static string getSaveDataPathC(string s) { return Program.DatDir + "chara_" + s + ".dat"; }
+	private static string getSaveDataPathV(int index) { return Path.Combine(RuntimeEnvironment.DatDir, string.Format("var_{0:00}.dat", index)); }
+	private static string getSaveDataPathC(int index) { return Path.Combine(RuntimeEnvironment.DatDir, string.Format("chara_{0:00}.dat", index)); }
+	private static string getSaveDataPathV(string s) { return Path.Combine(RuntimeEnvironment.DatDir, "var_" + s + ".dat"); }
+	private static string getSaveDataPathC(string s) { return Path.Combine(RuntimeEnvironment.DatDir, "chara_" + s + ".dat"); }
 
 	/// <summary>
 	/// DatFolderが存在せず、かつ作成に失敗したらエラーを投げる
@@ -1784,15 +1783,15 @@ internal sealed class VariableEvaluator : IDisposable
 	/// <returns></returns>
 	public static void CreateDatFolder()
 	{
-		if (Directory.Exists(Program.DatDir))
+		if (Directory.Exists(RuntimeEnvironment.DatDir))
 			return;
 		try
 		{
-			Directory.CreateDirectory(Program.DatDir);
+			Directory.CreateDirectory(RuntimeEnvironment.DatDir);
 		}
 		catch
 		{
-			MessageBox.Show(trerror.FailedCreateDataFolder.Text);
+			RuntimeHost.ShowInfo(trerror.FailedCreateDataFolder.Text);
 			throw new CodeEE(trerror.FailedCreateDataFolder.Text);
 		}
 	}
@@ -1800,12 +1799,12 @@ internal sealed class VariableEvaluator : IDisposable
 	public static List<string> GetDatFiles(bool charadat, string pattern)
 	{
 		List<string> files = [];
-		if (!Directory.Exists(Program.DatDir))
+		if (!Directory.Exists(RuntimeEnvironment.DatDir))
 			return files;
 		string searchPattern = "var_" + pattern + ".dat";
 		if (charadat)
 			searchPattern = "chara_" + pattern + ".dat";
-		string[] pathes = Directory.GetFiles(Program.DatDir, searchPattern, SearchOption.TopDirectoryOnly);
+			string[] pathes = RuntimeFileSearch.GetFiles(RuntimeEnvironment.DatDir, searchPattern, SearchOption.TopDirectoryOnly);
 		foreach (string path in pathes)
 		{
 			if (!Path.GetExtension(path).Equals(".dat", StringComparison.OrdinalIgnoreCase))
@@ -2017,7 +2016,7 @@ internal sealed class VariableEvaluator : IDisposable
 		{
 			Config.Config.CreateSavDir();
 			fs = new FileStream(filepath, FileMode.Create, FileAccess.Write);
-			bWriter = new EraBinaryDataWriter(fs);
+			bWriter = new EraBinaryDataWriter(fs, Config.Config.SystemSaveInBinary, Config.Config.ZipSaveData);
 			bWriter.WriteHeader();
 			bWriter.WriteFileType(EraSaveFileType.CharVar);
 			bWriter.WriteInt64(gamebase.ScriptUniqueCode);
@@ -2104,7 +2103,7 @@ internal sealed class VariableEvaluator : IDisposable
 		{
 			Config.Config.CreateSavDir();
 			fs = new FileStream(filepath, FileMode.Create, FileAccess.Write);
-			bWriter = new EraBinaryDataWriter(fs);
+			bWriter = new EraBinaryDataWriter(fs, Config.Config.SystemSaveInBinary, Config.Config.ZipSaveData);
 			bWriter.WriteHeader();
 			bWriter.WriteFileType(EraSaveFileType.Var);
 			bWriter.WriteInt64(gamebase.ScriptUniqueCode);
@@ -2234,7 +2233,7 @@ internal sealed class VariableEvaluator : IDisposable
 			if (Config.Config.SystemSaveInBinary)
 			{
 
-				using var bWriter = new EraBinaryDataWriter(fs);
+				using var bWriter = new EraBinaryDataWriter(fs, Config.Config.SystemSaveInBinary, Config.Config.ZipSaveData);
 				bWriter.WriteHeader();
 				bWriter.WriteFileType(EraSaveFileType.Global);
 				bWriter.WriteInt64(gamebase.ScriptUniqueCode);
@@ -2250,7 +2249,7 @@ internal sealed class VariableEvaluator : IDisposable
 			}
 			else
 			{
-				using var writer = new EraDataWriter(fs);
+				using var writer = new EraDataWriter(fs, Config.Config.SaveEncode);
 				writer.Write(gamebase.ScriptUniqueCode);
 				writer.Write(gamebase.ScriptVersion);
 				varData.SaveGlobalToStream(writer);
@@ -2406,12 +2405,12 @@ internal sealed class VariableEvaluator : IDisposable
 			fs = new FileStream(filepath, FileMode.Create, FileAccess.Write);
 			if (Config.Config.SystemSaveInBinary)
 			{
-				bWriter = new EraBinaryDataWriter(fs);
+				bWriter = new EraBinaryDataWriter(fs, Config.Config.SystemSaveInBinary, Config.Config.ZipSaveData);
 				SaveToStreamBinary(bWriter, saveText);
 			}
 			else
 			{
-				writer = new EraDataWriter(fs);
+				writer = new EraDataWriter(fs, Config.Config.SaveEncode);
 				SaveToStream(writer, saveText);
 			}
 			return true;

@@ -31,7 +31,7 @@ internal class FontFactory
 		#region EE_フォントファイル対応
 		int fontsize = Config.FontSize;
 		Font styledFont;
-		foreach (FontFamily ff in GlobalStatic.Pfc.Families)
+		foreach (FontFamily ff in FontRegistry.Collection.Families)
 		{
 			if (ff.Name == fontname)
 			{
@@ -61,7 +61,7 @@ internal class FontFactory
 			try
 			{
 				#region EE_フォントファイル対応
-				foreach (FontFamily ff in GlobalStatic.Pfc.Families)
+				foreach (FontFamily ff in FontRegistry.Collection.Families)
 				{
 					if (ff.Name == fn)
 					{

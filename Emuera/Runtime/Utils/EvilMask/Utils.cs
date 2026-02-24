@@ -1,14 +1,12 @@
-﻿using MinorShift.Emuera.UI.Game;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Text;
 
 namespace MinorShift.Emuera.Runtime.Utils.EvilMask;
 
-internal sealed class Utils
+internal sealed partial class Utils
 {
 	internal sealed class MixedNum
 	{
@@ -171,34 +169,6 @@ internal sealed class Utils
 			sb.Append('\'');
 		}
 	}
-	public static void AddColorParam(StringBuilder sb, string name, Color color)
-	{
-		if (color != Color.Transparent)
-		{
-			sb.Append(' ').Append(name).Append("='").Append(HtmlManager.GetColorToString(color)).Append('\'');
-		}
-	}
-	public static void AddColorParam4(StringBuilder sb, string name, Color[] colors)
-	{
-		if (colors != null)
-		{
-			sb.Append(' ').Append(name).Append("='");
-			if (colors[0] == colors[1] && colors[0] == colors[2] && colors[0] == colors[3])
-				sb.Append(HtmlManager.GetColorToString(colors[0]));
-			else if (colors[0] == colors[2] && colors[1] == colors[3])
-				sb.Append(HtmlManager.GetColorToString(colors[0])).Append(',').Append(HtmlManager.GetColorToString(colors[1]));
-			else if (colors[1] == colors[3])
-				sb.Append(HtmlManager.GetColorToString(colors[0])).Append(',').Append(HtmlManager.GetColorToString(colors[1]))
-					.Append(',').Append(HtmlManager.GetColorToString(colors[2]));
-			else
-				for (int i = 0; i < colors.Length; i++)
-				{
-					sb.Append(HtmlManager.GetColorToString(colors[i]));
-					if (i + 1 < colors.Length) sb.Append(',');
-				}
-			sb.Append('\'');
-		}
-	}
 	public static void AddTagArg(StringBuilder sb, string name, string value)
 	{
 		sb.Append(' ').Append(name).Append("='").Append(value).Append('\'');
@@ -213,17 +183,26 @@ internal sealed class Utils
 	/// </summary>
 	public static string GetValidPath(string path)
 	{
-		path = path.Replace('/', '\\').Replace("..\\", "");
+		if (string.IsNullOrWhiteSpace(path))
+			return null;
+
+		path = path
+			.Replace('\\', Path.DirectorySeparatorChar)
+			.Replace('/', Path.DirectorySeparatorChar);
 		try
 		{
-			if (Path.GetPathRoot(path) != string.Empty)
+			if (Path.IsPathRooted(path))
 				return null;
 		}
 		catch
 		{
 			return null;
 		}
-		return Path.Combine(Program.ExeDir + path);
+		var fullPath = Path.GetFullPath(Path.Combine(RuntimeEnvironment.ExeDir, path));
+		var relative = Path.GetRelativePath(RuntimeEnvironment.ExeDir, fullPath);
+		if (relative.StartsWith("..", StringComparison.Ordinal) || Path.IsPathRooted(relative))
+			return null;
+		return fullPath;
 	}
 	public static void MixedNum4ToInt4(MixedNum[] mnums, ref int[] nums)
 	{
@@ -233,48 +212,6 @@ internal sealed class Utils
 			for (int i = 0; i < 4; i++)
 				nums[i] = MixedNum.ToPixel(mnums[i]);
 		}
-	}
-	// filepathの安全性(ゲームフォルダ以外のフォルダか)を確認しない
-	static public Bitmap LoadImage(string filepath)
-	{
-		Bitmap bmp = null;
-		//FileStream fs = null;
-		if (!File.Exists(filepath)) return null;
-		try
-		{
-			/*				fs = new FileStream(filepath, FileMode.Open);
-							var factory = new ImageProcessor.ImageFactory();
-							factory.Load(fs);
-							bmp = (Bitmap)factory.Image;*/
-			if (Path.GetExtension(filepath).ToLower() == ".webp")
-			{
-				using WebP webp = new();
-				bmp = webp.Load(filepath);
-			}
-			else
-			{
-				bmp = new Bitmap(filepath);
-			}
-		}
-		catch { }
-		return bmp;
-
-	}
-	// ビットマップファイルからアイコンファイルをつくる
-	public static Icon MakeIconFromBmpFile(Bitmap bmp)
-	{
-		Image img = bmp;
-
-		Bitmap bitmap = new(256, 256, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-		Graphics g = Graphics.FromImage(bitmap);
-		g.DrawImage(img, new Rectangle(0, 0, 256, 256));
-		g.Dispose();
-
-		Icon icon = Icon.FromHandle(bitmap.GetHicon());
-
-		img.Dispose();
-		bitmap.Dispose();
-		return icon;
 	}
 
 	public sealed class DataTable

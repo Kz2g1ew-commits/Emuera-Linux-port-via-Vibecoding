@@ -1,7 +1,6 @@
-﻿using Microsoft.VisualBasic;
-using MinorShift.Emuera.GameProc;
+﻿using MinorShift.Emuera.GameProc;
 using MinorShift.Emuera.GameProc.Function;
-using MinorShift.Emuera.GameView;
+using MinorShift.Emuera.Runtime.Script;
 using MinorShift.Emuera.Runtime.Script.Statements.Variable;
 using MinorShift.Emuera.Runtime.Utils;
 using System.Text;
@@ -14,7 +13,7 @@ namespace MinorShift.Emuera.Runtime.Script.Statements;
 //変数が絡む仕事はVariableEvaluatorへ。
 internal sealed class ExpressionMediator
 {
-	public ExpressionMediator(Process proc, VariableEvaluator vev, EmueraConsole console)
+	public ExpressionMediator(Process proc, VariableEvaluator vev, IExecutionConsole console)
 	{
 		VEvaluator = vev;
 		Process = proc;
@@ -22,8 +21,7 @@ internal sealed class ExpressionMediator
 	}
 	public readonly VariableEvaluator VEvaluator;
 	public readonly Process Process;
-	public readonly EmueraConsole Console;
-
+	public readonly IExecutionConsole Console;
 
 
 	private bool forceHiragana;
@@ -58,7 +56,7 @@ internal sealed class ExpressionMediator
 					Console.ReadAnyKey();
 			}
 		}
-		Console.UseSetColorStyle = true;
+		RuntimeHost.SetUseSetColorStyle(true);
 	}
 
 	public string ConvertStringType(string str)
@@ -66,13 +64,10 @@ internal sealed class ExpressionMediator
 		if (!(forceHiragana | forceKatakana | halftoFull))
 			return str;
 		if (forceKatakana)
-			return Strings.StrConv(str, VbStrConv.Katakana, 0x0411);
+			return StringConversionCompat.ToKatakana(str);
 		else if (forceHiragana)
 		{
-			if (halftoFull)
-				return Strings.StrConv(str, VbStrConv.Hiragana | VbStrConv.Wide, 0x0411);
-			else
-				return Strings.StrConv(str, VbStrConv.Hiragana, 0x0411);
+			return StringConversionCompat.ToHiragana(str, halftoFull);
 		}
 		return str;
 	}

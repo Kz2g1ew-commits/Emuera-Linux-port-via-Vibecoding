@@ -2,7 +2,6 @@
 using MinorShift.Emuera.Runtime.Utils.EvilMask;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Text;
 
 namespace MinorShift.Emuera.Runtime.Config;
@@ -108,9 +107,9 @@ internal sealed class ConfigItem<T> : AConfigItem
 				return "YES";
 			return "NO";
 		}
-		if (this is ConfigItem<Color>)
+		if (this is ConfigItem<RuntimeColor>)
 		{
-			Color c = ((ConfigItem<Color>)(AConfigItem)this).Value;
+			RuntimeColor c = ((ConfigItem<RuntimeColor>)(AConfigItem)this).Value;
 			return string.Format("{0},{1},{2}", c.R, c.G, c.B);
 		}
 
@@ -157,12 +156,12 @@ internal sealed class ConfigItem<T> : AConfigItem
 			if (ret)//ConfigItem<T>をConfigItem<bool>に直接キャストすることはできない
 				((ConfigItem<bool>)(AConfigItem)this).Value = b;
 		}
-		else if (this is ConfigItem<Color>)
+		else if (this is ConfigItem<RuntimeColor>)
 		{
-			Color c;
+			RuntimeColor c;
 			ret = tryStringsToColor(str, out c);
 			if (ret)
-				((ConfigItem<Color>)(AConfigItem)this).Value = c;
+				((ConfigItem<RuntimeColor>)(AConfigItem)this).Value = c;
 			else
 				throw new CodeEE(Lang.Error.NotExistColorSpecifier.Text);
 		}
@@ -314,10 +313,10 @@ internal sealed class ConfigItem<T> : AConfigItem
 		throw new CodeEE(Lang.Error.InvalidSpecification.Text);
 	}
 
-	private static bool tryStringsToColor(string str, out Color c)
+	private static bool tryStringsToColor(string str, out RuntimeColor c)
 	{
 		string[] tokens = str.Split(',');
-		c = Color.Black;
+		c = default;
 		int r, g, b;
 		if (tokens.Length < 3)
 			return false;
@@ -327,7 +326,7 @@ internal sealed class ConfigItem<T> : AConfigItem
 			return false;
 		if (!int.TryParse(tokens[2].Trim(), out b) || b < 0 || b > 255)
 			return false;
-		c = Color.FromArgb(r, g, b);
+		c = new RuntimeColor((byte)r, (byte)g, (byte)b);
 		return true;
 	}
 }

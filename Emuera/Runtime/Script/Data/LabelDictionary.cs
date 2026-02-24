@@ -11,11 +11,13 @@ namespace MinorShift.Emuera.Runtime.Script.Data;
 /// </summary>
 internal sealed class LabelDictionary
 {
+	readonly IdentifierDictionary identifierDictionary;
 	#region EM_私家版_辞書獲得
 	public string[] NoneventKeys => noneventLabelDic.Keys.ToArray();
 	#endregion
-	public LabelDictionary()
+	public LabelDictionary(IdentifierDictionary identifierDictionary)
 	{
+		this.identifierDictionary = identifierDictionary;
 		Initialized = false;
 	}
 	/// <summary>
@@ -71,8 +73,8 @@ internal sealed class LabelDictionary
 			if (!list[0].IsEvent)
 			{
 				noneventLabelDic.Add(key, list[0]);
-				GlobalStatic.IdentifierDictionary.resizeLocalVars("ARG", list[0].LabelName, list[0].ArgLength);
-				GlobalStatic.IdentifierDictionary.resizeLocalVars("ARGS", list[0].LabelName, list[0].ArgsLength);
+				identifierDictionary.resizeLocalVars("ARG", list[0].LabelName, list[0].ArgLength);
+				identifierDictionary.resizeLocalVars("ARGS", list[0].LabelName, list[0].ArgsLength);
 				continue;
 			}
 			//1810alpha010 オプションによりイベント関数をイベント関数でないかのように呼び出すことを許可
@@ -101,10 +103,10 @@ internal sealed class LabelDictionary
 				if (!list[i].IsPri && !list[i].IsLater)
 					normallist.Add(list[i]);
 			}
-			if (localMax < GlobalStatic.IdentifierDictionary.getLocalDefaultSize("LOCAL"))
-				localMax = GlobalStatic.IdentifierDictionary.getLocalDefaultSize("LOCAL");
-			if (localsMax < GlobalStatic.IdentifierDictionary.getLocalDefaultSize("LOCALS"))
-				localsMax = GlobalStatic.IdentifierDictionary.getLocalDefaultSize("LOCALS");
+			if (localMax < identifierDictionary.getLocalDefaultSize("LOCAL"))
+				localMax = identifierDictionary.getLocalDefaultSize("LOCAL");
+			if (localsMax < identifierDictionary.getLocalDefaultSize("LOCALS"))
+				localsMax = identifierDictionary.getLocalDefaultSize("LOCALS");
 			eventLabels[0] = onlylist;
 			eventLabels[1] = prilist;
 			eventLabels[2] = normallist;

@@ -1,15 +1,14 @@
 ﻿using MinorShift.Emuera.GameData.Variable;
 using MinorShift.Emuera.GameProc.Function;
+using MinorShift.Emuera.Runtime;
 using MinorShift.Emuera.Runtime.Config;
 using MinorShift.Emuera.Runtime.Script;
 using MinorShift.Emuera.Runtime.Script.Statements;
 using MinorShift.Emuera.Runtime.Script.Statements.Expression;
 using MinorShift.Emuera.Runtime.Script.Statements.Variable;
 using MinorShift.Emuera.Runtime.Utils;
-using MinorShift.Emuera.UI.Game;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using trerror = MinorShift.Emuera.Runtime.Utils.EvilMask.Lang.Error;
 
 namespace MinorShift.Emuera.GameProc;
@@ -22,7 +21,7 @@ internal sealed partial class Process
 		{
 			//bool sequential = state.Sequential;
 			state.ShiftNextLine();
-			//WinmmTimerから時間を取得するのはそれ自体結構なコストがかかるので10000行に一回くらいで。
+			//시간 조회 자체 비용을 줄이기 위해 10000행마다 한 번씩만 확인한다.
 			if (Config.InfiniteLoopAlertTime > 0 && (state.lineCount % 10000 == 0))
 				checkInfiniteLoop();
 			LogicalLine line = state.CurrentLine;
@@ -33,13 +32,13 @@ internal sealed partial class Process
 				throw new CodeEE(line.ErrMes);
 			else if (line is InstructionLine func)
 			{//1753 InstructionLineを先に持ってきてみる。わずかに速くなった気がしないでもない
-				if (!Program.DebugMode && func.Function.IsDebug())
+				if (!RuntimeEnvironment.DebugMode && func.Function.IsDebug())
 				{//非DebugモードでのDebug系命令。何もしない。（SIF文のためにコメント行扱いにはできない）
 					continue;
 				}
 				if (func.Argument == null)
 				{
-					ArgumentParser.SetArgumentTo(func);
+					ArgumentParser.SetArgumentTo(func, exm);
 					if (func.IsError)
 						throw new CodeEE(func.ErrMes);
 				}
@@ -112,16 +111,16 @@ internal sealed partial class Process
 				{
 					if (skipPrint)
 						break;
-					exm.Console.UseUserStyle = true;
-					exm.Console.UseSetColorStyle = true;
+					RuntimeHost.SetUseUserStyle(true);
+					RuntimeHost.SetUseSetColorStyle(true);
 					SpButtonArgument bArg = (SpButtonArgument)func.Argument;
 					str = bArg.PrintStrTerm.GetStrValue(exm);
 					//ボタン処理に絡んで表示がおかしくなるため、PRINTBUTTONでの改行コードはオミット
 					str = str.Replace("\n", "");
 					if (bArg.ButtonWord.GetOperandType() == typeof(long))
-						exm.Console.PrintButton(str, bArg.ButtonWord.GetIntValue(exm));
+						RuntimeHost.PrintButton(str, bArg.ButtonWord.GetIntValue(exm));
 					else
-						exm.Console.PrintButton(str, bArg.ButtonWord.GetStrValue(exm));
+						RuntimeHost.PrintButton(str, bArg.ButtonWord.GetStrValue(exm));
 				}
 				break;
 			case FunctionCode.PRINTBUTTONC://変数の内容
@@ -129,17 +128,17 @@ internal sealed partial class Process
 				{
 					if (skipPrint)
 						break;
-					exm.Console.UseUserStyle = true;
-					exm.Console.UseSetColorStyle = true;
+					RuntimeHost.SetUseUserStyle(true);
+					RuntimeHost.SetUseSetColorStyle(true);
 					SpButtonArgument bArg = (SpButtonArgument)func.Argument;
 					str = bArg.PrintStrTerm.GetStrValue(exm);
 					//ボタン処理に絡んで表示がおかしくなるため、PRINTBUTTONでの改行コードはオミット
 					str = str.Replace("\n", "");
 					bool isRight = (func.FunctionCode == FunctionCode.PRINTBUTTONC);
 					if (bArg.ButtonWord.GetOperandType() == typeof(long))
-						exm.Console.PrintButtonC(str, bArg.ButtonWord.GetIntValue(exm), isRight);
+						RuntimeHost.PrintButtonC(str, bArg.ButtonWord.GetIntValue(exm), isRight);
 					else
-						exm.Console.PrintButtonC(str, bArg.ButtonWord.GetStrValue(exm), isRight);
+						RuntimeHost.PrintButtonC(str, bArg.ButtonWord.GetStrValue(exm), isRight);
 				}
 				break;
 			case FunctionCode.PRINTPLAIN:
@@ -147,16 +146,17 @@ internal sealed partial class Process
 				{
 					if (skipPrint)
 						break;
-					exm.Console.UseUserStyle = true;
-					exm.Console.UseSetColorStyle = true;
+					RuntimeHost.SetUseUserStyle(true);
+					RuntimeHost.SetUseSetColorStyle(true);
 					term = ((ExpressionArgument)func.Argument).Term;
-					exm.Console.PrintPlain(term.GetStrValue(exm));
+					string plainText = term.GetStrValue(exm);
+					RuntimeHost.PrintPlain(plainText);
 				}
 				break;
 			case FunctionCode.DRAWLINE://画面の左端から右端まで----と線を引く。
 				if (skipPrint)
 					break;
-				exm.Console.PrintBar();
+				RuntimeHost.PrintBar();
 				exm.Console.NewLine();
 				break;
 			//case FunctionCode.CUSTOMDRAWLINE:
@@ -166,9 +166,8 @@ internal sealed partial class Process
 						break;
 					term = ((ExpressionArgument)func.Argument).Term;
 					str = term.GetStrValue(exm);
-					exm.Console.printCustomBar(str, false);
+					RuntimeHost.PrintCustomBar(str, false);
 					//exm.Console.setStBar(str);
-					//exm.Console.PrintBar();
 					exm.Console.NewLine();
 					//exm.Console.setStBar(Config.DrawLineString);
 				}
@@ -202,11 +201,11 @@ internal sealed partial class Process
 							exm.Console.PrintC(printStr, true);
 							count++;
 							if ((Config.PrintCPerLine > 0) && (count % Config.PrintCPerLine == 0))
-								exm.Console.PrintFlush(false);
+								RuntimeHost.PrintFlush(false);
 						}
 					}
-					exm.Console.PrintFlush(false);
-					exm.Console.RefreshStrings(false);
+					RuntimeHost.PrintFlush(false);
+					RuntimeHost.RefreshStrings(false);
 				}
 				break;
 			case FunctionCode.PRINT_ITEM://所持アイテム
@@ -238,11 +237,11 @@ internal sealed partial class Process
 								exm.Console.PrintC(string.Format("[{2}] {0}({1}{3})", printStr, price, i, Config.MoneyLabel), false);
 							count++;
 							if ((Config.PrintCPerLine > 0) && (count % Config.PrintCPerLine == 0))
-								exm.Console.PrintFlush(false);
+								RuntimeHost.PrintFlush(false);
 						}
 					}
-					exm.Console.PrintFlush(false);
-					exm.Console.RefreshStrings(false);
+					RuntimeHost.PrintFlush(false);
+					RuntimeHost.RefreshStrings(false);
 				}
 				break;
 			case FunctionCode.UPCHECK://パラメータの変動
@@ -282,8 +281,8 @@ internal sealed partial class Process
 					if ((func.ParentLabelLine != null) && (func.ParentLabelLine.LabelName != "SYSTEM_TITLE"))
 						throw new CodeEE(trerror.CanNotUseOutsideSystemtitle.Text);
 					vEvaluator.AddCharacterFromCsvNo(0);
-					if (GlobalStatic.GameBaseData.DefaultCharacter > 0)
-						vEvaluator.AddCharacterFromCsvNo(GlobalStatic.GameBaseData.DefaultCharacter);
+					if (gamebase.DefaultCharacter > 0)
+						vEvaluator.AddCharacterFromCsvNo(gamebase.DefaultCharacter);
 					break;
 				}
 			case FunctionCode.PUTFORM://@SAVEINFO関数でのみ使用可能。PRINTFORMと同様の書式でセーブデータに概要をつける。
@@ -301,14 +300,14 @@ internal sealed partial class Process
 				break;
 			#region EE_FORCE_QUIT系
 			case FunctionCode.QUIT_AND_RESTART:
-				Program.rebootFlag = true;
+				RuntimeEnvironment.RebootRequested = true;
 				exm.Console.Quit();
 				break;
 			case FunctionCode.FORCE_QUIT://ゲームを終了
 				exm.Console.ForceQuit();
 				break;
 			case FunctionCode.FORCE_QUIT_AND_RESTART:
-				Program.rebootFlag = true;
+				RuntimeEnvironment.RebootRequested = true;
 				exm.Console.ForceQuit();
 				break;
 			#endregion
@@ -416,21 +415,18 @@ internal sealed partial class Process
 						if ((colorR > 255) || (colorG > 255) || (colorB > 255))
 							throw new CodeEE(trerror.SetcolorArgOver255.Text);
 					}
-					Color c = Color.FromArgb((int)colorR, (int)colorG, (int)colorB);
-					exm.Console.SetStringStyle(c);
+					var rgb = ((int)colorR << 16) | ((int)colorG << 8) | (int)colorB;
+					RuntimeHost.SetStringColorRgb(rgb);
 				}
 				break;
 			case FunctionCode.SETCOLORBYNAME:
 				{
 					string colorName = func.Argument.ConstStr;
-					Color c = Color.FromName(colorName);
-					if (c.A == 0)
-					{
-						if (str.Equals("transparent", StringComparison.OrdinalIgnoreCase))
-							throw new CodeEE(trerror.TransparentUnsupported.Text);
+					if (colorName.Equals("transparent", StringComparison.OrdinalIgnoreCase))
+						throw new CodeEE(trerror.TransparentUnsupported.Text);
+					if (!RuntimeHost.TryResolveNamedColorRgb(colorName, out var rgb))
 						throw new CodeEE(string.Format(trerror.InvalidColorName.Text, colorName));
-					}
-					exm.Console.SetStringStyle(c);
+					RuntimeHost.SetStringColorRgb(rgb);
 				}
 				break;
 			case FunctionCode.SETBGCOLOR:
@@ -463,39 +459,36 @@ internal sealed partial class Process
 						if ((colorR > 255) || (colorG > 255) || (colorB > 255))
 							throw new CodeEE(trerror.SetcolorArgOver255.Text);
 					}
-					Color c = Color.FromArgb((int)colorR, (int)colorG, (int)colorB);
-					exm.Console.SetBgColor(c);
+					var rgb = ((int)colorR << 16) | ((int)colorG << 8) | (int)colorB;
+					RuntimeHost.SetBackgroundColorRgb(rgb);
 				}
 				break;
 			case FunctionCode.SETBGCOLORBYNAME:
 				{
 					string colorName = func.Argument.ConstStr;
-					Color c = Color.FromName(colorName);
-					if (c.A == 0)
-					{
-						if (str.Equals("transparent", StringComparison.OrdinalIgnoreCase))
-							throw new CodeEE(trerror.TransparentUnsupported.Text);
+					if (colorName.Equals("transparent", StringComparison.OrdinalIgnoreCase))
+						throw new CodeEE(trerror.TransparentUnsupported.Text);
+					if (!RuntimeHost.TryResolveNamedColorRgb(colorName, out var rgb))
 						throw new CodeEE(string.Format(trerror.InvalidColorName.Text, colorName));
-					}
-					exm.Console.SetBgColor(c);
+					RuntimeHost.SetBackgroundColorRgb(rgb);
 				}
 				break;
 			case FunctionCode.FONTSTYLE:
 				{
-					FontStyle fs = FontStyle.Regular;
+					RuntimeFontStyleFlags fs = RuntimeFontStyleFlags.Regular;
 					if (func.Argument.IsConst)
 						iValue = func.Argument.ConstInt;
 					else
 						iValue = ((ExpressionArgument)func.Argument).Term.GetIntValue(exm);
 					if ((iValue & 1) != 0)
-						fs |= FontStyle.Bold;
+						fs |= RuntimeFontStyleFlags.Bold;
 					if ((iValue & 2) != 0)
-						fs |= FontStyle.Italic;
+						fs |= RuntimeFontStyleFlags.Italic;
 					if ((iValue & 4) != 0)
-						fs |= FontStyle.Strikeout;
+						fs |= RuntimeFontStyleFlags.Strikeout;
 					if ((iValue & 8) != 0)
-						fs |= FontStyle.Underline;
-					exm.Console.SetStringStyle(fs);
+						fs |= RuntimeFontStyleFlags.Underline;
+					RuntimeHost.SetStringStyleFlags(fs);
 				}
 				break;
 			case FunctionCode.SETFONT:
@@ -503,16 +496,16 @@ internal sealed partial class Process
 					str = func.Argument.ConstStr;
 				else
 					str = ((ExpressionArgument)func.Argument).Term.GetStrValue(exm);
-				exm.Console.SetFont(str);
+				RuntimeHost.SetFont(str);
 				break;
 			case FunctionCode.ALIGNMENT:
 				str = func.Argument.ConstStr;
 				if (str.Equals("LEFT", Config.StringComparison))
-					exm.Console.Alignment = DisplayLineAlignment.LEFT;
+					RuntimeHost.SetAlignment(RuntimeDisplayLineAlignment.LEFT);
 				else if (str.Equals("CENTER", Config.StringComparison))
-					exm.Console.Alignment = DisplayLineAlignment.CENTER;
+					RuntimeHost.SetAlignment(RuntimeDisplayLineAlignment.CENTER);
 				else if (str.Equals("RIGHT", Config.StringComparison))
-					exm.Console.Alignment = DisplayLineAlignment.RIGHT;
+					RuntimeHost.SetAlignment(RuntimeDisplayLineAlignment.RIGHT);
 				else
 					throw new CodeEE(string.Format(trerror.InvalidAlignment.Text, str));
 				break;
@@ -522,7 +515,7 @@ internal sealed partial class Process
 					iValue = func.Argument.ConstInt;
 				else
 					iValue = ((ExpressionArgument)func.Argument).Term.GetIntValue(exm);
-				exm.Console.SetRedraw(iValue);
+				RuntimeHost.SetRedraw(iValue);
 				break;
 
 			case FunctionCode.RESET_STAIN:
@@ -595,20 +588,6 @@ internal sealed partial class Process
 						skipPrint = true;
 				}
 				break;
-			#region EE_OUTPUTLOG拡張
-			/*
-			case FunctionCode.OUTPUTLOG:
-				#region EE_OUTPUTLOG
-				if (func.Argument.IsConst)
-					str = func.Argument.ConstStr;
-				else
-					str = ((ExpressionArgument)func.Argument).Term.GetStrValue(exm);
-				exm.Console.OutputLog(str);
-				// exm.Console.OutputLog(null);
-				#endregion
-				break;
-			*/
-			#endregion
 			case FunctionCode.ARRAYSHIFT: //配列要素をずらす
 				{
 					SpArrayShiftArgument arrayArg = (SpArrayShiftArgument)func.Argument;
@@ -695,13 +674,13 @@ internal sealed partial class Process
 						string[] names = [null, null];
 						names[0] = varName1.GetStrValue(exm);
 						names[1] = varName2.GetStrValue(exm);
-						if ((vars[0] = GlobalStatic.IdentifierDictionary.GetVariableToken(names[0], null, true)) == null)
+						if ((vars[0] = idDic.GetVariableToken(names[0], null, true)) == null)
 							throw new CodeEE(string.Format(trerror.NotVariableName.Text, "ARRAYCOPY", "1", names[0]));
 						if (!vars[0].IsArray1D && !vars[0].IsArray2D && !vars[0].IsArray3D)
 							throw new CodeEE(string.Format(trerror.ArraycopyArgIsNotArray.Text, "1", names[0]));
 						if (vars[0].IsCharacterData)
 							throw new CodeEE(string.Format(trerror.ArraycopyArgIsCharaVar.Text, "1", names[0]));
-						if ((vars[1] = GlobalStatic.IdentifierDictionary.GetVariableToken(names[1], null, true)) == null)
+						if ((vars[1] = idDic.GetVariableToken(names[1], null, true)) == null)
 							throw new CodeEE(string.Format(trerror.NotVariableName.Text, "ARRAYCOPY", "2", names[1]));
 						if (!vars[1].IsArray1D && !vars[1].IsArray2D && !vars[1].IsArray3D)
 							throw new CodeEE(string.Format(trerror.ArraycopyArgIsNotArray.Text, "2", names[1]));
@@ -716,8 +695,8 @@ internal sealed partial class Process
 					}
 					else
 					{
-						vars[0] = GlobalStatic.IdentifierDictionary.GetVariableToken(((SingleStrTerm)varName1).Str, null, true);
-						vars[1] = GlobalStatic.IdentifierDictionary.GetVariableToken(((SingleStrTerm)varName2).Str, null, true);
+						vars[0] = idDic.GetVariableToken(((SingleStrTerm)varName1).Str, null, true);
+						vars[1] = idDic.GetVariableToken(((SingleStrTerm)varName2).Str, null, true);
 						if ((vars[0].IsInteger && vars[1].IsString) || (vars[0].IsString && vars[1].IsInteger))
 							throw new CodeEE(trerror.DifferentArraycopyArgsType.Text);
 					}
@@ -751,7 +730,7 @@ internal sealed partial class Process
 			case FunctionCode.THROW:
 				throw new CodeEE(((ExpressionArgument)func.Argument).Term.GetStrValue(exm));
 			case FunctionCode.CLEARTEXTBOX:
-				console.ClearText();
+				RuntimeHost.ClearText();
 				break;
 			case FunctionCode.STRDATA:
 				{
@@ -769,7 +748,7 @@ internal sealed partial class Process
 					{
 						state.CurrentLine = selectedLine;
 						if (selectedLine.Argument == null)
-							ArgumentParser.SetArgumentTo(selectedLine);
+							ArgumentParser.SetArgumentTo(selectedLine, exm);
 						term = ((ExpressionArgument)selectedLine.Argument).Term;
 						str += term.GetStrValue(exm);
 						if (++i < iList.Count)
@@ -863,7 +842,7 @@ internal sealed partial class Process
 					foreach (InstructionLine iLine in func.callList)
 					{
 						if (iLine.Argument == null)
-							ArgumentParser.SetArgumentTo(iLine);
+							ArgumentParser.SetArgumentTo(iLine, exm);
 						funcName = ((SpCallArgment)iLine.Argument).FuncnameTerm.GetStrValue(exm);
 						jumpto = state.CurrentCalled.CallLabel(this, funcName);
 						if (jumpto != null)

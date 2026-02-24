@@ -1,6 +1,6 @@
 ﻿using MinorShift.Emuera.GameProc.Function;
-using MinorShift.Emuera.GameView;
 using MinorShift.Emuera.Runtime.Config;
+using MinorShift.Emuera.Runtime.Script;
 using MinorShift.Emuera.Runtime.Script.Data;
 using MinorShift.Emuera.Runtime.Script.Statements;
 using MinorShift.Emuera.Runtime.Script.Statements.Expression;
@@ -225,7 +225,7 @@ internal static class LogicalLineParser
 						int size = (int)sizeTerm.Int;
 						if (token.SequenceEqual("LOCALSIZE"))
 						{
-							if (GlobalStatic.IdentifierDictionary.getLocalIsForbid("LOCAL"))
+							if (RuntimeGlobals.IdentifierDictionary.getLocalIsForbid("LOCAL"))
 							{
 								ParserMediator.Warn(string.Format(trerror.LocalIsProhibited.Text, token.ToString(), "LOCAL"), position, 2);
 								break;
@@ -236,7 +236,7 @@ internal static class LogicalLineParser
 						}
 						else
 						{
-							if (GlobalStatic.IdentifierDictionary.getLocalIsForbid("LOCALS"))
+							if (RuntimeGlobals.IdentifierDictionary.getLocalIsForbid("LOCALS"))
 							{
 								ParserMediator.Warn(string.Format(trerror.LocalIsProhibited.Text, token.ToString(), "LOCALS"), position, 2);
 								break;
@@ -275,14 +275,14 @@ internal static class LogicalLineParser
 		return true;
 	}
 
-	public static LogicalLine ParseLine(string str, EmueraConsole console)
+	public static LogicalLine ParseLine(string str, IScriptConsole? console)
 	{
 		ScriptPosition? position = new();
 		CharStream stream = new(str);
 		return ParseLine(stream, position, console);
 	}
 
-	public static LogicalLine ParseLabelLine(CharStream stream, ScriptPosition? position, EmueraConsole console)
+	public static LogicalLine ParseLabelLine(CharStream stream, ScriptPosition? position, IScriptConsole? console)
 	{
 		bool isFunction = stream.Current == '@';
 		//int lineNo = Position.Value.LineNo;
@@ -299,7 +299,7 @@ internal static class LogicalLineParser
 			}
 			labelName = iw.Code;
 			wc.ShiftNext();
-			GlobalStatic.IdentifierDictionary.CheckUserLabelName(out errMes, ref warnLevel, isFunction, labelName);
+			RuntimeGlobals.IdentifierDictionary.CheckUserLabelName(out errMes, ref warnLevel, isFunction, labelName);
 			if (warnLevel >= 0)
 			{
 				if (warnLevel >= 2)
@@ -319,7 +319,7 @@ internal static class LogicalLineParser
 			//labelName = labelName.Trim();
 			//if (Config.Config.IgnoreCase)
 			//    labelName = labelName.ToUpper();
-			//GlobalStatic.IdentifierDictionary.CheckUserLabelName(ref errMes, ref warnLevel, isFunction, labelName);
+			//RuntimeGlobals.IdentifierDictionary.CheckUserLabelName(ref errMes, ref warnLevel, isFunction, labelName);
 			//if(warnLevel >= 0)
 			//{
 			//    if (warnLevel >= 2)
@@ -344,7 +344,7 @@ internal static class LogicalLineParser
 			//}
 			//WordCollection wc = null;
 			//wc = LexicalAnalyzer.Analyse(stream, LexEndWith.EoL, LexAnalyzeFlag.AllowAssignment);
-			if (Program.AnalysisMode)
+			if (RuntimeEnvironment.AnalysisMode && console != null)
 				console.PrintC("@" + labelName, false);
 			FunctionLabelLine funclabelLine = new(position, labelName, wc);
 			if (IdentifierDictionary.IsEventLabelName(labelName))
@@ -368,7 +368,7 @@ internal static class LogicalLineParser
 
 		static LogicalLine err(ScriptPosition? position, bool isFunction, ref string labelName, string errMes)
 		{
-			System.Media.SystemSounds.Hand.Play();
+			RuntimeHost.PlayErrorTone();
 			if (isFunction)
 			{
 				if (labelName.Length == 0)
@@ -380,7 +380,7 @@ internal static class LogicalLineParser
 	}
 
 
-	public static LogicalLine ParseLine(CharStream stream, ScriptPosition? position, EmueraConsole console, FunctionLabelLine parentLine = null)
+	public static LogicalLine ParseLine(CharStream stream, ScriptPosition? position, IScriptConsole? console, FunctionLabelLine parentLine = null)
 	{
 		//int lineNo = Position.Value.LineNo;
 		string errMes;
@@ -416,7 +416,7 @@ internal static class LogicalLineParser
 			IdentifierWord idWT = LexicalAnalyzer.ReadFirstIdentifierWord(stream);
 			if (idWT != null)
 			{
-				FunctionIdentifier func = GlobalStatic.IdentifierDictionary.GetFunctionIdentifier(idWT.Code);
+				FunctionIdentifier func = RuntimeGlobals.IdentifierDictionary.GetFunctionIdentifier(idWT.Code);
 				//命令文
 				if (func != null)//関数文
 				{
@@ -466,7 +466,7 @@ internal static class LogicalLineParser
 								//初期値がある
 								if (!right.IsWhiteSpace())
 								{
-									GlobalStatic.Process.scaningLine = line;
+									RuntimeGlobals.SetCurrentScanningLine(line);
 									var wc = LexicalAnalyzer.Analyse(new CharStream(right.ToString()), LexEndWith.EoL, LexAnalyzeFlag.None);
 									exp = ExpressionParser.ReduceIntegerTerm(wc, TermEndWith.EoL);
 								}
@@ -591,7 +591,7 @@ internal static class LogicalLineParser
 		}
 		catch (CodeEE e)
 		{
-			System.Media.SystemSounds.Hand.Play();
+			RuntimeHost.PlayErrorTone();
 			return new InvalidLine(position, e.Message);
 		}
 	}

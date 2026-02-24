@@ -1,4 +1,5 @@
 ﻿using MinorShift.Emuera.Runtime.Script.Parser;
+using MinorShift.Emuera.Runtime.Script.Statements;
 using MinorShift.Emuera.Runtime.Script.Statements.Expression;
 using MinorShift.Emuera.Runtime.Utils;
 using System;
@@ -26,10 +27,10 @@ internal sealed class UserDefinedVariableData
 	//1822 Privateの方もDIMだけ遅延させようとしたけどちょっと課題がおおいのでやめとく
 	public static UserDefinedVariableData Create(DimLineWC dimline)
 	{
-		return Create(dimline.WC, dimline.Dims, dimline.IsPrivate, dimline.SC);
+		return Create(dimline.WC, dimline.Dims, dimline.IsPrivate, dimline.SC, dimline.Exm);
 	}
 
-	public static UserDefinedVariableData Create(WordCollection wc, bool dims, bool isPrivate, ScriptPosition? sc)
+	public static UserDefinedVariableData Create(WordCollection wc, bool dims, bool isPrivate, ScriptPosition? sc, ExpressionMediator exm = null)
 	{
 		string dimtype = dims ? "#DIM" : "#DIMS";
 		UserDefinedVariableData ret = new()
@@ -173,13 +174,13 @@ internal sealed class UserDefinedVariableData
 		if (ret.Name == null)
 			throw new CodeEE(string.Format(trerror.NotVarAfterKeyword.Text, keyword), sc);
 		if (Config.Config.UseERD && Config.Config.CheckDuplicateIdentifier)
-			GlobalStatic.ConstantData.isDefinedErd(ret.Name, sc);
+			RuntimeGlobals.ConstantData.isDefinedErd(ret.Name, sc);
 		string errMes = "";
 		int errLevel = -1;
 		if (isPrivate)
-			GlobalStatic.IdentifierDictionary.CheckUserPrivateVarName(ref errMes, ref errLevel, ret.Name);
+			RuntimeGlobals.IdentifierDictionary.CheckUserPrivateVarName(ref errMes, ref errLevel, ret.Name);
 		else
-			GlobalStatic.IdentifierDictionary.CheckUserVarName(ref errMes, ref errLevel, ret.Name);
+			RuntimeGlobals.IdentifierDictionary.CheckUserVarName(ref errMes, ref errLevel, ret.Name);
 		if (errLevel >= 0)
 		{
 			if (errLevel >= 2)
@@ -269,7 +270,7 @@ internal sealed class UserDefinedVariableData
 			{
 				if (terms[i] == null)
 					throw new CodeEE(trerror.ArrayVarCanNotOmitInitialValue.Text);
-				terms[i] = terms[i].Restructure(GlobalStatic.EMediator);
+				terms[i] = terms[i].Restructure(exm);
 				if (terms[i] is not SingleTerm sTerm)
 					throw new CodeEE(trerror.InitialValueOnlyConst.Text);
 				if (dims != sTerm.IsString)
@@ -323,11 +324,13 @@ internal sealed class DimLineWC
 	public bool Dims;
 	public bool IsPrivate;
 	public ScriptPosition? SC;
-	public DimLineWC(WordCollection wc, bool isString, bool isPrivate, ScriptPosition? position)
+	public ExpressionMediator Exm;
+	public DimLineWC(WordCollection wc, bool isString, bool isPrivate, ScriptPosition? position, ExpressionMediator exm = null)
 	{
 		WC = wc;
 		Dims = isString;
 		IsPrivate = isPrivate;
 		SC = position;
+		Exm = exm;
 	}
 }

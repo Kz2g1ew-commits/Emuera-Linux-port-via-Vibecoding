@@ -11,3 +11,13 @@ Emuera/obj/*
 
 *.diff
 *.patch
+
+artifacts/*
+Emuera.Cli/bin/*
+Emuera.Cli/obj/*
+Emuera.RuntimeCore/bin/*
+Emuera.RuntimeCore/obj/*
+Emuera.RuntimeEngine/bin/*
+Emuera.RuntimeEngine/obj/*
+EmueraPluginExample/bin/*
+EmueraPluginExample/obj/*

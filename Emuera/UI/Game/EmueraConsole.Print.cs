@@ -11,7 +11,6 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Windows.Forms;
 using static MinorShift.Emuera.Runtime.Utils.EvilMask.Utils;
 using trerror = MinorShift.Emuera.Runtime.Utils.EvilMask.Lang.Error;
 using trmb = MinorShift.Emuera.Runtime.Utils.EvilMask.Lang.MessageBox;
@@ -24,12 +23,13 @@ namespace MinorShift.Emuera.GameView;
 internal sealed partial class EmueraConsole : IDisposable
 {
 	private readonly List<ConsoleDisplayLine> displayLineList;
-	public bool noOutputLog;
-	public Color bgColor = Config.BackColor;
+	public bool noOutputLog { get; set; }
+	public Color bgColor { get; set; } = Config.BackColor;
 
 	private readonly PrintStringBuffer printBuffer;
 	#region EE_BINPUT
 	public PrintStringBuffer PrintBuffer { get { return printBuffer; } }
+	public bool IsPrintBufferEmpty => printBuffer.IsEmpty;
 	#endregion
 	readonly StringMeasure stringMeasure = new();
 
@@ -88,9 +88,15 @@ internal sealed partial class EmueraConsole : IDisposable
 	}
 	//private StringStyle Style { get { return (useUserStyle ? userStyle : defaultStyle); } }
 	public StringStyle StringStyle { get { return userStyle; } }
+	private static Color FromRgb24(int rgb) => Color.FromArgb((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF);
 	public void SetStringStyle(FontStyle fs) { userStyle.FontStyle = fs; }
 	public void SetStringStyle(Color color) { userStyle.Color = color; userStyle.ColorChanged = color != Config.ForeColor; }
+	public void SetStringColorRgb(int rgb) { SetStringStyle(FromRgb24(rgb)); }
+	public int GetStringColorRgb() { return userStyle.Color.ToArgb() & 0xFFFFFF; }
+	public void SetStringStyleFlags(MinorShift.Emuera.Runtime.Script.RuntimeFontStyleFlags styleFlags) { SetStringStyle((FontStyle)(int)styleFlags); }
+	public MinorShift.Emuera.Runtime.Script.RuntimeFontStyleFlags GetStringStyleFlags() => (MinorShift.Emuera.Runtime.Script.RuntimeFontStyleFlags)(int)userStyle.FontStyle;
 	public void SetFont(string fontname) { if (!string.IsNullOrEmpty(fontname)) userStyle.Fontname = fontname; else userStyle.Fontname = Config.FontName; }
+	public string GetFontName() { return userStyle.Fontname ?? Config.FontName; }
 	private DisplayLineAlignment alignment = DisplayLineAlignment.LEFT;
 	public DisplayLineAlignment Alignment { get { return alignment; } set { alignment = value; } }
 	public void ResetStyle()
@@ -114,7 +120,7 @@ internal sealed partial class EmueraConsole : IDisposable
 		forceTextBoxColor = true;
 		//REDRAWされない場合はTextBoxの色は変えずにフラグだけ立てる
 		//最初の再描画時に現在の背景色に合わせる
-		if (redraw == ConsoleRedraw.None && window.ScrollBar.Value == window.ScrollBar.Maximum)
+		if (redraw == ConsoleRedraw.None && window.ScrollValue == window.ScrollMaximum)
 			return;
 		//色変化が速くなりすぎないように一定時間以内の再呼び出しは強制待ちにする
 		if (_drawStopwatch == null)
@@ -125,12 +131,14 @@ internal sealed partial class EmueraConsole : IDisposable
 		{
 			while (_drawStopwatch.ElapsedMilliseconds < msPerFrame)
 			{
-				Application.DoEvents();
+				UiPlatformBridge.DoEvents();
 			}
 		}
 		RefreshStrings(true);
 		_drawStopwatch.Restart();
 	}
+	public void SetBackgroundColorRgb(int rgb) { SetBgColor(FromRgb24(rgb)); }
+	public int GetBackgroundColorRgb() { return bgColor.ToArgb() & 0xFFFFFF; }
 
 	//完全に独立したHTML
 	public void PrintHTMLIsland(string html)
@@ -213,7 +221,7 @@ internal sealed partial class EmueraConsole : IDisposable
 			line.SetAlignment(alignment);
 		line.LineNo = lineNo;
 		//Bitmap Cache
-		line.bitmapCacheEnabled = GlobalStatic.Console.bitmapCacheEnabledForNextLine;
+		line.bitmapCacheEnabled = bitmapCacheEnabledForNextLine;
 		if (displayLineList.Count != 0 &&
 					!displayLineList[^1].IsLineEnd)
 		{
@@ -361,7 +369,7 @@ internal sealed partial class EmueraConsole : IDisposable
 			if (position.Value.LineNo >= 0)
 			{
 				PrintErrorButton(string.Format(trerror.Warning1.Text, level, position.Value.Filename, position.Value.LineNo, str), position, level);
-				GlobalStatic.Process.printRawLine(position);
+				process?.printRawLine(position);
 			}
 			else
 				PrintErrorButton(string.Format(trerror.Warning2.Text, level, position.Value.Filename, str), position, level);
@@ -405,7 +413,7 @@ internal sealed partial class EmueraConsole : IDisposable
 		RefreshStrings(false);
 	}
 
-	internal void PrintErrorButton(string str, ScriptPosition? pos, int level = 0)
+	public void PrintErrorButton(string str, ScriptPosition? pos, int level = 0)
 	{
 		if (string.IsNullOrEmpty(str))
 			return;
@@ -593,32 +601,32 @@ internal sealed partial class EmueraConsole : IDisposable
 		return str;
 	}
 
-	internal void PrintButton(string str, string p)
+	public void PrintButton(string str, string p)
 	{
 		if (string.IsNullOrEmpty(str))
 			return;
 		printBuffer.AppendButton(str, Style, p);
 	}
-	internal void PrintButton(string str, long p)
+	public void PrintButton(string str, long p)
 	{
 		if (string.IsNullOrEmpty(str))
 			return;
 		printBuffer.AppendButton(str, Style, p);
 	}
-	internal void PrintButtonC(string str, string p, bool isRight)
+	public void PrintButtonC(string str, string p, bool isRight)
 	{
 		if (string.IsNullOrEmpty(str))
 			return;
 		printBuffer.AppendButton(CreateTypeCString(str, isRight), Style, p);
 	}
-	internal void PrintButtonC(string str, long p, bool isRight)
+	public void PrintButtonC(string str, long p, bool isRight)
 	{
 		if (string.IsNullOrEmpty(str))
 			return;
 		printBuffer.AppendButton(CreateTypeCString(str, isRight), Style, p);
 	}
 
-	internal void PrintPlain(string str)
+	public void PrintPlain(string str)
 	{
 		if (string.IsNullOrEmpty(str))
 			return;
@@ -647,7 +655,7 @@ internal sealed partial class EmueraConsole : IDisposable
 		window.clear_richText();
 	}
 
-	internal ConsoleDisplayLine PrintPlainwithSingleLine(string str)
+	public ConsoleDisplayLine PrintPlainwithSingleLine(string str)
 	{
 		if (!Enabled)
 			return null;
@@ -656,6 +664,11 @@ internal sealed partial class EmueraConsole : IDisposable
 		printBuffer.AppendPlainText(str, Style);
 		ConsoleDisplayLine dispLine = printBuffer.FlushSingleLine(stringMeasure, false);
 		return dispLine;
+	}
+
+	public void PrintPlainSingleLine(string str)
+	{
+		PrintPlainwithSingleLine(str);
 	}
 
 	/// <summary>
@@ -823,10 +836,12 @@ internal sealed partial class EmueraConsole : IDisposable
 			builder.AppendLine(AssemblyData.EmueraVersionText);
 			builder.AppendLine();
 			builder.AppendLine(trsl.Variant.Text);
-			if (string.IsNullOrEmpty(process.gameBase.ScriptTitle))
+			var scriptTitle = process.GetScriptTitle();
+			var scriptVersion = process.GetScriptVersionText();
+			if (string.IsNullOrEmpty(scriptTitle))
 				builder.AppendLine(trsl.NotDefinedGameBase.Text);
 			else
-				builder.AppendLine(process.gameBase.ScriptTitle + " " + process.gameBase.ScriptVersionText);
+				builder.AppendLine(scriptTitle + " " + scriptVersion);
 
 			var patchVersionsPath = Path.Combine(Program.ExeDir, "patch_versions");
 			if (Directory.Exists(patchVersionsPath))

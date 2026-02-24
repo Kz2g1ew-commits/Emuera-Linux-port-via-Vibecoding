@@ -33,19 +33,6 @@ internal partial class IdentifierDictionary
 	public string[] VarKeys => varTokenDic.Keys.ToArray();
 	public string[] MacroKeys => macroDic.Values.Select(v=>v.Keyword).ToArray();
 	#endregion
-	private enum DefinedNameType
-	{
-		None = 0,
-		Reserved,
-		SystemVariable,
-		SystemMethod,
-		SystemInstrument,
-		//UserIdentifier,
-		UserGlobalVariable,
-		UserMacro,
-		UserRefMethod,
-		NameSpace,
-	}
 	readonly static Regex regexCom = preCompiledComRegex();
 	readonly static Regex regexComAble = preCompiledComAbleRegex();
 	readonly static Regex regexAblup = preCompiledAblupRegex();
@@ -488,7 +475,7 @@ internal partial class IdentifierDictionary
 		//	key = key.ToUpper();
 		if (allowPrivate)
 		{
-			LogicalLine line = GlobalStatic.Process.GetScaningLine();
+			LogicalLine line = RuntimeGlobals.CurrentScanningLine;
 			if ((line != null) && (line.ParentLabelLine != null))
 			{
 				ret = line.ParentLabelLine.GetPrivateVariable(key);
@@ -506,7 +493,7 @@ internal partial class IdentifierDictionary
 			{
 				throw new CodeEE(string.Format(treer.UsedProhibitedVar.Text, key));
 			}
-			LogicalLine line = GlobalStatic.Process.GetScaningLine();
+			LogicalLine line = RuntimeGlobals.CurrentScanningLine;
 			if (string.IsNullOrEmpty(subKey))
 			{
 				//システムの入力待ち中にデバッグコマンドからLOCALを呼んだとき。

@@ -1,8 +1,8 @@
 ﻿using MinorShift.Emuera.GameData.Variable;
-using MinorShift.Emuera.GameProc;
-using MinorShift.Emuera.GameView;
 using MinorShift.Emuera.Runtime.Script.Data;
 using MinorShift.Emuera.Runtime.Script.Parser;
+using MinorShift.Emuera.Runtime.Script.Statements;
+using MinorShift.Emuera.Runtime.Script.Statements.Variable;
 using MinorShift.Emuera.Runtime.Utils;
 using MinorShift.Emuera.Sub;
 using System;
@@ -15,15 +15,17 @@ namespace MinorShift.Emuera.Runtime.Script.Loader;
 
 internal sealed class ErhLoader
 {
-	public ErhLoader(EmueraConsole main, IdentifierDictionary idDic, Process proc)
+	public ErhLoader(IScriptConsole main, IdentifierDictionary idDic, ExpressionMediator exm, VariableData variableData)
 	{
 		output = main;
-		parentProcess = proc;
 		this.idDic = idDic;
+		this.exm = exm;
+		this.variableData = variableData;
 	}
-	readonly Process parentProcess;
-	readonly EmueraConsole output;
+	readonly IScriptConsole output;
 	readonly IdentifierDictionary idDic;
+	readonly ExpressionMediator exm;
+	readonly VariableData variableData;
 
 	bool noError = true;
 	Queue<DimLineWC> dimlines;
@@ -82,7 +84,10 @@ internal sealed class ErhLoader
 		//EraStreamReader eReader = new EraStreamReader(false);
 		//1815修正 _rename.csvの適用
 		//eramakerEXの仕様的には.ERHに適用するのはおかしいけど、もうEmueraの仕様になっちゃってるのでしかたないか
-		using EraStreamReader eReader = new(true);
+		using EraStreamReader eReader = new(
+			Config.Config.UseRenameFile,
+			ParserMediator.RenameDic,
+			Config.Config.ReplaceContinuationBR.Replace("\"", ""));
 
 		if (!eReader.OpenOnCache(filepath, filename))
 		{
@@ -121,7 +126,7 @@ internal sealed class ErhLoader
 						//1822 #DIMは保留しておいて後でまとめてやる
 						{
 							WordCollection wc = LexicalAnalyzer.Analyse(st, LexEndWith.EoL, LexAnalyzeFlag.AllowAssignment);
-							dimlines.Enqueue(new DimLineWC(wc, sharpID.SequenceEqual("DIMS"), false, position));
+							dimlines.Enqueue(new DimLineWC(wc, sharpID.SequenceEqual("DIMS"), false, position, exm));
 						}
 						//analyzeSharpDim(st, position, sharpID == "DIMS");
 						break;
@@ -284,9 +289,9 @@ internal sealed class ErhLoader
 						throw new NotImplCodeEE();
 					VariableToken var = null;
 					if (data.CharaData)
-						var = parentProcess.VEvaluator.VariableData.CreateUserDefCharaVariable(data, dimline);
+						var = variableData.CreateUserDefCharaVariable(data, dimline);
 					else
-						var = parentProcess.VEvaluator.VariableData.CreateUserDefVariable(data, dimline);
+						var = variableData.CreateUserDefVariable(data, dimline);
 					idDic.AddUseDefinedVariable(var);
 					#region EE_ERD
 					if (Config.Config.UseERD)
@@ -298,9 +303,9 @@ internal sealed class ErhLoader
 							if (erdFileNames.ContainsKey(key))
 							{
 								var info = erdFileNames[key];
-								GlobalStatic.ConstantData.UserDefineLoadData(info, data.Name, data.Lengths[0], Config.Config.DisplayReport, dimline.SC);
+								RuntimeGlobals.ConstantData.UserDefineLoadData(info, data.Name, data.Lengths[0], Config.Config.DisplayReport, dimline.SC);
 							}
-							System.Windows.Forms.Application.DoEvents();
+							RuntimeHost.DoEvents();
 						}
 						else if (data.Dimension == 2)
 						{
@@ -310,9 +315,9 @@ internal sealed class ErhLoader
 								if (erdFileNames.ContainsKey(key))
 								{
 									var info = erdFileNames[key];
-									GlobalStatic.ConstantData.UserDefineLoadData(info, data.Name + "@" + dim, data.Lengths[dim - 1], Config.Config.DisplayReport, dimline.SC);
+									RuntimeGlobals.ConstantData.UserDefineLoadData(info, data.Name + "@" + dim, data.Lengths[dim - 1], Config.Config.DisplayReport, dimline.SC);
 								}
-								System.Windows.Forms.Application.DoEvents();
+								RuntimeHost.DoEvents();
 							}
 						}
 						else if (data.Dimension == 3)
@@ -323,9 +328,9 @@ internal sealed class ErhLoader
 								if (erdFileNames.ContainsKey(key))
 								{
 									var info = erdFileNames[key];
-									GlobalStatic.ConstantData.UserDefineLoadData(info, data.Name + "@" + dim, data.Lengths[dim - 1], Config.Config.DisplayReport, dimline.SC);
+									RuntimeGlobals.ConstantData.UserDefineLoadData(info, data.Name + "@" + dim, data.Lengths[dim - 1], Config.Config.DisplayReport, dimline.SC);
 								}
-								System.Windows.Forms.Application.DoEvents();
+								RuntimeHost.DoEvents();
 							}
 						}
 					}
@@ -364,7 +369,7 @@ internal sealed class ErhLoader
 	private void PrepareERDFileNames()
 	{
 		if (erdFileNames == null) erdFileNames = [];
-		foreach (var path in Directory.GetFiles(Program.ErbDir, "*.erd", SearchOption.AllDirectories))
+		foreach (var path in RuntimeFileSearch.GetFiles(RuntimeEnvironment.ErbDir, "*.erd", SearchOption.AllDirectories))
 		{
 			var key = Path.GetFileNameWithoutExtension(path).ToUpper();
 			if (!erdFileNames.ContainsKey(key))
@@ -372,7 +377,7 @@ internal sealed class ErhLoader
 			else
 				erdFileNames[key].Add(path);
 		}
-		foreach (var path in Directory.GetFiles(Program.CsvDir, "*.csv", SearchOption.TopDirectoryOnly))
+		foreach (var path in RuntimeFileSearch.GetFiles(RuntimeEnvironment.CsvDir, "*.csv", SearchOption.TopDirectoryOnly))
 		{
 			var key = Path.GetFileNameWithoutExtension(path).ToUpper();
 			if (!erdFileNames.ContainsKey(key))

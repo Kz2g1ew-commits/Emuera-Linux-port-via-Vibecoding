@@ -2,7 +2,6 @@
 using MinorShift.Emuera.Runtime.Config.JSON;
 using System;
 using System.Drawing;
-using System.Windows.Forms;
 
 namespace MinorShift.Emuera.UI.Game;
 
@@ -138,16 +137,16 @@ internal sealed class ConsoleStyledString : AConsoleColoredPart
 					{
 						backcolor = Color.FromArgb(50, 50, 50);
 					}
-					TextRenderer.DrawText(graph, Text.AsSpan(), Font, new Point(PointX, pointY), color, backColor: backcolor.Value, TextFormatFlags.NoPrefix);
+					UiPlatformBridge.DrawTextNoPrefixWithBackColor(graph, Text.AsSpan(), Font, new Point(PointX, pointY), color, backcolor.Value);
 				}
 				else
 				{
-					TextRenderer.DrawText(graph, Text.AsSpan(), Font, new Point(PointX, pointY), color, TextFormatFlags.NoPrefix);
+					UiPlatformBridge.DrawTextNoPrefix(graph, Text.AsSpan(), Font, new Point(PointX, pointY), color);
 				}
 			}
 			else
 			{
-				TextRenderer.DrawText(graph, Text.AsSpan(), Font, new Point(PointX, pointY), color, TextFormatFlags.NoPrefix | TextFormatFlags.PreserveGraphicsClipping);
+				UiPlatformBridge.DrawTextNoPrefixPreserveClip(graph, Text.AsSpan(), Font, new Point(PointX, pointY), color);
 			}
 		}
 
@@ -170,7 +169,7 @@ internal sealed class ConsoleStyledString : AConsoleColoredPart
 			graph.DrawString(Text, Font, new SolidBrush(color), new Point(xOffset, 0));
 		else
 			// TextRenderer.DrawText(graph, Text, Font, new Point(PointX, pointY), color, TextFormatFlags.NoPrefix);
-			TextRenderer.DrawText(graph, Text.AsSpan(), Font, new Point(xOffset, 0), color, TextFormatFlags.NoPrefix | TextFormatFlags.PreserveGraphicsClipping);
+			UiPlatformBridge.DrawTextNoPrefixPreserveClip(graph, Text.AsSpan(), Font, new Point(xOffset, 0), color);
 		#endregion
 	}
 }

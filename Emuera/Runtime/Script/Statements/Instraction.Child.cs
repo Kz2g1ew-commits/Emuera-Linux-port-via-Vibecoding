@@ -12,15 +12,12 @@ using MinorShift.Emuera.Runtime.Script.Statements.Variable;
 using MinorShift.Emuera.Runtime.Utils;
 using MinorShift.Emuera.Runtime.Utils.EvilMask;
 using MinorShift.Emuera.Runtime.Utils.PluginSystem;
-using MinorShift.Emuera.UI.Game;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Windows.Forms;
 using static MinorShift.Emuera.Runtime.Utils.EvilMask.Utils;
 using trerror = MinorShift.Emuera.Runtime.Utils.EvilMask.Lang.Error;
 using trmb = MinorShift.Emuera.Runtime.Utils.EvilMask.Lang.MessageBox;
@@ -29,13 +26,17 @@ namespace MinorShift.Emuera.GameProc.Function;
 
 internal sealed partial class FunctionIdentifier
 {
+	private static bool IsMesSkip(ExpressionMediator exm) => exm.Console.MesSkip;
+	private static IdentifierDictionary RuntimeIdentifierDictionary => RuntimeGlobals.IdentifierDictionary;
+	private static LabelDictionary RuntimeLabelDictionary => RuntimeGlobals.LabelDictionary;
+
 	#region Emuera.NET VAR命令
 	private sealed class VARI_Instruction : AInstruction
 	{
-		public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
-		{
-			var arg = (IntAsignArgument)func.Argument;
-			var varName = arg.ConstStr;
+	public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
+	{
+		var arg = (IntAsignArgument)func.Argument;
+		var varName = arg.ConstStr;
 	
 			var privateVar = func.ParentLabelLine.GetPrivateVariable(varName);
 			privateVar.ScopeIn();
@@ -178,10 +179,10 @@ internal sealed partial class FunctionIdentifier
 		readonly bool isForms;
 		public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 		{
-			if (GlobalStatic.Process.SkipPrint)
+			if (exm.Process.SkipPrint)
 				return;
-			exm.Console.UseUserStyle = true;
-			exm.Console.UseSetColorStyle = !func.Function.IsPrintDFunction();
+			RuntimeHost.SetUseUserStyle(true);
+			RuntimeHost.SetUseSetColorStyle(!func.Function.IsPrintDFunction());
 			string str;
 			if (func.Argument.IsConst)
 				str = func.Argument.ConstStr;
@@ -217,7 +218,7 @@ internal sealed partial class FunctionIdentifier
 				exm.Console.PrintC(str, false);
 			else
 				exm.OutputToConsole(str, func.Function, isLineEnd);
-			exm.Console.UseSetColorStyle = true;
+			RuntimeHost.SetUseSetColorStyle(true);
 		}
 	}
 
@@ -261,10 +262,10 @@ internal sealed partial class FunctionIdentifier
 
 		public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 		{
-			if (GlobalStatic.Process.SkipPrint)
+			if (exm.Process.SkipPrint)
 				return;
-			exm.Console.UseUserStyle = true;
-			exm.Console.UseSetColorStyle = !func.Function.IsPrintDFunction();
+			RuntimeHost.SetUseUserStyle(true);
+			RuntimeHost.SetUseSetColorStyle(!func.Function.IsPrintDFunction());
 			//表示データが空なら何もしないで飛ぶ
 			if (func.dataList.Count == 0)
 			{
@@ -285,8 +286,8 @@ internal sealed partial class FunctionIdentifier
 			foreach (InstructionLine selectedLine in iList)
 			{
 				state.CurrentLine = selectedLine;
-				if (selectedLine.Argument == null)
-					ArgumentParser.SetArgumentTo(selectedLine);
+					if (selectedLine.Argument == null)
+						ArgumentParser.SetArgumentTo(selectedLine, exm);
 				term = ((ExpressionArgument)selectedLine.Argument).Term;
 				str = term.GetStrValue(exm);
 				if (func.Function.IsPrintKFunction())
@@ -301,7 +302,7 @@ internal sealed partial class FunctionIdentifier
 				if (func.Function.IsWaitInput())
 					exm.Console.ReadAnyKey();
 			}
-			exm.Console.UseSetColorStyle = true;
+			RuntimeHost.SetUseSetColorStyle(true);
 			//ジャンプするが、流れが連続であることを保証。
 			state.JumpTo(func.JumpTo);
 			//state.RunningLine = null;
@@ -320,13 +321,12 @@ internal sealed partial class FunctionIdentifier
 
 		public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 		{
-			if (GlobalStatic.Process.SkipPrint)
+			if (exm.Process.SkipPrint)
 				return;
 			#region EM_私家版_HTML_PRINT拡張
 			var arg = (SpHtmlPrint)func.Argument;
-			// string str;
-			if (arg.IsConst) exm.Console.PrintHtml(arg.ConstStr, arg.ConstInt != 0);
-			else exm.Console.PrintHtml(arg.Str.GetStrValue(exm), arg.Opt == null ? false : arg.Opt.GetIntValue(exm) != 0);
+			if (arg.IsConst) RuntimeHost.PrintHtml(arg.ConstStr, arg.ConstInt != 0);
+			else RuntimeHost.PrintHtml(arg.Str.GetStrValue(exm), arg.Opt != null && arg.Opt.GetIntValue(exm) != 0);
 			//if (func.Argument.IsConst)
 			//	str = func.Argument.ConstStr;
 			//else
@@ -347,7 +347,7 @@ internal sealed partial class FunctionIdentifier
 		{
 			SpHtmlSplitArgument spSplitArg = (SpHtmlSplitArgument)func.Argument;
 			string str = spSplitArg.TargetStr.GetStrValue(exm);
-			string[] strs = HtmlManager.HtmlTagSplit(str);
+			string[] strs = RuntimeHost.HtmlTagSplit(str);
 
 			if (strs == null)
 			{
@@ -372,7 +372,7 @@ internal sealed partial class FunctionIdentifier
 
 		public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 		{
-			if (GlobalStatic.Process.SkipPrint)
+			if (exm.Process.SkipPrint)
 				return;
 			string str;
 			var arg = (SpHtmlPrint)func.Argument;
@@ -380,7 +380,7 @@ internal sealed partial class FunctionIdentifier
 				str = arg.ConstStr;
 			else
 				str = ((SpHtmlPrint)func.Argument).Str.GetStrValue(exm);
-			exm.Console.PrintHTMLIsland(str);
+			RuntimeHost.PrintHtmlIsland(str);
 		}
 	}
 
@@ -394,7 +394,7 @@ internal sealed partial class FunctionIdentifier
 
 		public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 		{
-			exm.Console.ClearHTMLIsland();
+			RuntimeHost.ClearHtmlIsland();
 		}
 	}
 
@@ -411,7 +411,7 @@ internal sealed partial class FunctionIdentifier
 
 		public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 		{
-			if (GlobalStatic.Process.SkipPrint)
+			if (exm.Process.SkipPrint)
 				return;
 			#region EM_私家版_HTMLパラメータ拡張
 			//string str;
@@ -426,7 +426,7 @@ internal sealed partial class FunctionIdentifier
 			var strb = arg.Nameb != null ? arg.Nameb.GetStrValue(exm) : null;
 			var strm = arg.Namem != null ? arg.Namem.GetStrValue(exm) : null;
 			if (strb == string.Empty) strb = null;
-			exm.Console.PrintImg(
+			RuntimeHost.PrintImage(
 				arg.Name.GetStrValue(exm),
 				strb,
 				strm,
@@ -450,7 +450,7 @@ internal sealed partial class FunctionIdentifier
 
 		public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 		{
-			if (GlobalStatic.Process.SkipPrint)
+			if (exm.Process.SkipPrint)
 				return;
 			#region EM_私家版_HTMLパラメータ拡張
 			//ExpressionArrayArgument intExpArg = (ExpressionArrayArgument)func.Argument;
@@ -465,7 +465,10 @@ internal sealed partial class FunctionIdentifier
 			var param = new MixedNum[arg.Param.Length];
 			for (int i = 0; i < param.Length; i++)
 				param[i] = new MixedNum { num = (int)arg.Param[i].num.GetIntValue(exm), isPx = arg.Param[i].isPx };
-			exm.Console.PrintShape("rect", param);
+			var shapeParams = new object[param.Length];
+			for (var i = 0; i < param.Length; i++)
+				shapeParams[i] = param[i];
+			RuntimeHost.PrintShape("rect", shapeParams);
 			#endregion
 		}
 	}
@@ -483,7 +486,7 @@ internal sealed partial class FunctionIdentifier
 
 		public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 		{
-			if (GlobalStatic.Process.SkipPrint)
+			if (exm.Process.SkipPrint)
 				return;
 			#region EM_私家版_HTMLパラメータ拡張
 			//Int64 param;
@@ -499,7 +502,10 @@ internal sealed partial class FunctionIdentifier
 			var param = new MixedNum[arg.Param.Length];
 			for (int i = 0; i < param.Length; i++)
 				param[i] = new MixedNum { num = (int)arg.Param[i].num.GetIntValue(exm), isPx = arg.Param[i].isPx };
-			exm.Console.PrintShape("space", param);
+			var shapeParams = new object[param.Length];
+			for (var i = 0; i < param.Length; i++)
+				shapeParams[i] = param[i];
+			RuntimeHost.PrintShape("space", shapeParams);
 			#endregion
 		}
 	}
@@ -519,7 +525,7 @@ internal sealed partial class FunctionIdentifier
 				throw new CodeEE(trerror.MissingArg.Text);
 			else
 				rowStr = st.Substring();
-			rowStr = GlobalStatic.Console.getStBar(rowStr);
+			rowStr = RuntimeHost.FormatDrawLineString(rowStr);
 			Argument ret = new ExpressionArgument(new SingleStrTerm(rowStr))
 			{
 				ConstStr = rowStr,
@@ -530,9 +536,9 @@ internal sealed partial class FunctionIdentifier
 
 		public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 		{
-			if (GlobalStatic.Process.SkipPrint)
+			if (exm.Process.SkipPrint)
 				return;
-			GlobalStatic.Console.printCustomBar(func.Argument.ConstStr, true);
+			RuntimeHost.PrintCustomBar(func.Argument.ConstStr, true);
 			exm.Console.NewLine();
 		}
 	}
@@ -556,9 +562,9 @@ internal sealed partial class FunctionIdentifier
 				str = func.Argument.ConstStr;
 			else
 				str = ((ExpressionArgument)func.Argument).Term.GetStrValue(exm);
-			exm.Console.DebugPrint(str);
+			RuntimeHost.DebugPrint(str);
 			if (func.Function.IsNewLine())
-				exm.Console.DebugNewLine();
+				RuntimeHost.DebugNewLine();
 		}
 	}
 
@@ -571,7 +577,7 @@ internal sealed partial class FunctionIdentifier
 		}
 		public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 		{
-			exm.Console.DebugClear();
+			RuntimeHost.DebugClear();
 		}
 	}
 
@@ -668,7 +674,7 @@ internal sealed partial class FunctionIdentifier
 		{
 			AExpression term = ((ExpressionArgument)func.Argument).Term;
 			string str = term.GetStrValue(exm);
-			exm.Console.PrintTemporaryLine(str);
+			RuntimeHost.PrintTemporaryLine(str);
 		}
 	}
 
@@ -683,8 +689,8 @@ internal sealed partial class FunctionIdentifier
 		{
 			ExpressionArgument intExpArg = (ExpressionArgument)func.Argument;
 			int delNum = (int)intExpArg.Term.GetIntValue(exm);
-			exm.Console.deleteLine(delNum);
-			exm.Console.RefreshStrings(false);
+			RuntimeHost.DeleteLine(delNum);
+			RuntimeHost.RefreshStrings(false);
 		}
 	}
 
@@ -843,15 +849,15 @@ internal sealed partial class FunctionIdentifier
 			{
 				req.MouseInput = arg.Mouse.GetIntValue(exm) != 0;
 			}
-			exm.Console.Window.ApplyTextBoxChanges();
+			RuntimeHost.ApplyTextBoxChanges();
 			#endregion
 			#region EE_INPUT機能拡張
-			if (arg.CanSkip != null && GlobalStatic.Console.MesSkip)
+			if (arg.CanSkip != null && IsMesSkip(exm))
 			{
 				if (arg.Mouse.GetIntValue(exm) == 0)
-					GlobalStatic.VEvaluator.RESULT = arg.Def.GetIntValue(exm);
+					exm.VEvaluator.RESULT = arg.Def.GetIntValue(exm);
 				else
-					GlobalStatic.VEvaluator.RESULT_ARRAY[1] = arg.Def.GetIntValue(exm);
+					exm.VEvaluator.RESULT_ARRAY[1] = arg.Def.GetIntValue(exm);
 			}
 			else
 				exm.Console.WaitInput(req);
@@ -898,15 +904,15 @@ internal sealed partial class FunctionIdentifier
 			{
 				req.MouseInput = arg.Mouse.GetIntValue(exm) != 0;
 			}
-			exm.Console.Window.ApplyTextBoxChanges();
+			RuntimeHost.ApplyTextBoxChanges();
 			#endregion
 			#region EE_INPUT機能拡張
-			if (arg.CanSkip != null && GlobalStatic.Console.MesSkip)
+			if (arg.CanSkip != null && IsMesSkip(exm))
 			{
 				if (arg.Mouse.GetIntValue(exm) == 0)
-					GlobalStatic.VEvaluator.RESULTS = arg.Def.GetStrValue(exm);
+					exm.VEvaluator.RESULTS = arg.Def.GetStrValue(exm);
 				else
-					GlobalStatic.VEvaluator.RESULTS_ARRAY[1] = arg.Def.GetStrValue(exm);
+					exm.VEvaluator.RESULTS_ARRAY[1] = arg.Def.GetStrValue(exm);
 			}
 			else
 				exm.Console.WaitInput(req);
@@ -963,15 +969,15 @@ internal sealed partial class FunctionIdentifier
 			{
 				req.MouseInput = arg.Mouse.GetIntValue(exm) != 0;
 			}
-			//GlobalStatic.Process.InputInteger(1, 0);
+			//exm.Process.InputInteger(1, 0);
 			#endregion
 			#region EE_INPUT機能拡張
-			if (arg.CanSkip != null && GlobalStatic.Console.MesSkip)
+			if (arg.CanSkip != null && IsMesSkip(exm))
 			{
 				if (arg.Mouse.GetIntValue(exm) == 0)
-					GlobalStatic.VEvaluator.RESULT = arg.Def.GetIntValue(exm);
+					exm.VEvaluator.RESULT = arg.Def.GetIntValue(exm);
 				else
-					GlobalStatic.VEvaluator.RESULT_ARRAY[1] = arg.Def.GetIntValue(exm);
+					exm.VEvaluator.RESULT_ARRAY[1] = arg.Def.GetIntValue(exm);
 			}
 			else
 				exm.Console.WaitInput(req);
@@ -1026,15 +1032,15 @@ internal sealed partial class FunctionIdentifier
 			{
 				req.MouseInput = arg.Mouse.GetIntValue(exm) != 0;
 			}
-			//GlobalStatic.Process.InputInteger(1, 0);
+			//exm.Process.InputInteger(1, 0);
 			#endregion
 			#region EE_INPUT機能拡張
-			if (arg.CanSkip != null && GlobalStatic.Console.MesSkip)
+			if (arg.CanSkip != null && IsMesSkip(exm))
 			{
 				if (arg.Mouse.GetIntValue(exm) == 0)
-					GlobalStatic.VEvaluator.RESULTS = arg.Def.GetStrValue(exm);
+					exm.VEvaluator.RESULTS = arg.Def.GetStrValue(exm);
 				else
-					GlobalStatic.VEvaluator.RESULTS_ARRAY[1] = arg.Def.GetStrValue(exm);
+					exm.VEvaluator.RESULTS_ARRAY[1] = arg.Def.GetStrValue(exm);
 			}
 			else
 				exm.Console.WaitInput(req);
@@ -1083,15 +1089,15 @@ internal sealed partial class FunctionIdentifier
 			req.DisplayTime = z != 0;
 			req.TimeUpMes = (tinputarg.Timeout != null) ? tinputarg.Timeout.GetStrValue(exm) : Config.TimeupLabel;
 			#region EM_私家版_INPUT系機能拡張
-			//GlobalStatic.Process.InputInteger(1, 0);
+			//exm.Process.InputInteger(1, 0);
 			#endregion
 			#region EE_INPUT機能拡張
-			if (tinputarg.CanSkip != null && GlobalStatic.Console.MesSkip)
+			if (tinputarg.CanSkip != null && IsMesSkip(exm))
 			{
 				if (tinputarg.Mouse.GetIntValue(exm) == 0)
-					GlobalStatic.VEvaluator.RESULT = tinputarg.Def.GetIntValue(exm);
+					exm.VEvaluator.RESULT = tinputarg.Def.GetIntValue(exm);
 				else
-					GlobalStatic.VEvaluator.RESULT_ARRAY[1] = tinputarg.Def.GetIntValue(exm);
+					exm.VEvaluator.RESULT_ARRAY[1] = tinputarg.Def.GetIntValue(exm);
 			}
 			else
 				exm.Console.WaitInput(req);
@@ -1133,15 +1139,15 @@ internal sealed partial class FunctionIdentifier
 			req.DisplayTime = z != 0;
 			req.TimeUpMes = (tinputarg.Timeout != null) ? tinputarg.Timeout.GetStrValue(exm) : Config.TimeupLabel;
 			#region EM_私家版_INPUT系機能拡張
-			//GlobalStatic.Process.InputInteger(1, 0);
+			//exm.Process.InputInteger(1, 0);
 			#endregion
 			#region EE_INPUT機能拡張
-			if (tinputarg.CanSkip != null && GlobalStatic.Console.MesSkip)
+			if (tinputarg.CanSkip != null && IsMesSkip(exm))
 			{
 				if (tinputarg.Mouse.GetIntValue(exm) == 0)
-					GlobalStatic.VEvaluator.RESULTS = tinputarg.Def.GetStrValue(exm);
+					exm.VEvaluator.RESULTS = tinputarg.Def.GetStrValue(exm);
 				else
-					GlobalStatic.VEvaluator.RESULTS_ARRAY[1] = tinputarg.Def.GetStrValue(exm);
+					exm.VEvaluator.RESULTS_ARRAY[1] = tinputarg.Def.GetStrValue(exm);
 			}
 			else
 				exm.Console.WaitInput(req);
@@ -1170,7 +1176,11 @@ internal sealed partial class FunctionIdentifier
 			SpCallFArgment callfArg = (SpCallFArgment)func.Argument;
 			try
 			{
-				callfArg.FuncTerm = GlobalStatic.IdentifierDictionary.GetFunctionMethod(GlobalStatic.LabelDictionary, callfArg.ConstStr, callfArg.RowArgs, true);
+					var identifierDictionary = RuntimeIdentifierDictionary;
+					var labelDictionary = RuntimeLabelDictionary;
+				if (identifierDictionary == null || labelDictionary == null)
+					return;
+				callfArg.FuncTerm = identifierDictionary.GetFunctionMethod(labelDictionary, callfArg.ConstStr, callfArg.RowArgs, true);
 			}
 			catch (CodeEE e)
 			{
@@ -1179,7 +1189,7 @@ internal sealed partial class FunctionIdentifier
 			}
 			if (callfArg.FuncTerm == null)
 			{
-				if (!Program.AnalysisMode)
+				if (!RuntimeEnvironment.AnalysisMode)
 					ParserMediator.Warn(string.Format(trerror.NotDefinedFunc.Text, callfArg.ConstStr), func, 2, true, false);
 				else
 					ParserMediator.Warn(callfArg.ConstStr, func, 2, true, false);
@@ -1195,7 +1205,7 @@ internal sealed partial class FunctionIdentifier
 			{
 				SpCallFArgment spCallformArg = (SpCallFArgment)func.Argument;
 				labelName = spCallformArg.FuncnameTerm.GetStrValue(exm);
-				mToken = GlobalStatic.IdentifierDictionary.GetFunctionMethod(GlobalStatic.LabelDictionary, labelName, spCallformArg.RowArgs, true);
+				mToken = exm.Process.IdentifierDictionary.GetFunctionMethod(exm.Process.LabelDictionary, labelName, spCallformArg.RowArgs, true);
 			}
 			else
 			{
@@ -1224,7 +1234,7 @@ internal sealed partial class FunctionIdentifier
 				throw new CodeEE(trerror.MissingArg.Text);
 			else
 				rowStr = st.Substring();
-			rowStr = GlobalStatic.Console.getStBar(rowStr);
+			rowStr = RuntimeHost.FormatDrawLineString(rowStr);
 			Argument ret = new ExpressionArgument(new SingleStrTerm(rowStr))
 			{
 				ConstStr = rowStr,
@@ -1303,7 +1313,11 @@ internal sealed partial class FunctionIdentifier
 			//	callfArg.ConstStr = callfArg.ConstStr.ToUpper();
 			try
 			{
-				callfArg.FuncTerm = GlobalStatic.IdentifierDictionary.GetFunctionMethod(GlobalStatic.LabelDictionary, callfArg.ConstStr, callfArg.RowArgs, true);
+					var identifierDictionary = RuntimeIdentifierDictionary;
+					var labelDictionary = RuntimeLabelDictionary;
+				if (identifierDictionary == null || labelDictionary == null)
+					return;
+				callfArg.FuncTerm = identifierDictionary.GetFunctionMethod(labelDictionary, callfArg.ConstStr, callfArg.RowArgs, true);
 			}
 			catch
 			{
@@ -1323,7 +1337,7 @@ internal sealed partial class FunctionIdentifier
 			{
 				SpCallFArgment spCallformArg = (SpCallFArgment)func.Argument;
 				labelName = spCallformArg.FuncnameTerm.GetStrValue(exm);
-				mToken = GlobalStatic.IdentifierDictionary.GetFunctionMethod(GlobalStatic.LabelDictionary, labelName, spCallformArg.RowArgs, true);
+				mToken = exm.Process.IdentifierDictionary.GetFunctionMethod(exm.Process.LabelDictionary, labelName, spCallformArg.RowArgs, true);
 			}
 			else
 			{
@@ -1540,7 +1554,7 @@ internal sealed partial class FunctionIdentifier
 
 		public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 		{
-			exm.Console.SetStringStyle(Config.ForeColor);
+			RuntimeHost.SetStringColorRgb(Config.ForeColorRuntime.ToRgb24());
 		}
 	}
 
@@ -1554,7 +1568,7 @@ internal sealed partial class FunctionIdentifier
 
 		public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 		{
-			exm.Console.SetBgColor(Config.BackColor);
+			RuntimeHost.SetBackgroundColorRgb(Config.BackColorRuntime.ToRgb24());
 		}
 	}
 
@@ -1581,7 +1595,7 @@ internal sealed partial class FunctionIdentifier
 			{
 				opacity = long.Parse(arg.TermList[2].GetStrValue(exm)) / 255.0f;
 			}
-			exm.Console.AddBackgroundImage(bgName, bgDepth, opacity);
+			RuntimeHost.AddBackgroundImage(bgName, bgDepth, opacity);
 		}
 	}
 	private sealed class REMOVEBGIMAGE_Instruction : AInstruction
@@ -1597,7 +1611,7 @@ internal sealed partial class FunctionIdentifier
 			ExpressionArrayArgument arg = (ExpressionArrayArgument)func.Argument;
 			string bgName;
 			bgName = arg.TermList[0].GetStrValue(exm);
-			exm.Console.RemoveBackground(bgName);
+			RuntimeHost.RemoveBackgroundImage(bgName);
 		}
 	}
 	private sealed class CLEARBGIMAGE_Instruction : AInstruction
@@ -1610,7 +1624,7 @@ internal sealed partial class FunctionIdentifier
 
 		public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 		{
-			exm.Console.ClearBackgroundImage();
+			RuntimeHost.ClearBackgroundImage();
 		}
 	}
 
@@ -1626,7 +1640,7 @@ internal sealed partial class FunctionIdentifier
 		{
 			if (!OperatingSystem.IsWindows())
 				return;
-			exm.Console.SetStringStyle(exm.Console.StringStyle.FontStyle | FontStyle.Bold);
+			RuntimeHost.SetStringStyleFlags(RuntimeHost.GetStringStyleFlags() | RuntimeFontStyleFlags.Bold);
 		}
 	}
 	private sealed class FONTITALIC_Instruction : AInstruction
@@ -1641,7 +1655,7 @@ internal sealed partial class FunctionIdentifier
 		{
 			if (!OperatingSystem.IsWindows())
 				return;
-			exm.Console.SetStringStyle(exm.Console.StringStyle.FontStyle | FontStyle.Italic);
+			RuntimeHost.SetStringStyleFlags(RuntimeHost.GetStringStyleFlags() | RuntimeFontStyleFlags.Italic);
 		}
 	}
 	private sealed class FONTREGULAR_Instruction : AInstruction
@@ -1656,7 +1670,7 @@ internal sealed partial class FunctionIdentifier
 		{
 			if (!OperatingSystem.IsWindows())
 				return;
-			exm.Console.SetStringStyle(FontStyle.Regular);
+			RuntimeHost.SetStringStyleFlags(RuntimeFontStyleFlags.Regular);
 		}
 	}
 
@@ -1692,7 +1706,7 @@ internal sealed partial class FunctionIdentifier
 			if (var.IsString)
 			{
 				string src = spvarsetarg.Term.GetStrValue(exm);
-				VariableEvaluator.SetValueAll(p, src, start, end);
+					VariableEvaluator.SetValueAll(p, src, start, end, exm);
 			}
 			else
 			{
@@ -1742,13 +1756,13 @@ internal sealed partial class FunctionIdentifier
 				throw new CodeEE(string.Format(trerror.CvarsetArgIsNotCharaVar.Text, p.Identifier.Name));
 			if (index is SingleStrTerm singleStrTerm && p.Identifier.IsArray1D)
 			{
-				if (!GlobalStatic.ConstantData.isDefined(p.Identifier.Code, singleStrTerm.Str))
+				if (!exm.VEvaluator.Constant.isDefined(p.Identifier.Code, singleStrTerm.Str))
 					throw new CodeEE(string.Format(trerror.NotDefinedKey.Text, p.Identifier.Name, singleStrTerm.Str));
 			}
 			if (p.Identifier.IsString)
 			{
 				string src = spvarsetarg.Term.GetStrValue(exm);
-				exm.VEvaluator.SetValueAllEachChara(p, index, src, start, end);
+					exm.VEvaluator.SetValueAllEachChara(p, index, src, start, end, exm);
 			}
 			else
 			{
@@ -1871,7 +1885,7 @@ internal sealed partial class FunctionIdentifier
 		public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 		{
 			exm.VEvaluator.ResetData();
-			exm.Console.ResetStyle();
+			RuntimeHost.ResetStyle();
 		}
 	}
 
@@ -2058,10 +2072,10 @@ internal sealed partial class FunctionIdentifier
 				CalledFunction call = arg.SrcCalledFunction;
 				if (str != null)//REFBYNAMEかつ第二引数が定数でない
 				{
-					srcRef = GlobalStatic.IdentifierDictionary.GetRefMethod(str);
+					srcRef = exm.Process.IdentifierDictionary.GetRefMethod(str);
 					if (srcRef == null)
 					{
-						FunctionLabelLine label = GlobalStatic.LabelDictionary.GetNonEventLabel(str);
+						FunctionLabelLine label = exm.Process.LabelDictionary.GetNonEventLabel(str);
 						//if (label == null)
 						//    throw new CodeEE("式中関数" + str + "が見つかりません");
 						//if (!label.IsMethod)
@@ -2090,7 +2104,7 @@ internal sealed partial class FunctionIdentifier
 			string errmes;
 			if (str != null)
 			{
-				srcVar = GlobalStatic.IdentifierDictionary.GetVariableToken(str, null, true);
+				srcVar = exm.Process.IdentifierDictionary.GetVariableToken(str, null, true);
 
 				//if (srcVar == null)
 				//    throw new CodeEE("変数" + str + "が見つかりません");
@@ -2125,9 +2139,7 @@ internal sealed partial class FunctionIdentifier
 				throw new CodeEE(string.Format(trerror.ArgIsOoRColorCode.Text, "1"));
 			if (backColor < 0 || backColor > 0xFFFFFF)
 				throw new CodeEE(string.Format(trerror.ArgIsOoRColorCode.Text, "2"));
-			Color fc = Color.FromArgb((int)foreColor >> 16, (int)foreColor >> 8 & 0xFF, (int)foreColor & 0xFF);
-			Color bc = Color.FromArgb((int)backColor >> 16, (int)backColor >> 8 & 0xFF, (int)backColor & 0xFF);
-			exm.Console.SetToolTipColor(fc, bc);
+			RuntimeHost.SetToolTipColorRgb((int)foreColor, (int)backColor);
 			return;
 		}
 	}
@@ -2149,7 +2161,7 @@ internal sealed partial class FunctionIdentifier
 				delay = arg.Term.GetIntValue(exm);
 			if (delay < 0 || delay > int.MaxValue)
 				throw new CodeEE(trerror.ArgIsOoR.Text);
-			exm.Console.SetToolTipDelay((int)delay);
+			RuntimeHost.SetToolTipDelay((int)delay);
 			return;
 		}
 	}
@@ -2173,7 +2185,7 @@ internal sealed partial class FunctionIdentifier
 				throw new CodeEE(trerror.ArgIsOoR.Text);
 			if (duration > short.MaxValue)
 				duration = short.MaxValue;
-			exm.Console.SetToolTipDuration((int)duration);
+			RuntimeHost.SetToolTipDuration((int)duration);
 			return;
 		}
 	}
@@ -2235,9 +2247,9 @@ internal sealed partial class FunctionIdentifier
 		public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 		{
 			//実行時点で描画されてないときがあるのでやっておく
-			if (!exm.Console.PrintBuffer.IsEmpty)
+			if (!RuntimeHost.IsPrintBufferEmpty())
 				exm.Console.NewLine();
-			exm.Console.RefreshStrings(true);
+			RuntimeHost.RefreshStrings(true);
 			SpInputsArgument arg = (SpInputsArgument)func.Argument;
 			InputRequest req = new()
 			{
@@ -2254,60 +2266,26 @@ internal sealed partial class FunctionIdentifier
 			{
 				req.MouseInput = arg.Mouse.GetIntValue(exm) != 0;
 			}
-			exm.Console.Window.ApplyTextBoxChanges();
+			RuntimeHost.ApplyTextBoxChanges();
 			int count = 0;
-			if (arg.CanSkip != null && GlobalStatic.Console.MesSkip)
+			if (arg.CanSkip != null && IsMesSkip(exm))
 			{
 				if (arg.Mouse.GetIntValue(exm) == 0)
-					GlobalStatic.VEvaluator.RESULT = arg.Def.GetIntValue(exm);
+					exm.VEvaluator.RESULT = arg.Def.GetIntValue(exm);
 				else
-					GlobalStatic.VEvaluator.RESULT_ARRAY[1] = arg.Def.GetIntValue(exm);
+					exm.VEvaluator.RESULT_ARRAY[1] = arg.Def.GetIntValue(exm);
 			}
 			else
 			{
-				foreach (ConsoleDisplayLine line in Enumerable.Reverse(exm.Console.DisplayLineList).ToList())
-				{
-					foreach (ConsoleButtonString button in line.Buttons)
-					{
-						if (button.Generation != 0 && button.Generation != exm.Console.LastButtonGeneration)
-							goto loopep;
-						else if (button.IsButton && button.IsInteger)
-							count++;
-					}
-				}
-			loopep:
-				List<AConsoleDisplayNode> ep;
-				foreach (var value in exm.Console.EscapedParts)
-				{
-					ep = value.Value;
-					foreach (var part in ep)
-					{
-						if (part is ConsoleDivPart div)
-						{
-							foreach (ConsoleDisplayLine line in Enumerable.Reverse(div.Children).ToList())
-							{
-								foreach (ConsoleButtonString button in line.Buttons)
-								{
-									if (button.IsButton && button.IsInteger)
-									{
-										count++;
-										goto loopend;
-									}
-								}
-							}
-						}
-					}
-				}
-
+				count = RuntimeHost.CountInteractiveButtons(integerOnly: true);
 			}
-		loopend:
 			if (count == 0)
 			{
 				if (arg.Def == null)
 					throw new CodeEE(string.Format(trerror.NothingButtonBinput.Text, "BINPUT"));
 				else
 				{
-					GlobalStatic.VEvaluator.RESULT = arg.Def.GetIntValue(exm);
+					exm.VEvaluator.RESULT = arg.Def.GetIntValue(exm);
 					return;
 				}
 			}
@@ -2338,9 +2316,9 @@ internal sealed partial class FunctionIdentifier
 			//	req.DefStrValue = def;
 			//}
 			//実行時点で描画されてないときがあるのでやっておく
-			if (!exm.Console.PrintBuffer.IsEmpty)
+			if (!RuntimeHost.IsPrintBufferEmpty())
 				exm.Console.NewLine();
-			exm.Console.RefreshStrings(true);
+			RuntimeHost.RefreshStrings(true);
 			SpInputsArgument arg = (SpInputsArgument)func.Argument;
 			InputRequest req = new()
 			{
@@ -2357,60 +2335,26 @@ internal sealed partial class FunctionIdentifier
 			{
 				req.MouseInput = arg.Mouse.GetIntValue(exm) != 0;
 			}
-			exm.Console.Window.ApplyTextBoxChanges();
+			RuntimeHost.ApplyTextBoxChanges();
 			int count = 0;
-			if (arg.CanSkip != null && GlobalStatic.Console.MesSkip)
+			if (arg.CanSkip != null && IsMesSkip(exm))
 			{
 				if (arg.Mouse.GetIntValue(exm) == 0)
-					GlobalStatic.VEvaluator.RESULTS = arg.Def.GetStrValue(exm);
+					exm.VEvaluator.RESULTS = arg.Def.GetStrValue(exm);
 				else
-					GlobalStatic.VEvaluator.RESULTS_ARRAY[1] = arg.Def.GetStrValue(exm);
+					exm.VEvaluator.RESULTS_ARRAY[1] = arg.Def.GetStrValue(exm);
 			}
 			else
 			{
-				foreach (ConsoleDisplayLine line in Enumerable.Reverse(exm.Console.DisplayLineList).ToList())
-				{
-					foreach (ConsoleButtonString button in line.Buttons)
-					{
-						if (button.Generation != 0 && button.Generation != exm.Console.LastButtonGeneration)
-							goto loopep;
-						else if (button.IsButton)
-							count++;
-					}
-				}
-			loopep:
-				List<AConsoleDisplayNode> ep;
-				foreach (var value in exm.Console.EscapedParts)
-				{
-					ep = value.Value;
-					foreach (var part in ep)
-					{
-						if (part is ConsoleDivPart div)
-						{
-							foreach (ConsoleDisplayLine line in Enumerable.Reverse(div.Children).ToList())
-							{
-								foreach (ConsoleButtonString button in line.Buttons)
-								{
-									if (button.IsButton)
-									{
-										count++;
-										goto loopend;
-									}
-								}
-							}
-						}
-					}
-				}
-
+				count = RuntimeHost.CountInteractiveButtons(integerOnly: false);
 			}
-		loopend:
 			if (count == 0)
 			{
 				if (arg.Def == null)
 					throw new CodeEE(string.Format(trerror.NothingButtonBinput.Text, "BINPUTS"));
 				else
 				{
-					GlobalStatic.VEvaluator.RESULTS = arg.Def.GetStrValue(exm);
+					exm.VEvaluator.RESULTS = arg.Def.GetStrValue(exm);
 					return;
 				}
 			}
@@ -2431,9 +2375,9 @@ internal sealed partial class FunctionIdentifier
 		public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 		{
 			//実行時点で描画されてないときがあるのでやっておく
-			if (!exm.Console.PrintBuffer.IsEmpty)
+			if (!RuntimeHost.IsPrintBufferEmpty())
 				exm.Console.NewLine();
-			exm.Console.RefreshStrings(true);
+			RuntimeHost.RefreshStrings(true);
 			SpInputsArgument arg = (SpInputsArgument)func.Argument;
 			InputRequest req = new()
 			{
@@ -2451,59 +2395,26 @@ internal sealed partial class FunctionIdentifier
 			{
 				req.MouseInput = arg.Mouse.GetIntValue(exm) != 0;
 			}
-			exm.Console.Window.ApplyTextBoxChanges();
+			RuntimeHost.ApplyTextBoxChanges();
 			int count = 0;
-			if (arg.CanSkip != null && GlobalStatic.Console.MesSkip)
+			if (arg.CanSkip != null && IsMesSkip(exm))
 			{
 				if (arg.Mouse.GetIntValue(exm) == 0)
-					GlobalStatic.VEvaluator.RESULT = arg.Def.GetIntValue(exm);
+					exm.VEvaluator.RESULT = arg.Def.GetIntValue(exm);
 				else
-					GlobalStatic.VEvaluator.RESULT_ARRAY[1] = arg.Def.GetIntValue(exm);
+					exm.VEvaluator.RESULT_ARRAY[1] = arg.Def.GetIntValue(exm);
 			}
 			else
 			{
-				foreach (ConsoleDisplayLine line in Enumerable.Reverse(exm.Console.DisplayLineList).ToList())
-				{
-					foreach (ConsoleButtonString button in line.Buttons)
-					{
-						if (button.Generation != 0 && button.Generation != exm.Console.LastButtonGeneration)
-							goto loopep;
-						else if (button.IsButton && button.IsInteger)
-							count++;
-					}
-				}
-			loopep:
-				List<AConsoleDisplayNode> ep;
-				foreach (var value in exm.Console.EscapedParts)
-				{
-					ep = value.Value;
-					foreach (var part in ep)
-					{
-						if (part is ConsoleDivPart div)
-						{
-							foreach (ConsoleDisplayLine line in Enumerable.Reverse(div.Children).ToList())
-							{
-								foreach (ConsoleButtonString button in line.Buttons)
-								{
-									if (button.IsButton && button.IsInteger)
-									{
-										count++;
-										goto loopend;
-									}
-								}
-							}
-						}
-					}
-				}
+				count = RuntimeHost.CountInteractiveButtons(integerOnly: true);
 			}
-		loopend:
 			if (count == 0)
 			{
 				if (arg.Def == null)
 					throw new CodeEE(string.Format(trerror.NothingButtonBinput.Text, "ONEBINPUT"));
 				else
 				{
-					GlobalStatic.VEvaluator.RESULT = arg.Def.GetIntValue(exm);
+					exm.VEvaluator.RESULT = arg.Def.GetIntValue(exm);
 					return;
 				}
 			}
@@ -2534,9 +2445,9 @@ internal sealed partial class FunctionIdentifier
 			//	req.DefStrValue = def;
 			//}
 			//実行時点で描画されてないときがあるのでやっておく
-			if (!exm.Console.PrintBuffer.IsEmpty)
+			if (!RuntimeHost.IsPrintBufferEmpty())
 				exm.Console.NewLine();
-			exm.Console.RefreshStrings(true);
+			RuntimeHost.RefreshStrings(true);
 			SpInputsArgument arg = (SpInputsArgument)func.Argument;
 			InputRequest req = new()
 			{
@@ -2554,60 +2465,26 @@ internal sealed partial class FunctionIdentifier
 			{
 				req.MouseInput = arg.Mouse.GetIntValue(exm) != 0;
 			}
-			exm.Console.Window.ApplyTextBoxChanges();
+			RuntimeHost.ApplyTextBoxChanges();
 			int count = 0;
-			if (arg.CanSkip != null && GlobalStatic.Console.MesSkip)
+			if (arg.CanSkip != null && IsMesSkip(exm))
 			{
 				if (arg.Mouse.GetIntValue(exm) == 0)
-					GlobalStatic.VEvaluator.RESULTS = arg.Def.GetStrValue(exm);
+					exm.VEvaluator.RESULTS = arg.Def.GetStrValue(exm);
 				else
-					GlobalStatic.VEvaluator.RESULTS_ARRAY[1] = arg.Def.GetStrValue(exm);
+					exm.VEvaluator.RESULTS_ARRAY[1] = arg.Def.GetStrValue(exm);
 			}
 			else
 			{
-				foreach (ConsoleDisplayLine line in Enumerable.Reverse(exm.Console.DisplayLineList).ToList())
-				{
-					foreach (ConsoleButtonString button in line.Buttons)
-					{
-						if (button.Generation != 0 && button.Generation != exm.Console.LastButtonGeneration)
-							goto loopep;
-						else if (button.IsButton)
-							count++;
-					}
-				}
-			loopep:
-				List<AConsoleDisplayNode> ep;
-				foreach (var value in exm.Console.EscapedParts)
-				{
-					ep = value.Value;
-					foreach (var part in ep)
-					{
-						if (part is ConsoleDivPart div)
-						{
-							foreach (ConsoleDisplayLine line in Enumerable.Reverse(div.Children).ToList())
-							{
-								foreach (ConsoleButtonString button in line.Buttons)
-								{
-									if (button.IsButton)
-									{
-										count++;
-										goto loopend;
-									}
-								}
-							}
-						}
-					}
-				}
-
+				count = RuntimeHost.CountInteractiveButtons(integerOnly: false);
 			}
-		loopend:
 			if (count == 0)
 			{
 				if (arg.Def == null)
 					throw new CodeEE(string.Format(trerror.NothingButtonBinput.Text, "ONEBINPUTS"));
 				else
 				{
-					GlobalStatic.VEvaluator.RESULTS = arg.Def.GetStrValue(exm);
+					exm.VEvaluator.RESULTS = arg.Def.GetStrValue(exm);
 					return;
 				}
 			}
@@ -2643,7 +2520,7 @@ internal sealed partial class FunctionIdentifier
 				var v = arg.Values[idx];
 				switch (opt)
 				{
-					case SpDtColumnOptions.DTOptions.Default:
+					case DTOptions.Default:
 						if (v.GetOperandType() != (isString ? typeof(string) : typeof(long)))
 							throw new CodeEE(string.Format(trerror.DTInvalidDataType.Text, "DT_COLUMN_OPTIONS", key, cName));
 						if (isString)
@@ -2705,7 +2582,7 @@ internal sealed partial class FunctionIdentifier
 			else
 				datFilename = soundArg.Str.GetStrValue(exm);
 			int repeat = soundArg.Opt != null ? (int)Math.Max(soundArg.Opt.GetIntValue(exm), 1) : 1;
-			string filepath = Path.GetFullPath(Program.SoundDir + datFilename);
+			string filepath = RuntimeEnvironment.ResolveSoundPath(datFilename);
 			try
 			{
 				if (File.Exists(filepath))
@@ -2768,7 +2645,7 @@ internal sealed partial class FunctionIdentifier
 				datFilename = arg.ConstStr;
 			else
 				datFilename = arg.Term.GetStrValue(exm);
-			string filepath = Path.GetFullPath(Program.SoundDir + datFilename);
+			string filepath = RuntimeEnvironment.ResolveSoundPath(datFilename);
 
 			try
 			{
@@ -2850,7 +2727,7 @@ internal sealed partial class FunctionIdentifier
 				return;
 			}
 
-			string url = GlobalStatic.GameBaseData.UpdateCheckURL;
+			string url = exm.Process.gameBase.UpdateCheckURL;
 			WebClient wc = new();
 			if (url == null || url == "")
 			{
@@ -2875,22 +2752,11 @@ internal sealed partial class FunctionIdentifier
 						exm.VEvaluator.RESULT = 3;
 						return;
 					}
-					if (version != GlobalStatic.GameBaseData.VersionName)
+					if (version != exm.Process.gameBase.VersionName)
 					{
-						DialogResult result = MessageBox.Show(string.Format(trmb.NewVersionAvailable.Text, version, link),
-							trmb.UpdateCheck.Text,
-							MessageBoxButtons.YesNo,
-							MessageBoxIcon.None,
-							MessageBoxDefaultButton.Button2
-							);
-						if (result == DialogResult.Yes)
+						if (RuntimeHost.ConfirmYesNo(string.Format(trmb.NewVersionAvailable.Text, version, link), trmb.UpdateCheck.Text))
 						{
-							exm.VEvaluator.RESULT = 2;
-							System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-							{
-								UseShellExecute = true,
-								FileName = link,
-							});
+							exm.VEvaluator.RESULT = RuntimeHost.OpenUrl(link) ? 2 : 3;
 							//System.Diagnostics.Process.Start(link);
 							st.Close();
 							wc.Dispose();
@@ -2942,7 +2808,7 @@ internal sealed partial class FunctionIdentifier
 		public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 		{
 			ExpressionArgument fn = (ExpressionArgument)func.Argument;
-			exm.Console.SetToolTipFontName(fn.Term.GetStrValue(exm));
+			RuntimeHost.SetToolTipFontName(fn.Term.GetStrValue(exm));
 		}
 	}
 	private sealed class TOOLTIP_SETFONTSIZE_Instruction : AInstruction
@@ -2958,7 +2824,7 @@ internal sealed partial class FunctionIdentifier
 		public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 		{
 			ExpressionArgument fs = (ExpressionArgument)func.Argument;
-			exm.Console.SetToolTipFontSize(fs.Term.GetIntValue(exm));
+			RuntimeHost.SetToolTipFontSize(fs.Term.GetIntValue(exm));
 		}
 	}
 	private sealed class TOOLTIP_CUSTOM_Instruction : AInstruction
@@ -2975,9 +2841,9 @@ internal sealed partial class FunctionIdentifier
 		{
 			ExpressionArgument b = (ExpressionArgument)func.Argument;
 			if (b.Term.GetIntValue(exm) == 0)
-				exm.Console.CustomToolTip(false);
+				RuntimeHost.SetCustomToolTip(false);
 			else
-				exm.Console.CustomToolTip(true);
+				RuntimeHost.SetCustomToolTip(true);
 		}
 	}
 	private sealed class TOOLTIP_FORMAT_Instruction : AInstruction
@@ -2993,7 +2859,7 @@ internal sealed partial class FunctionIdentifier
 		public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 		{
 			ExpressionArgument i = (ExpressionArgument)func.Argument;
-			exm.Console.SetToolTipFormat(i.Term.GetIntValue(exm));
+			RuntimeHost.SetToolTipFormat(i.Term.GetIntValue(exm));
 		}
 	}
 	private sealed class TOOLTIP_IMG_Instruction : AInstruction
@@ -3009,7 +2875,7 @@ internal sealed partial class FunctionIdentifier
 		public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 		{
 			ExpressionArgument i = (ExpressionArgument)func.Argument;
-			exm.Console.SetToolTipImg(i.Term.GetIntValue(exm) != 0);
+			RuntimeHost.SetToolTipImageEnabled(i.Term.GetIntValue(exm) != 0);
 		}
 	}
 	#endregion
@@ -3033,7 +2899,7 @@ internal sealed partial class FunctionIdentifier
 			state.SetBegin(keyword, true);
 			#endregion
 			state.Return(0);
-			exm.Console.ResetStyle();
+			RuntimeHost.ResetStyle();
 		}
 	}
 	#region EE
@@ -3051,7 +2917,7 @@ internal sealed partial class FunctionIdentifier
 			//	keyword = keyword.ToUpper();
 			state.SetBegin(keyword, true);
 			state.Return(0);
-			exm.Console.ResetStyle();
+			RuntimeHost.ResetStyle();
 		}
 	}
 	#endregion
@@ -3073,9 +2939,9 @@ internal sealed partial class FunctionIdentifier
 					funcName = "";
 				throw new CodeEE(string.Format(trerror.CanNotUseInstruction.Text, funcName, "SAVEGAME/LOADGAME"));
 			}
-			GlobalStatic.Process.saveCurrentState(true);
+			exm.Process.saveCurrentState(true);
 			//バックアップに入れた旧ProcessStateの方を参照するため、ここでstateは使えない
-			GlobalStatic.Process.getCurrentState.SaveLoadData(isSave);
+			exm.Process.getCurrentState.SaveLoadData(isSave);
 		}
 	}
 
@@ -3634,7 +3500,10 @@ internal sealed partial class FunctionIdentifier
 			}
 			SpCallArgment callArg = (SpCallArgment)func.Argument;
 			string labelName = callArg.ConstStr;
-			CalledFunction call = CalledFunction.CallFunction(GlobalStatic.Process, labelName, func);
+			var labelDictionary = RuntimeLabelDictionary;
+			if (labelDictionary == null)
+				return;
+			CalledFunction call = CalledFunction.CallFunction(labelDictionary, labelName, func);
 			if ((call == null) && (!func.Function.IsTry()))
 			{
 				FunctionoNotFoundName = labelName;
@@ -3677,7 +3546,7 @@ internal sealed partial class FunctionIdentifier
 			else
 			{
 				labelName = spCallArg.FuncnameTerm.GetStrValue(exm);
-				call = CalledFunction.CallFunction(GlobalStatic.Process, labelName, func);
+				call = CalledFunction.CallFunction(exm.Process, labelName, func);
 			}
 			if (call == null)
 			{
@@ -3720,7 +3589,7 @@ internal sealed partial class FunctionIdentifier
 		public override void DoInstruction(ExpressionMediator exm, InstructionLine func, ProcessState state)
 		{
 			string labelName = func.Argument.ConstStr;
-			CalledFunction call = CalledFunction.CallEventFunction(GlobalStatic.Process, labelName, func);
+			CalledFunction call = CalledFunction.CallEventFunction(exm.Process, labelName, func);
 			if (call == null)
 				return;
 			state.IntoFunction(call, null, null);
@@ -3751,7 +3620,10 @@ internal sealed partial class FunctionIdentifier
 			if (func.Argument.IsConst)
 			{
 				string labelName = func.Argument.ConstStr;
-				jumpto = GlobalStatic.LabelDictionary.GetLabelDollar(labelName, func.ParentLabelLine);
+					var labelDictionary = RuntimeLabelDictionary;
+				if (labelDictionary == null)
+					return;
+				jumpto = labelDictionary.GetLabelDollar(labelName, func.ParentLabelLine);
 				if (jumpto == null)
 				{
 					if (!func.Function.IsTry())
@@ -3782,7 +3654,7 @@ internal sealed partial class FunctionIdentifier
 			else
 			{
 				label = ((SpCallArgment)func.Argument).FuncnameTerm.GetStrValue(exm);
-				jumpto = state.CurrentCalled.CallLabel(GlobalStatic.Process, label);
+				jumpto = state.CurrentCalled.CallLabel(exm.Process, label);
 			}
 			if (jumpto == null)
 			{

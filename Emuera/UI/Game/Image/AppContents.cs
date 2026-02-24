@@ -88,6 +88,11 @@ static class AppContents
 		imageDictionary[imgName] = newCImg;
 	}
 
+	static public void CreateSpriteG(string imgName, GraphicsImage parent, RuntimeRect rect)
+	{
+		CreateSpriteG(imgName, parent, new Rectangle(rect.X, rect.Y, rect.Width, rect.Height));
+	}
+
 	internal static void CreateSpriteAnime(string imgName, int w, int h)
 	{
 		if (string.IsNullOrEmpty(imgName))

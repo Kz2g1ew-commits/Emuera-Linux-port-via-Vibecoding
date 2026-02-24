@@ -12,7 +12,7 @@ internal static class VariableParser
 	{
 		ZeroTerm = new SingleLongTerm(0);
 		AExpression[] zeroArgs = [ZeroTerm];
-		TARGET = new VariableTerm(GlobalStatic.VariableData.GetSystemVariableToken("TARGET"), zeroArgs);
+		TARGET = new VariableTerm(RuntimeGlobals.VEvaluator.VariableData.GetSystemVariableToken("TARGET"), zeroArgs);
 	}
 
 	public static SingleTerm ZeroTerm { get; private set; }
@@ -24,7 +24,7 @@ internal static class VariableParser
 			return false;
 		string[] idlist = ids.Split(':');
 		//idlist = synonym.ApplySynonym(idlist);
-		VariableToken id = GlobalStatic.IdentifierDictionary.GetVariableToken(idlist[0], null, false);
+		VariableToken id = RuntimeGlobals.IdentifierDictionary.GetVariableToken(idlist[0], null, false);
 		return id != null;
 	}
 

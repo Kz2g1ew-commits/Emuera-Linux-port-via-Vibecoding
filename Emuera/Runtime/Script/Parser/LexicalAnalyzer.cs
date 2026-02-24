@@ -13,51 +13,6 @@ using trerror = MinorShift.Emuera.Runtime.Utils.EvilMask.Lang.Error;
 
 namespace MinorShift.Emuera.Runtime.Script.Parser;
 
-enum LexEndWith
-{
-	//いずれにせよEoLで強制終了
-	None = 0,
-	EoL,//常に最後まで解析
-	Operator,//演算子を見つけたら終了。代入式の左辺
-	Question,//三項演算子?により終了。\@～～?～～#～～\@
-	Percent,//%により終了。%～～%
-	RightCurlyBrace,//}により終了。{～～}
-	Comma,//,により終了。TIMES第一引数
-		  //Single,//Identifier一つで終了//1807 Single削除
-	GreaterThan,//'>'により終了。Htmlタグ解析
-}
-
-enum FormStrEndWith
-{
-	//いずれにせよEoLで強制終了
-	None = 0,
-	EoL,//常に最後まで解析
-	DoubleQuotation,//"で終了。@"～～"
-	Sharp,//#で終了。\@～～?～～#～～\@　の一つ目
-	YenAt,//\@で終了。\@～～?～～#～～\@　の二つ目
-	Comma,//,により終了。ANY_FORM引数
-	LeftParenthesis_Bracket_Comma_Semicolon,//[または(または,または;により終了。CALLFORM系の関数名部分。
-}
-
-enum StrEndWith
-{
-	//いずれにせよEoLで強制終了
-	None = 0,
-	EoL,//常に最後まで解析
-	SingleQuotation,//"で終了。'～～'
-	DoubleQuotation,//"で終了。"～～"
-	Comma,//,により終了。PRINTV'～～,
-	LeftParenthesis_Bracket_Comma_Semicolon,//[または(または,または;により終了。関数名部分。
-}
-
-enum LexAnalyzeFlag
-{
-	None = 0,
-	AnalyzePrintV = 1,//PRINTVの引数で'に続けて文字列を書くと数式ではないが文字列として表示される
-	AllowAssignment = 2,//代入演算子が使用できる場面であるFlag。このFlagなしで=が途中に出てきたらエラー
-	AllowSingleQuotationStr = 4,//HTML_PRINT解析用。''で囲まれた文字列を許可する。
-}
-
 /// <summary>
 /// 1756 TokenReaderより改名
 /// Lexicalといいつつ構文解析を含む
@@ -390,7 +345,7 @@ internal static partial class LexicalAnalyzer
 		//    int i = 0;
 		//    while (true)
 		//    {
-		//        DefineMacro macro = GlobalStatic.IdentifierDictionary.GetMacro(str);
+		//        DefineMacro macro = RuntimeGlobals.IdentifierDictionary.GetMacro(str);
 		//        i++;
 		//        if (i > MAX_EXPAND_MACRO)
 		//            throw new CodeEE("マクロの展開数が1文あたりの上限を超えました(自己参照・循環参照のおそれ)");
@@ -423,7 +378,7 @@ internal static partial class LexicalAnalyzer
 			int i = 0;
 			while (true)
 			{
-				DefineMacro macro = GlobalStatic.IdentifierDictionary.GetMacro(str);
+				DefineMacro macro = RuntimeGlobals.IdentifierDictionary.GetMacro(str);
 				i++;
 				if (i > MAX_EXPAND_MACRO)
 					throw new CodeEE(string.Format(trerror.MacroOverLimit.Text, MAX_EXPAND_MACRO.ToString()));
@@ -779,7 +734,7 @@ internal static partial class LexicalAnalyzer
 						return count;
 					goto case ' ';
 				case ';':
-					if (st.CurrentEqualTo(";#;") && Program.DebugMode)
+					if (st.CurrentEqualTo(";#;") && RuntimeEnvironment.DebugMode)
 					{
 						st.Jump(3);
 						continue;
@@ -993,7 +948,7 @@ internal static partial class LexicalAnalyzer
 					case '$':
 						throw new CodeEE(string.Format(trerror.UnexpectedCharacter.Text, st.Current));
 					case ';'://1807 行中コメント
-						if (st.CurrentEqualTo(";#;") && Program.DebugMode)
+						if (st.CurrentEqualTo(";#;") && RuntimeEnvironment.DebugMode)
 						{
 							st.Jump(3);
 							break;
@@ -1045,7 +1000,7 @@ internal static partial class LexicalAnalyzer
 				continue;
 			}
 			string idStr = word.Code;
-			DefineMacro macro = GlobalStatic.IdentifierDictionary.GetMacro(idStr);
+			DefineMacro macro = RuntimeGlobals.IdentifierDictionary.GetMacro(idStr);
 			if (macro == null)
 			{
 				wc.ShiftNext();
@@ -1289,7 +1244,7 @@ internal static partial class LexicalAnalyzer
 			if (st.Current != '@')
 				throw new CodeEE(string.Format(trerror.NotFoundCorresponding.Text, "\\@", "#"));
 			st.ShiftNext();
-			ParserMediator.Warn(string.Format(trerror.NotFoundCorresponding.Text, "\\@", "#"), GlobalStatic.Process.GetScaningLine(), 1, false, false);
+			ParserMediator.Warn(string.Format(trerror.NotFoundCorresponding.Text, "\\@", "#"), RuntimeGlobals.CurrentScanningLine, 1, false, false);
 			return new YenAtSubWord(w, left, null);
 		}
 		st.ShiftNext();

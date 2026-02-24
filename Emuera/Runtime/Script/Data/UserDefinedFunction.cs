@@ -5,22 +5,6 @@ using trerror = MinorShift.Emuera.Runtime.Utils.EvilMask.Lang.Error;
 
 namespace MinorShift.Emuera.Runtime.Script.Data;
 
-internal enum UserDifinedFunctionDataArgType
-{
-	Null,
-	Int = 0x10,
-	Str = 0x20,
-
-	RefInt1 = 0x51,
-	RefInt2 = 0x52,
-	RefInt3 = 0x53,
-	RefStr1 = 0x61,
-	RefStr2 = 0x62,
-	RefStr3 = 0x63,
-	__Ref = 0x40,
-	__Dimention = 0x0F,
-}
-
 internal sealed class UserDefinedFunctionData
 {
 	private UserDefinedFunctionData()
@@ -65,9 +49,9 @@ internal sealed class UserDefinedFunctionData
 			throw new CodeEE(trerror.NotIdentifierArg.Text, sc);
 		string errMes = "";
 		int errLevel = -1;
-		GlobalStatic.IdentifierDictionary.CheckUserLabelName(out errMes, ref errLevel, true, ret.Name);
+		RuntimeGlobals.IdentifierDictionary.CheckUserLabelName(out errMes, ref errLevel, true, ret.Name);
 		if (errLevel == 0)//関数と変数の両方からチェック エラーメッセージが微妙だがひとまず気にしない
-			GlobalStatic.IdentifierDictionary.CheckUserVarName(ref errMes, ref errLevel, ret.Name);
+			RuntimeGlobals.IdentifierDictionary.CheckUserVarName(ref errMes, ref errLevel, ret.Name);
 		if (errLevel >= 0)
 		{
 			if (errLevel >= 2)

@@ -1,5 +1,6 @@
-﻿using MinorShift.Emuera.GameView;
-using MinorShift.Emuera.Runtime.Config;
+﻿using MinorShift.Emuera.Runtime.Config;
+using MinorShift.Emuera.Runtime;
+using MinorShift.Emuera.Runtime.Script;
 using MinorShift.Emuera.Runtime.Script.Statements;
 using MinorShift.Emuera.Runtime.Utils;
 using System;
@@ -25,13 +26,13 @@ internal partial class ParserMediator
 	/// <param name="?"></param>
 	public static void ConfigWarn(string str, ScriptPosition? pos, int level, string stack)
 	{
-		if (level <Config.DisplayWarningLevel && !Program.AnalysisMode)
+		if (level <Config.DisplayWarningLevel && !RuntimeEnvironment.AnalysisMode)
 			return;
 		warningList.Add(new ParserWarning(str, pos, level, stack));
 	}
 
-	static EmueraConsole console;
-	public static void Initialize(EmueraConsole console)
+	static IScriptConsole console;
+	public static void Initialize(IScriptConsole console)
 	{
 		ParserMediator.console = console;
 	}
@@ -86,7 +87,7 @@ internal partial class ParserMediator
 
 	public static void Warn(string str, ScriptPosition? pos, int level, string stack)
 	{
-		if (level < Config.DisplayWarningLevel && !Program.AnalysisMode)
+		if (level < Config.DisplayWarningLevel && !RuntimeEnvironment.AnalysisMode)
 			return;
 		if (console != null && !console.RunERBFromMemory)
 		{
@@ -115,7 +116,7 @@ internal partial class ParserMediator
 			line.IsError = true;
 			line.ErrMes = str;
 		}
-		if (level < Config.DisplayWarningLevel && !Program.AnalysisMode)
+		if (level < Config.DisplayWarningLevel && !RuntimeEnvironment.AnalysisMode)
 			return;
 		if (isBackComp && !Config.WarnBackCompatibility)
 			return;

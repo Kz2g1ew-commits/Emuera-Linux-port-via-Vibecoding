@@ -1,5 +1,4 @@
-﻿using MinorShift.Emuera.GameView;
-using MinorShift.Emuera.Runtime.Script.Parser;
+﻿using MinorShift.Emuera.Runtime.Script.Parser;
 using MinorShift.Emuera.Runtime.Script.Statements.Variable;
 using MinorShift.Emuera.Runtime.Utils;
 using MinorShift.Emuera.Sub;
@@ -14,29 +13,6 @@ using trsl = MinorShift.Emuera.Runtime.Utils.EvilMask.Lang.SystemLine;
 
 
 namespace MinorShift.Emuera.Runtime.Script.Data;
-
-internal enum CharacterStrData
-{
-	NAME = 0,
-	CALLNAME = 1,
-	NICKNAME = 2,
-	MASTERNAME = 3,
-	CSTR = 4,
-}
-
-internal enum CharacterIntData
-{
-	BASE = 0,
-	ABL = 1,
-	TALENT = 2,
-	MARK = 3,
-	EXP = 4,
-	RELATION = 5,
-	CFLAG = 6,
-	EQUIP = 7,
-	JUEL = 8,
-
-}
 
 internal sealed class ConstantData
 {
@@ -121,7 +97,7 @@ internal sealed class ConstantData
 	public long[] ItemPrice;
 
 	private readonly List<CharacterTemplate> CharacterTmplList;
-	private EmueraConsole output;
+	private IScriptConsole output;
 
 	public ConstantData()
 	{
@@ -218,6 +194,7 @@ internal sealed class ConstantData
 
 	private void loadVariableSizeData(string csvPath, bool disp)
 	{
+		csvPath = RuntimeFileSearch.ResolveFilePath(csvPath);
 		if (!File.Exists(csvPath))
 			return;
 		using var eReader = new EraStreamReader(false);
@@ -241,7 +218,7 @@ internal sealed class ConstantData
 		}
 		catch
 		{
-			System.Media.SystemSounds.Hand.Play();
+			RuntimeHost.PlayErrorTone();
 			if (position != null)
 				ParserMediator.Warn(trerror.UnexpectedError.Text, position, 3);
 			else
@@ -620,7 +597,7 @@ internal sealed class ConstantData
 	}
 
 
-	public void LoadData(string csvDir, EmueraConsole console, bool disp)
+	public void LoadData(string csvDir, IScriptConsole console, bool disp)
 	{
 		output = console;
 		loadVariableSizeData(Path.Combine(csvDir, "VariableSize.CSV"), disp);
@@ -692,7 +669,7 @@ internal sealed class ConstantData
 					nameToIntDics[i].Add(alias.Key, alias.Value);
 			}
 		}
-		//if (!Program.AnalysisMode)
+		//if (!RuntimeEnvironment.AnalysisMode)
 		loadCharacterData(csvDir, disp);
 
 		#region EM_私家版_セーブ拡張
@@ -1232,7 +1209,7 @@ internal sealed class ConstantData
 	//private CharacterData dummyChara = null;
 	//public CharacterData DummyChara
 	//{
-	//    get { if (dummyChara == null) dummyChara = new CharacterData(GlobalStatic.VEvaluator.Constant, GetPseudoChara(),varData); return dummyChara; }
+	//    get { if (dummyChara == null) dummyChara = new CharacterData(RuntimeGlobals.VEvaluator.Constant, GetPseudoChara(),varData); return dummyChara; }
 	//    set { dummyChara = value; }
 	//}
 
@@ -1286,7 +1263,7 @@ internal sealed class ConstantData
 		SaveMaps.Clear();
 		StaticMaps.Clear();
 		StaticXmls.Clear();
-		foreach (var path in Directory.GetFiles(csvPath, "VarExt*.csv", SearchOption.AllDirectories))
+		foreach (var path in RuntimeFileSearch.GetFiles(csvPath, "VarExt*.csv", SearchOption.AllDirectories))
 		{
 			using var eReader = new EraStreamReader(false);
 			if (!eReader.Open(path))
@@ -1372,7 +1349,7 @@ internal sealed class ConstantData
 			}
 			catch
 			{
-				System.Media.SystemSounds.Hand.Play();
+				RuntimeHost.PlayErrorTone();
 				if (position != null)
 					ParserMediator.Warn(trerror.UnexpectedError.Text, position, 3);
 				else
@@ -1460,7 +1437,7 @@ internal sealed class ConstantData
 		}
 		catch
 		{
-			System.Media.SystemSounds.Hand.Play();
+			RuntimeHost.PlayErrorTone();
 			if (position != null)
 				ParserMediator.Warn(trerror.UnexpectedError.Text, position, 3);
 			else
@@ -1685,6 +1662,7 @@ internal sealed class ConstantData
 
 	private void loadDataTo(string csvPath, int targetIndex, long[] targetI, bool disp)
 	{
+		csvPath = RuntimeFileSearch.ResolveFilePath(csvPath);
 
 		if (!File.Exists(csvPath))
 			return;
@@ -1703,8 +1681,8 @@ internal sealed class ConstantData
 		}
 		ScriptPosition? position = null;
 		#region EE_ERD
-		// if (disp || Program.AnalysisMode)
-		if ((disp || Program.AnalysisMode) && output != null)
+		// if (disp || RuntimeEnvironment.AnalysisMode)
+		if ((disp || RuntimeEnvironment.AnalysisMode) && output != null)
 			#endregion
 			output.PrintSystemLine(string.Format(trsl.LoadingFile.Text, eReader.Filename));
 		try
@@ -1754,7 +1732,7 @@ internal sealed class ConstantData
 		}
 		catch
 		{
-			System.Media.SystemSounds.Hand.Play();
+			RuntimeHost.PlayErrorTone();
 			if (position != null)
 				ParserMediator.Warn(trerror.UnexpectedError.Text, position, 3);
 			else
@@ -1766,7 +1744,8 @@ internal sealed class ConstantData
 			eReader.Close();
 		}
 
-		var aliasPath = Path.GetDirectoryName(csvPath) + "\\" + Path.GetFileNameWithoutExtension(csvPath) + ".als";
+		var aliasDir = Path.GetDirectoryName(csvPath) ?? string.Empty;
+		var aliasPath = Path.Combine(aliasDir, Path.GetFileNameWithoutExtension(csvPath) + ".als");
 		if (File.Exists(aliasPath))
 		{
 			loadAliases(aliasPath, targetIndex);
@@ -1815,7 +1794,7 @@ internal sealed class ConstantData
 		}
 		catch
 		{
-			System.Media.SystemSounds.Hand.Play();
+			RuntimeHost.PlayErrorTone();
 			if (position != null)
 				ParserMediator.Warn(trerror.UnexpectedError.Text, position, 3);
 			else

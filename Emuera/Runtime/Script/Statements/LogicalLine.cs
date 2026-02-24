@@ -289,7 +289,7 @@ internal class FunctionLabelLine : LogicalLine, IComparable<FunctionLabelLine>
 	{
 		if (privateVar.ContainsKey(data.Name))
 			return false;
-		UserDefinedVariableToken var = GlobalStatic.VariableData.CreatePrivateVariable(data);
+		UserDefinedVariableToken var = RuntimeGlobals.VariableData.CreatePrivateVariable(data);
 		privateVar.Add(data.Name, var);
 		//静的な変数のみの場合は関数呼び出し時に何もする必要がない
 		if (!data.Static)
@@ -308,7 +308,7 @@ internal class FunctionLabelLine : LogicalLine, IComparable<FunctionLabelLine>
 	internal void ScopeIn()
 	{
 #if DEBUG
-		GlobalStatic.StackList.Add(this);
+		RuntimeHost.DebugStackPush(this);
 #endif
 		foreach (UserDefinedVariableToken var in privateVar.Values)
 			if (!var.IsStatic)
@@ -317,7 +317,7 @@ internal class FunctionLabelLine : LogicalLine, IComparable<FunctionLabelLine>
 	internal void ScopeOut()
 	{
 #if DEBUG
-		GlobalStatic.StackList.Remove(this);
+		RuntimeHost.DebugStackPop(this);
 #endif
 		foreach (UserDefinedVariableToken var in privateVar.Values)
 			if (!var.IsStatic)

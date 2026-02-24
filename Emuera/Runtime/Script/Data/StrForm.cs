@@ -32,13 +32,13 @@ internal sealed class StrForm
 		formatCurlyBrace = new FormatCurlyBrace();
 		formatPercent = new FormatPercent();
 		formatYenAt = new FormatYenAt();
-		VariableToken nameID = GlobalStatic.VariableData.GetSystemVariableToken("NAME");
-		VariableToken callnameID = GlobalStatic.VariableData.GetSystemVariableToken("CALLNAME");
+		VariableToken nameID = RuntimeGlobals.VariableData.GetSystemVariableToken("NAME");
+		VariableToken callnameID = RuntimeGlobals.VariableData.GetSystemVariableToken("CALLNAME");
 		AExpression[] zeroArg = [new SingleLongTerm(0)];
-		VariableTerm target = new(GlobalStatic.VariableData.GetSystemVariableToken("TARGET"), zeroArg);
-		VariableTerm master = new(GlobalStatic.VariableData.GetSystemVariableToken("MASTER"), zeroArg);
-		VariableTerm player = new(GlobalStatic.VariableData.GetSystemVariableToken("PLAYER"), zeroArg);
-		VariableTerm assi = new(GlobalStatic.VariableData.GetSystemVariableToken("ASSI"), zeroArg);
+		VariableTerm target = new(RuntimeGlobals.VariableData.GetSystemVariableToken("TARGET"), zeroArg);
+		VariableTerm master = new(RuntimeGlobals.VariableData.GetSystemVariableToken("MASTER"), zeroArg);
+		VariableTerm player = new(RuntimeGlobals.VariableData.GetSystemVariableToken("PLAYER"), zeroArg);
+		VariableTerm assi = new(RuntimeGlobals.VariableData.GetSystemVariableToken("ASSI"), zeroArg);
 
 		VariableTerm nametarget = new(nameID, [target]);
 		VariableTerm callnamemaster = new(callnameID, [master]);

@@ -302,17 +302,17 @@ internal sealed class ConsoleButtonString
 					xOffset += css.Width;
 				}
 
-				nint index = GlobalStatic.Console.bitmapCacheArrayIndex;
-				ConsoleButtonString last = GlobalStatic.Console.bitmapCacheArray[index];
+				nint index = parent.bitmapCacheArrayIndex;
+				ConsoleButtonString last = parent.bitmapCacheArray[index];
 				if (last != null)
 				{
 					last.bitmapCache.Dispose();
 					last.bitmapCache = null;
 				}
-				GlobalStatic.Console.bitmapCacheArray[index] = this;
+				parent.bitmapCacheArray[index] = this;
 				index++;
 				if (index >= EmueraConsole.bitmapCacheArrayCap) index = 0;
-				GlobalStatic.Console.bitmapCacheArrayIndex = index;
+				parent.bitmapCacheArrayIndex = index;
 
 			}
 			graph.DrawImageUnscaled(bitmapCache, PointX, pointY);

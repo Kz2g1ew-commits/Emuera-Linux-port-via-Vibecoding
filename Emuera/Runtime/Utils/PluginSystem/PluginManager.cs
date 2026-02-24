@@ -4,10 +4,10 @@ using MinorShift.Emuera.Runtime.Script;
 using MinorShift.Emuera.Runtime.Script.Parser;
 using MinorShift.Emuera.Runtime.Script.Statements;
 using MinorShift.Emuera.Runtime.Script.Statements.Variable;
+using MinorShift.Emuera.Runtime.Utils;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -44,7 +44,7 @@ namespace MinorShift.Emuera.Runtime.Utils.PluginSystem
 		{
 			var logicalLine = LogicalLineParser.ParseLine(line, null);
 			InstructionLine func = (InstructionLine)logicalLine;
-			ArgumentParser.SetArgumentTo(func);
+			ArgumentParser.SetArgumentTo(func, expressionMediator);
 			func.Function.Instruction.DoInstruction(expressionMediator, func, processState);
 		}
 
@@ -62,11 +62,11 @@ namespace MinorShift.Emuera.Runtime.Utils.PluginSystem
 		}
 		public void PrintPlain(string text)
 		{
-			expressionMediator.Console.PrintPlain(text);
+			RuntimeHost.PrintPlain(text);
 		}
 		public void PrintPlainWithSingleLine(string text)
 		{
-			expressionMediator.Console.PrintPlainwithSingleLine(text);
+			RuntimeHost.PrintPlainSingleLine(text);
 		}
 		public void PrintSingleLine(string text)
 		{
@@ -78,30 +78,30 @@ namespace MinorShift.Emuera.Runtime.Utils.PluginSystem
 		}
 		public void PrintTemporaryLine(string text)
 		{
-			expressionMediator.Console.PrintTemporaryLine(text);
+			RuntimeHost.PrintTemporaryLine(text);
 		}
 		public void PrintButton(string text, long id)
 		{
-			expressionMediator.Console.PrintButton(text, id);
+			RuntimeHost.PrintButton(text, id);
 		}
 		public void PrintButtonC(string text, long id, bool aligmentRight = false)
 		{
-			expressionMediator.Console.PrintButtonC(text, id, aligmentRight);
+			RuntimeHost.PrintButtonC(text, id, aligmentRight);
 		}
 		public void PrintBar(string text = "", bool isConst = true)
 		{
 			if (text == "")
 			{
-				expressionMediator.Console.PrintBar();
+				RuntimeHost.PrintBar();
 			}
 			else
 			{
-				expressionMediator.Console.printCustomBar(text, isConst);
+				RuntimeHost.PrintCustomBar(text, isConst);
 			}
 		}
 		public void PrintHtml(string htmlText, bool toBuffer = false)
 		{
-			expressionMediator.Console.PrintHtml(htmlText, toBuffer);
+			RuntimeHost.PrintHtml(htmlText, toBuffer);
 		}
 		public void PrintImage(string resourceName, int width, int height, int y, string buttonResourceName = null, string mapResourceName = null)
 		{
@@ -120,7 +120,7 @@ namespace MinorShift.Emuera.Runtime.Utils.PluginSystem
 				isPx = true,
 				num = y
 			};
-			expressionMediator.Console.PrintImg(resourceName, buttonResourceName, mapResourceName, heightNum, widthNum, yNum);
+			RuntimeHost.PrintImage(resourceName, buttonResourceName, mapResourceName, heightNum, widthNum, yNum);
 		}
 		public void PrintNewLine()
 		{
@@ -128,28 +128,48 @@ namespace MinorShift.Emuera.Runtime.Utils.PluginSystem
 		}
 		public void FlushConsole(bool force = false)
 		{
-			expressionMediator.Console.PrintFlush(force);
+			RuntimeHost.PrintFlush(force);
 		}
 		public void DebugPrint(string text)
 		{
-			expressionMediator.Console.DebugPrint(text);
+			RuntimeHost.DebugPrint(text);
 		}
 
 		public void ClearDisplay()
 		{
-			expressionMediator.Console.ClearDisplay();
+			RuntimeHost.ClearDisplay();
 		}
-		public void SetBgColor(Color color)
+		public void SetBgColor(RuntimeColor color)
 		{
-			expressionMediator.Console.SetBgColor(color);
+			SetBgColorRgb(color.ToRgb24());
+		}
+		public void SetBgColorRgb(byte r, byte g, byte b)
+		{
+			SetBgColorRgb((r << 16) | (g << 8) | b);
+		}
+		public void SetBgColorRgb(int rgb)
+		{
+			RuntimeHost.SetBackgroundColorRgb(rgb & 0xFFFFFF);
 		}
 		public void SetFont(string fontName)
 		{
-			expressionMediator.Console.SetFont(fontName);
+			RuntimeHost.SetFont(fontName);
 		}
-		public Point GetMousePosition()
+		public RuntimePoint GetMousePositionXY()
 		{
-			return expressionMediator.Console.GetMousePosition();
+			return RuntimeHost.GetMousePositionXY();
+		}
+		public int GetMouseX()
+		{
+			return GetMousePositionXY().X;
+		}
+		public int GetMouseY()
+		{
+			return GetMousePositionXY().Y;
+		}
+		public bool MoveMouse(int x, int y)
+		{
+			return RuntimeHost.MoveMouseXY(x, y);
 		}
 		public void WaitInput(bool oneInput = true, int timelimit = -1)
 		{
@@ -171,7 +191,7 @@ namespace MinorShift.Emuera.Runtime.Utils.PluginSystem
 		}
 		public void ForceStopTimer()
 		{
-			expressionMediator.Console.forceStopTimer();
+			RuntimeHost.ForceStopTimer();
 		}
 		public void Quit(bool force = false)
 		{
@@ -268,14 +288,15 @@ namespace MinorShift.Emuera.Runtime.Utils.PluginSystem
 		/// </summary>
 		public void LoadPlugins()
 		{
-			if (!Directory.Exists(Path.Combine(Program.ExeDir, "Plugins")))
+			var pluginsDir = RuntimeFileSearch.ResolveDirectoryPath(Path.Combine(RuntimeEnvironment.ExeDir, "Plugins"));
+			if (!Directory.Exists(pluginsDir))
 			{
 				//フォルダを作らないようにする
 				return;
 				//Directory.CreateDirectory("Plugins");
 			}
-			string[] plugins = Directory.GetFiles(Path.Combine(Program.ExeDir, "Plugins"), "*.dll");
-			bool pluginsAware = File.Exists(Program.ExeDir + "pluginsAware.txt");
+			string[] plugins = RuntimeFileSearch.GetFiles(pluginsDir, "*.dll", SearchOption.TopDirectoryOnly);
+			bool pluginsAware = File.Exists(RuntimeFileSearch.ResolveFilePath(Path.Combine(RuntimeEnvironment.ExeDir, "pluginsAware.txt")));
 			ClearMethods();
 			foreach (var pluginPath in plugins)
 			{

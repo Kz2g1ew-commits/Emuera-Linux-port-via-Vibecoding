@@ -1,7 +1,6 @@
 ﻿using MinorShift.Emuera.Runtime.Config;
 using System;
 using System.Drawing;
-using System.Windows.Forms;
 
 namespace MinorShift.Emuera.UI.Game;
 
@@ -36,8 +35,7 @@ internal sealed class StringMeasure : IDisposable
 	{
 		if (textDrawingMode == TextDrawingMode.TEXTRENDERER)
 		{
-			var size = TextRenderer.MeasureText(graph, chars, f, layoutSize, TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix);
-			return size.Width;
+			return UiPlatformBridge.MeasureTextNoPaddingNoPrefix(graph, chars, f, layoutSize);
 		}
 		else
 		{
@@ -63,9 +61,9 @@ internal sealed class StringMeasure : IDisposable
 		}
 		else if (textDrawingMode == TextDrawingMode.TEXTRENDERER)
 		{
-			Size size = TextRenderer.MeasureText(graph, s.AsSpan(), font, layoutSize, TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix);
+			int measuredWidth = UiPlatformBridge.MeasureTextNoPaddingNoPrefix(graph, s.AsSpan(), font, layoutSize);
 			//Size size = TextRenderer.MeasureText(g, s, StaticConfig.Font);
-			return size.Width;
+			return measuredWidth;
 		}
 		else// if (StaticConfig.TextDrawingMode == TextDrawingMode.WINAPI)
 		{

@@ -19,23 +19,28 @@ namespace MinorShift.Emuera.Runtime.Utils
 
 		public AudioDeviceTracker()
 		{
-			if (SynchronizationContext.Current == null)
-				throw new Exception("SynchronizationContext.Current is null");
+			syncContext = SynchronizationContext.Current ?? new SynchronizationContext();
+			try
+			{
+				enumerator = new MMDeviceEnumerator();
+				if (enumerator.HasDefaultAudioEndpoint(DataFlow.Render, Role.Console))
+					Device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
+				else
+					Device = null;
 
-			syncContext = SynchronizationContext.Current;
-			enumerator = new MMDeviceEnumerator();
-
-			if (enumerator.HasDefaultAudioEndpoint(DataFlow.Render, Role.Console))
-				Device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
-			else
+				enumerator.RegisterEndpointNotificationCallback(this);
+			}
+			catch
+			{
+				enumerator = null;
 				Device = null;
-
-			enumerator.RegisterEndpointNotificationCallback(this);
+			}
 		}
 
 		~AudioDeviceTracker()
 		{
-			enumerator.UnregisterEndpointNotificationCallback(this);
+			if (enumerator != null)
+				enumerator.UnregisterEndpointNotificationCallback(this);
 		}
 
 		public void OnDefaultDeviceChanged(DataFlow flow, Role role, string defaultDeviceId)
@@ -48,6 +53,9 @@ namespace MinorShift.Emuera.Runtime.Utils
 
 		private void DispatchDefaultDeviceChanged(object defaultDeviceId)
 		{
+			if (enumerator == null)
+				return;
+
 			if (Device?.ID != (string)defaultDeviceId)
 			{
 				if (defaultDeviceId == null)
@@ -286,9 +294,16 @@ namespace MinorShift.Emuera.Runtime.Utils
 			mixer.ReadFully = true;
 			mixer.MixerInputEnded += SoundEnded;
 
-			deviceTracker = new AudioDeviceTracker();
-			InitializeOutput(deviceTracker.Device);
-			deviceTracker.DefaultDeviceChanged += ChangeOutput;
+			if (OperatingSystem.IsWindows())
+			{
+				deviceTracker = new AudioDeviceTracker();
+				InitializeOutput(deviceTracker.Device);
+				deviceTracker.DefaultDeviceChanged += ChangeOutput;
+			}
+			else
+			{
+				InitializeOutput(null);
+			}
 
 			initialized = true;
 		}
@@ -300,13 +315,21 @@ namespace MinorShift.Emuera.Runtime.Utils
 
 		private static void InitializeOutput(MMDevice device)
 		{
-			if (SynchronizationContext.Current == null)
-				throw new Exception("SynchronizationContext.Current is null");
-
-			if (device != null)
-				output = new WasapiOut(device, AudioClientShareMode.Shared, true, 50);
+			if (OperatingSystem.IsWindows() && device != null)
+			{
+				try
+				{
+					output = new WasapiOut(device, AudioClientShareMode.Shared, true, 50);
+				}
+				catch
+				{
+					output = new DummyOut(200);
+				}
+			}
 			else
+			{
 				output = new DummyOut(200);
+			}
 
 			output.Init(mixer);
 			output.Play();
@@ -350,24 +373,48 @@ namespace MinorShift.Emuera.Runtime.Utils
 		public void play(string filename, int repeat = 1)
 		{
 			if (!SoundMixer.Initialized)
-				SoundMixer.Initialize();
+			{
+				try
+				{
+					SoundMixer.Initialize();
+				}
+				catch (Exception e)
+				{
+					Debug.WriteLine($"Sound mixer initialization failed: {e.Message}");
+					return;
+				}
+			}
 
 			stop();
 
-			if (filename.EndsWith(".wav", StringComparison.OrdinalIgnoreCase))
+			try
 			{
-				stream = new WaveFileReader(filename);
+				if (filename.EndsWith(".wav", StringComparison.OrdinalIgnoreCase))
+				{
+					stream = new WaveFileReader(filename);
+				}
+				else if (filename.EndsWith(".ogg", StringComparison.OrdinalIgnoreCase))
+				{
+					stream = new VorbisWaveReader(filename);
+				}
+				else if (OperatingSystem.IsWindows())
+				{
+					// NOTE: MediaFoundationReader currently seems to only support 16 bit audio files on wine
+					var settings = new MediaFoundationReader.MediaFoundationReaderSettings();
+					settings.RequestFloatOutput = true;
+					stream = new MediaFoundationReader(filename, settings);
+				}
+				else
+				{
+					throw new PlatformNotSupportedException("Only .wav and .ogg are supported on non-Windows audio backend.");
+				}
 			}
-			else if (filename.EndsWith(".ogg", StringComparison.OrdinalIgnoreCase))
+			catch (Exception e)
 			{
-				stream = new VorbisWaveReader(filename);
-			}
-			else
-			{
-				// NOTE: MediaFoundationReader currently seems to only support 16 bit audio files on wine
-				var settings = new MediaFoundationReader.MediaFoundationReaderSettings();
-				settings.RequestFloatOutput = true;
-				stream = new MediaFoundationReader(filename, settings);
+				Debug.WriteLine($"Sound playback unavailable for '{filename}': {e.Message}");
+				stream = null;
+				Playing = false;
+				return;
 			}
 
 			WaveStream _stream = stream;

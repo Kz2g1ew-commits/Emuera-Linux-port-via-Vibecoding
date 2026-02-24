@@ -1,12 +1,12 @@
 ﻿using MinorShift.Emuera.Runtime.Config;
 using MinorShift.Emuera.Runtime.Config.JSON;
+using MinorShift.Emuera.UI.Game;
+using MinorShift.Emuera.Runtime.Utils;
 using MinorShift.Emuera.Runtime.Utils.EvilMask;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Text;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using trmb = MinorShift.Emuera.Runtime.Utils.EvilMask.Lang.MessageBox;
@@ -268,18 +268,7 @@ namespace MinorShift.Emuera.Forms
 
 		private void shown(object sender, EventArgs e)
 		{
-			//フォントを事前読み込み
-			foreach (var ff in new InstalledFontCollection().Families)
-			{
-				if (ff.IsStyleAvailable(FontStyle.Regular) &&
-					ff.IsStyleAvailable(FontStyle.Bold) &&
-					ff.IsStyleAvailable(FontStyle.Italic) &&
-					ff.IsStyleAvailable(FontStyle.Strikeout) &&
-					ff.IsStyleAvailable(FontStyle.Underline))
-				{
-					comboBox2.Items.Add(ff.Name);
-				}
-			}
+			PopulateFontList();
 		}
 
 		private void buttonSave_Click(object sender, EventArgs e)
@@ -323,10 +312,14 @@ namespace MinorShift.Emuera.Forms
 
 		static void setColorBox(ColorBox colorBox, ConfigCode code)
 		{
-			ConfigItem<Color> item = (ConfigItem<Color>)ConfigData.Instance.GetConfigItem(code);
-			colorBox.SelectingColor = item.Value;
+			ConfigItem<RuntimeColor> item = (ConfigItem<RuntimeColor>)ConfigData.Instance.GetConfigItem(code);
+			colorBox.SelectingColor = RuntimeToDrawingColor(item.Value);
 			colorBox.Enabled = !item.Fixed;
 		}
+
+		static RuntimeColor DrawingToRuntimeColor(Color color) => new(color.R, color.G, color.B);
+
+		static Color RuntimeToDrawingColor(RuntimeColor color) => Color.FromArgb(color.R, color.G, color.B);
 		/*		void setTextBox(TextBox textBox, ConfigCode code)
 				{
 					ConfigItem<string> item = (ConfigItem<string>)ConfigData.Instance.GetConfigItem(code);
@@ -334,8 +327,8 @@ namespace MinorShift.Emuera.Forms
 					textBox.Enabled = !item.Fixed;
 				}
 		*/
-		MainWindow parent;
-		public void SetConfig(MainWindow mainWindow)
+		IConfigDialogHost parent;
+		public void SetConfig(IConfigDialogHost mainWindow)
 		{
 			parent = mainWindow;
 			//ConfigData config = ConfigData.Instance;
@@ -629,10 +622,10 @@ namespace MinorShift.Emuera.Forms
 
 
 
-			config.GetConfigItem(ConfigCode.ForeColor).SetValue(colorBoxFG.SelectingColor);
-			config.GetConfigItem(ConfigCode.BackColor).SetValue(colorBoxBG.SelectingColor);
-			config.GetConfigItem(ConfigCode.FocusColor).SetValue(colorBoxSelecting.SelectingColor);
-			config.GetConfigItem(ConfigCode.LogColor).SetValue(colorBoxBacklog.SelectingColor);
+			config.GetConfigItem(ConfigCode.ForeColor).SetValue(DrawingToRuntimeColor(colorBoxFG.SelectingColor));
+			config.GetConfigItem(ConfigCode.BackColor).SetValue(DrawingToRuntimeColor(colorBoxBG.SelectingColor));
+			config.GetConfigItem(ConfigCode.FocusColor).SetValue(DrawingToRuntimeColor(colorBoxSelecting.SelectingColor));
+			config.GetConfigItem(ConfigCode.LogColor).SetValue(DrawingToRuntimeColor(colorBoxBacklog.SelectingColor));
 
 			switch (comboBoxTextDrawingMode.SelectedIndex)
 			{
@@ -738,16 +731,14 @@ namespace MinorShift.Emuera.Forms
 			config.GetConfigItem(ConfigCode.CBScrollCount).SetValue((int)numericUpDownCBScrollCount.Value);
 			config.GetConfigItem(ConfigCode.CBMinTimer).SetValue((int)numericUpDownCBMinTimer.Value);
 			#region EE_AnchorのCB機能移植Extension
-			GlobalStatic.Console.CBProc.SetMaxCB(Config.CBMaxCB);
-			GlobalStatic.Console.CBProc.SetScrollCount(Config.CBScrollCount);
-			GlobalStatic.Console.CBProc.SetTimerInterval(Config.CBMinTimer);
+			parent?.UpdateClipboardRuntimeSettings(Config.CBMaxCB, Config.CBScrollCount, Config.CBMinTimer);
 			#endregion
 			#endregion
 
 			config.GetConfigItem(ConfigCode.RikaiEnabled).SetValue(rikaiCheckBoxEnable.Checked);
 			config.GetConfigItem(ConfigCode.RikaiFilename).SetValue(rikaiDictFilenameTextBox.Text);
-			config.GetConfigItem(ConfigCode.RikaiColorBack).SetValue(rikaiColorBoxBG.SelectingColor);
-			config.GetConfigItem(ConfigCode.RikaiColorText).SetValue(rikaiColorBoxText.SelectingColor);
+			config.GetConfigItem(ConfigCode.RikaiColorBack).SetValue(DrawingToRuntimeColor(rikaiColorBoxBG.SelectingColor));
+			config.GetConfigItem(ConfigCode.RikaiColorText).SetValue(DrawingToRuntimeColor(rikaiColorBoxText.SelectingColor));
 			config.GetConfigItem(ConfigCode.RikaiUseSeparateBoxes).SetValue(rikaiCheckBoxSeparateBoxes.Checked);
 
 			config.GetConfigItem(ConfigCode.Ctrl_Z_Enabled).SetValue(checkBox27.Checked);
@@ -787,9 +778,9 @@ namespace MinorShift.Emuera.Forms
 			if (parent == null)
 				return;
 			if (numericUpDown2.Enabled)
-				numericUpDown2.Value = parent.MainPicBox.Width;
+				numericUpDown2.Value = parent.ClientAreaWidth;
 			if (numericUpDown3.Enabled)
-				numericUpDown3.Value = parent.MainPicBox.Height + Config.LineHeight;
+				numericUpDown3.Value = parent.ClientAreaHeight + Config.LineHeight;
 		}
 
 		private void button3_Click(object sender, EventArgs e)
@@ -798,19 +789,19 @@ namespace MinorShift.Emuera.Forms
 				return;
 			if (numericUpDownPosX.Enabled)
 			{
-				if (numericUpDownPosX.Maximum < parent.Location.X)
-					numericUpDownPosX.Maximum = parent.Location.X;
-				if (numericUpDownPosX.Minimum > parent.Location.X)
-					numericUpDownPosX.Minimum = parent.Location.X;
-				numericUpDownPosX.Value = parent.Location.X;
+				if (numericUpDownPosX.Maximum < parent.WindowPositionX)
+					numericUpDownPosX.Maximum = parent.WindowPositionX;
+				if (numericUpDownPosX.Minimum > parent.WindowPositionX)
+					numericUpDownPosX.Minimum = parent.WindowPositionX;
+				numericUpDownPosX.Value = parent.WindowPositionX;
 			}
 			if (numericUpDownPosY.Enabled)
 			{
-				if (numericUpDownPosY.Maximum < parent.Location.Y)
-					numericUpDownPosY.Maximum = parent.Location.Y;
-				if (numericUpDownPosY.Minimum > parent.Location.Y)
-					numericUpDownPosY.Minimum = parent.Location.Y;
-				numericUpDownPosY.Value = parent.Location.Y;
+				if (numericUpDownPosY.Maximum < parent.WindowPositionY)
+					numericUpDownPosY.Maximum = parent.WindowPositionY;
+				if (numericUpDownPosY.Minimum > parent.WindowPositionY)
+					numericUpDownPosY.Minimum = parent.WindowPositionY;
+				numericUpDownPosY.Value = parent.WindowPositionY;
 			}
 
 		}
@@ -819,54 +810,30 @@ namespace MinorShift.Emuera.Forms
 		{
 			if (!comboBox2.Enabled)
 				return;
-			if (!OperatingSystem.IsWindows())
-				return;
-			foreach (var ff in new InstalledFontCollection().Families)
-			{
-				if (ff.IsStyleAvailable(FontStyle.Regular) &&
-					ff.IsStyleAvailable(FontStyle.Bold) &&
-					ff.IsStyleAvailable(FontStyle.Italic) &&
-					ff.IsStyleAvailable(FontStyle.Strikeout) &&
-					ff.IsStyleAvailable(FontStyle.Underline))
-				{
-					comboBox2.Items.Add(ff.Name);
-				}
-			}
+			PopulateFontList();
+		}
 
+		private void PopulateFontList()
+		{
 			var selectedFontName = comboBox2.Text;
-			#region EE_フォントファイル対応
-			if (Directory.Exists(Program.FontDir))
+			var known = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+			foreach (var item in comboBox2.Items)
 			{
-				PrivateFontCollection pfc = new();
-				foreach (string fontFile in Directory.GetFiles(Program.FontDir, "*.ttf", SearchOption.AllDirectories))
-					pfc.AddFontFile(fontFile);
-
-				foreach (string fontFile in Directory.GetFiles(Program.FontDir, "*.otf", SearchOption.AllDirectories))
-					pfc.AddFontFile(fontFile);
-
-				foreach (FontFamily ff in pfc.Families)
-				{
-					/**
-					if (!ff.IsStyleAvailable(FontStyle.Regular))
-						continue;
-					if (!ff.IsStyleAvailable(FontStyle.Bold))
-						continue;
-					if (!ff.IsStyleAvailable(FontStyle.Italic))
-						continue;
-					if (!ff.IsStyleAvailable(FontStyle.Strikeout))
-						continue;
-					if (!ff.IsStyleAvailable(FontStyle.Underline))
-						continue;
-					**/
-					comboBox2.Items.Add(ff.Name);
-				}
+				if (item is string existing && !string.IsNullOrWhiteSpace(existing))
+					known.Add(existing);
 			}
-			#endregion
 
-			string fontname = comboBox2.Text;
-			if (!string.IsNullOrEmpty(fontname))
+			foreach (var fontName in UiPlatformBridge.GetInstalledFontNames())
 			{
-				int nameIndex = comboBox2.Items.IndexOf(fontname);
+				if (!known.Add(fontName))
+					continue;
+				comboBox2.Items.Add(fontName);
+			}
+
+			if (!string.IsNullOrEmpty(selectedFontName))
+			{
+				int nameIndex = comboBox2.Items.IndexOf(selectedFontName);
 				if (nameIndex >= 0)
 					comboBox2.SelectedIndex = nameIndex;
 			}

@@ -1,16 +1,13 @@
 ﻿using MinorShift.Emuera.Runtime.Utils;
-using MinorShift.Emuera.UI;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Text;
-using System.Windows.Forms;
 using trmb = MinorShift.Emuera.Runtime.Utils.EvilMask.Lang.MessageBox;
 
 namespace MinorShift.Emuera.Runtime.Config;
 
-internal static class Config
+internal static partial class Config
 {
 
 	#region config
@@ -55,10 +52,14 @@ internal static class Config
 		MaxLog = instance.GetConfigValue<int>(ConfigCode.MaxLog);
 		PrintCPerLine = instance.GetConfigValue<int>(ConfigCode.PrintCPerLine);
 		PrintCLength = instance.GetConfigValue<int>(ConfigCode.PrintCLength);
-		ForeColor = instance.GetConfigValue<Color>(ConfigCode.ForeColor);
-		BackColor = instance.GetConfigValue<Color>(ConfigCode.BackColor);
-		FocusColor = instance.GetConfigValue<Color>(ConfigCode.FocusColor);
-		LogColor = instance.GetConfigValue<Color>(ConfigCode.LogColor);
+		ForeColorRuntime = instance.GetConfigRuntimeColor(ConfigCode.ForeColor);
+		BackColorRuntime = instance.GetConfigRuntimeColor(ConfigCode.BackColor);
+		FocusColorRuntime = instance.GetConfigRuntimeColor(ConfigCode.FocusColor);
+		LogColorRuntime = instance.GetConfigRuntimeColor(ConfigCode.LogColor);
+		ForeColorRgb = ForeColorRuntime.ToRgb24();
+		BackColorRgb = BackColorRuntime.ToRgb24();
+		FocusColorRgb = FocusColorRuntime.ToRgb24();
+		LogColorRgb = LogColorRuntime.ToRgb24();
 		FontSize = instance.GetConfigValue<int>(ConfigCode.FontSize);
 		FontName = instance.GetConfigValue<string>(ConfigCode.FontName);
 		LineHeight = instance.GetConfigValue<int>(ConfigCode.LineHeight);
@@ -166,8 +167,10 @@ internal static class Config
 		#region EmuEra-Rikaichan related settings
 		RikaiEnabled = instance.GetConfigValue<bool>(ConfigCode.RikaiEnabled);
 		RikaiFilename = instance.GetConfigValue<string>(ConfigCode.RikaiFilename);
-		RikaiColorBack = instance.GetConfigValue<Color>(ConfigCode.RikaiColorBack);
-		RikaiColorText = instance.GetConfigValue<Color>(ConfigCode.RikaiColorText);
+		RikaiColorBackRuntime = instance.GetConfigRuntimeColor(ConfigCode.RikaiColorBack);
+		RikaiColorTextRuntime = instance.GetConfigRuntimeColor(ConfigCode.RikaiColorText);
+		RikaiColorBackRgb = RikaiColorBackRuntime.ToRgb24();
+		RikaiColorTextRgb = RikaiColorTextRuntime.ToRgb24();
 		RikaiUseSeparateBoxes = instance.GetConfigValue<bool>(ConfigCode.RikaiUseSeparateBoxes);
 		#endregion
 
@@ -214,7 +217,7 @@ internal static class Config
 		}
 		if (TextDrawingMode == TextDrawingMode.WINAPI)
 		{
-			MessageBox.Show(trmb.DoNotSupportWINAPI.Text);
+			RuntimeHost.ShowInfo(trmb.DoNotSupportWINAPI.Text);
 			TextDrawingMode = TextDrawingMode.TEXTRENDERER;
 		}
 
@@ -223,14 +226,14 @@ internal static class Config
 			DrawingParam_ShapePositionShift = Math.Max(2, FontSize / 6);
 		DrawableWidth = WindowX - DrawingParam_ShapePositionShift;
 		#region eee_カレントディレクトリー
-		// ForceSavDir = Program.ExeDir + "sav\\";
-		ForceSavDir = Program.ExeDir + "sav" + Path.DirectorySeparatorChar;
+		// ForceSavDir = RuntimeEnvironment.ExeDir + "sav\\";
+		ForceSavDir = Path.Combine(RuntimeEnvironment.ExeDir, "sav") + Path.DirectorySeparatorChar;
 		if (UseSaveFolder)
-			// SavDir = Program.ExeDir + "sav\\";
-			SavDir = Program.ExeDir + "sav" + Path.DirectorySeparatorChar;
+			// SavDir = RuntimeEnvironment.ExeDir + "sav\\";
+			SavDir = Path.Combine(RuntimeEnvironment.ExeDir, "sav") + Path.DirectorySeparatorChar;
 		else
-			// SavDir = Program.ExeDir;
-			SavDir = Program.ExeDir;
+			// SavDir = RuntimeEnvironment.ExeDir;
+			SavDir = RuntimeEnvironment.ExeDir;
 		#endregion
 		if (UseSaveFolder && !Directory.Exists(SavDir))
 			createSavDirAndMoveFiles();
@@ -249,7 +252,7 @@ internal static class Config
 	}
 	#endregion
 
-	public static Font DefaultFont { get { return FontFactory.GetFont("", FontStyle.Regular); } }
+	public static RuntimeFontSpec DefaultFontSpec { get { return new RuntimeFontSpec(FontName, Math.Max(8, FontSize)); } }
 
 
 	/// <summary>
@@ -286,10 +289,11 @@ internal static class Config
 			return;
 		}
 		#region eee_カレントディレクトリー
-		// bool existGlobal = File.Exists(Program.ExeDir + "global.sav");
-		// string[] savFiles = Directory.GetFiles(Program.ExeDir, "save*.sav", SearchOption.TopDirectoryOnly);
-		bool existGlobal = File.Exists(Program.ExeDir + "global.sav");
-		string[] savFiles = Directory.GetFiles(Program.ExeDir, "save*.sav", SearchOption.TopDirectoryOnly);
+		// bool existGlobal = File.Exists(RuntimeEnvironment.ExeDir + "global.sav");
+		// string[] savFiles = Directory.GetFiles(RuntimeEnvironment.ExeDir, "save*.sav", SearchOption.TopDirectoryOnly);
+		string globalPath = Path.Combine(RuntimeEnvironment.ExeDir, "global.sav");
+		bool existGlobal = File.Exists(globalPath);
+			string[] savFiles = GetFilesCrossPlatform(RuntimeEnvironment.ExeDir, "save*.sav", SearchOption.TopDirectoryOnly);
 		#endregion
 		if (!existGlobal && savFiles.Length == 0)
 			return;
@@ -306,15 +310,15 @@ internal static class Config
 		try
 		{
 			#region eee_カレントディレクトリー
-			//if (File.Exists(Program.ExeDir + "global.sav"))
-			//	File.Move(Program.ExeDir + "global.sav", SavDir + "global.sav");
-			//savFiles = Directory.GetFiles(Program.ExeDir, "save*.sav", SearchOption.TopDirectoryOnly);
-			if (File.Exists(Program.ExeDir + "global.sav"))
-				File.Move(Program.ExeDir + "global.sav", SavDir + "global.sav");
-			savFiles = Directory.GetFiles(Program.ExeDir, "save*.sav", SearchOption.TopDirectoryOnly);
+			//if (File.Exists(RuntimeEnvironment.ExeDir + "global.sav"))
+			//	File.Move(RuntimeEnvironment.ExeDir + "global.sav", SavDir + "global.sav");
+			//savFiles = Directory.GetFiles(RuntimeEnvironment.ExeDir, "save*.sav", SearchOption.TopDirectoryOnly);
+			if (File.Exists(globalPath))
+				File.Move(globalPath, Path.Combine(SavDir, "global.sav"));
+				savFiles = GetFilesCrossPlatform(RuntimeEnvironment.ExeDir, "save*.sav", SearchOption.TopDirectoryOnly);
 			#endregion
 			foreach (string oldpath in savFiles)
-				File.Move(oldpath, SavDir + Path.GetFileName(oldpath));
+				File.Move(oldpath, Path.Combine(SavDir, Path.GetFileName(oldpath)));
 		}
 		catch
 		{
@@ -345,8 +349,8 @@ internal static class Config
 		SearchOption option = SearchOption.TopDirectoryOnly;
 		if (SearchSubdirectory)
 			option = SearchOption.AllDirectories;
-		string[] erbFiles = Directory.GetFiles(Program.ErbDir, "*.ERB", option);
-		string[] csvFiles = Directory.GetFiles(Program.CsvDir, "*.CSV", option);
+			string[] erbFiles = GetFilesCrossPlatform(RuntimeEnvironment.ErbDir, "*.ERB", option);
+			string[] csvFiles = GetFilesCrossPlatform(RuntimeEnvironment.CsvDir, "*.CSV", option);
 		long[] writetimes = new long[erbFiles.Length + csvFiles.Length];
 		for (int i = 0; i < erbFiles.Length; i++)
 			if (Path.GetExtension(erbFiles[i]).Equals(".ERB", StringComparison.OrdinalIgnoreCase))
@@ -386,15 +390,27 @@ internal static class Config
 			RelativePath = "";
 		else
 		{
-			if (!dir.StartsWith(rootdir, StringComparison.OrdinalIgnoreCase))
+			try
+			{
+				var relative = Path.GetRelativePath(rootdir, dir);
+				if (relative == ".." || relative.StartsWith(".." + Path.DirectorySeparatorChar, StringComparison.Ordinal))
+					RelativePath = dir;
+				else
+					RelativePath = relative;
+			}
+			catch
+			{
 				RelativePath = dir;
-			else
-				RelativePath = dir[rootdir.Length..];//前方が検索ルートパスと一致するならその部分を切り取る
-			if (!RelativePath.EndsWith('\\') && !RelativePath.EndsWith('/'))
-				RelativePath += "\\";//末尾が\又は/で終わるように。後でFile名を直接加算できるようにしておく
+			}
+			if (RelativePath.Length > 0 &&
+				!RelativePath.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal) &&
+				!RelativePath.EndsWith(Path.AltDirectorySeparatorChar.ToString(), StringComparison.Ordinal))
+			{
+				RelativePath += Path.DirectorySeparatorChar;//末尾が区切り文字で終わるようにする
+			}
 		}
 		//filepathsは完全パスである
-		string[] filepaths = Directory.GetFiles(dir, pattern, SearchOption.TopDirectoryOnly);
+			string[] filepaths = GetFilesCrossPlatform(dir, pattern, SearchOption.TopDirectoryOnly);
 		if (sort)
 			Array.Sort(filepaths);
 		for (int i = 0; i < filepaths.Length; i++)
@@ -414,6 +430,11 @@ internal static class Config
 		}
 
 		return retList;
+	}
+
+	private static string[] GetFilesCrossPlatform(string dir, string pattern, SearchOption option)
+	{
+		return RuntimeFileSearch.GetFiles(dir, pattern, option);
 	}
 
 	/// <summary>
@@ -467,10 +488,14 @@ internal static class Config
 	public static int MaxLog { get; private set; }
 	public static int PrintCPerLine { get; private set; }
 	public static int PrintCLength { get; private set; }
-	public static Color ForeColor { get; private set; }
-	public static Color BackColor { get; private set; }
-	public static Color FocusColor { get; private set; }
-	public static Color LogColor { get; private set; }
+	public static int ForeColorRgb { get; private set; }
+	public static int BackColorRgb { get; private set; }
+	public static int FocusColorRgb { get; private set; }
+	public static int LogColorRgb { get; private set; }
+	public static RuntimeColor ForeColorRuntime { get; private set; }
+	public static RuntimeColor BackColorRuntime { get; private set; }
+	public static RuntimeColor FocusColorRuntime { get; private set; }
+	public static RuntimeColor LogColorRuntime { get; private set; }
 	public static int FontSize { get; private set; }
 	public static string FontName { get; private set; }
 	public static int LineHeight { get; private set; }
@@ -645,8 +670,10 @@ internal static class Config
 	#region EmuEra-Rikaichan related settings
 	public static bool RikaiEnabled { get; private set; }
 	public static string RikaiFilename { get; private set; }
-	public static Color RikaiColorBack { get; private set; }
-	public static Color RikaiColorText { get; private set; }
+	public static int RikaiColorBackRgb { get; private set; }
+	public static int RikaiColorTextRgb { get; private set; }
+	public static RuntimeColor RikaiColorBackRuntime { get; private set; }
+	public static RuntimeColor RikaiColorTextRuntime { get; private set; }
 	public static bool RikaiUseSeparateBoxes { get; private set; }
 	#endregion
 

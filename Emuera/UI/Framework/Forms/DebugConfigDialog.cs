@@ -82,7 +82,7 @@ namespace MinorShift.Emuera.Forms
 			updown.Enabled = !item.Fixed;
 		}
 
-		public void SetConfig(DebugDialog debugDialog)
+		public void SetConfig(IDebugConfigDialogHost debugDialog)
 		{
 			dd = debugDialog;
 			//ConfigData config = ConfigData.Instance;
@@ -117,37 +117,37 @@ namespace MinorShift.Emuera.Forms
 		{
 		}
 
-		DebugDialog dd;
+		IDebugConfigDialogHost dd;
 		private void button6_Click(object sender, EventArgs e)
 		{
-			if ((dd == null) || (!dd.Created))
+			if ((dd == null) || !dd.IsWindowCreated)
 				return;
 			if (numericUpDownDWW.Enabled)
-				numericUpDownDWW.Value = dd.Width;
+				numericUpDownDWW.Value = dd.WindowWidth;
 			if (numericUpDownDWH.Enabled)
-				numericUpDownDWH.Value = dd.Height;
+				numericUpDownDWH.Value = dd.WindowHeight;
 		}
 
 		private void button5_Click(object sender, EventArgs e)
 		{
 
-			if ((dd == null) || (!dd.Created))
+			if ((dd == null) || !dd.IsWindowCreated)
 				return;
 			if (numericUpDownDWX.Enabled)
 			{
-				if (numericUpDownDWX.Maximum < dd.Location.X)
-					numericUpDownDWX.Maximum = dd.Location.X;
-				if (numericUpDownDWX.Minimum > dd.Location.X)
-					numericUpDownDWX.Minimum = dd.Location.X;
-				numericUpDownDWX.Value = dd.Location.X;
+				if (numericUpDownDWX.Maximum < dd.WindowPositionX)
+					numericUpDownDWX.Maximum = dd.WindowPositionX;
+				if (numericUpDownDWX.Minimum > dd.WindowPositionX)
+					numericUpDownDWX.Minimum = dd.WindowPositionX;
+				numericUpDownDWX.Value = dd.WindowPositionX;
 			}
 			if (numericUpDownDWY.Enabled)
 			{
-				if (numericUpDownDWY.Maximum < dd.Location.Y)
-					numericUpDownDWY.Maximum = dd.Location.Y;
-				if (numericUpDownDWY.Minimum > dd.Location.Y)
-					numericUpDownDWY.Minimum = dd.Location.Y;
-				numericUpDownDWY.Value = dd.Location.Y;
+				if (numericUpDownDWY.Maximum < dd.WindowPositionY)
+					numericUpDownDWY.Maximum = dd.WindowPositionY;
+				if (numericUpDownDWY.Minimum > dd.WindowPositionY)
+					numericUpDownDWY.Minimum = dd.WindowPositionY;
+				numericUpDownDWY.Value = dd.WindowPositionY;
 			}
 		}
 

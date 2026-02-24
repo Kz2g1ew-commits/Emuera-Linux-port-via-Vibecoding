@@ -1,4 +1,5 @@
 ﻿using MinorShift.Emuera.Runtime.Script.Statements;
+using MinorShift.Emuera.Runtime;
 using MinorShift.Emuera.Runtime.Utils;
 
 namespace MinorShift.Emuera.GameProc.Function;
@@ -6,7 +7,7 @@ namespace MinorShift.Emuera.GameProc.Function;
 //1756 LogicalLineParserから分離。処理をArgumentBuilderに分割
 internal static partial class ArgumentParser
 {
-	public static bool SetArgumentTo(InstructionLine line)
+	public static bool SetArgumentTo(InstructionLine line, ExpressionMediator exm)
 	{
 		if (line == null)
 			return false;
@@ -14,7 +15,7 @@ internal static partial class ArgumentParser
 			return true;
 		if (line.IsError)
 			return false;
-		if (!Program.DebugMode && line.Function.IsDebug())
+		if (!RuntimeEnvironment.DebugMode && line.Function.IsDebug())
 		{//非DebugモードでのDebug系命令。何もしないので引数解析も不要
 			line.Argument = null;
 			return true;
@@ -25,9 +26,9 @@ internal static partial class ArgumentParser
 		try
 		{
 			if (line.Function.ArgBuilder != null)
-				arg = line.Function.ArgBuilder.CreateArgument(line, GlobalStatic.EMediator);
+				arg = line.Function.ArgBuilder.CreateArgument(line, exm);
 			else
-				arg = line.Function.Instruction.CreateArgument(line, GlobalStatic.EMediator);
+				arg = line.Function.Instruction.CreateArgument(line, exm);
 		}
 		catch (EmueraException e)
 		{
@@ -50,7 +51,7 @@ internal static partial class ArgumentParser
 
 		static bool error(InstructionLine line, string errmes)
 		{
-			System.Media.SystemSounds.Hand.Play();
+			RuntimeHost.PlayErrorTone();
 
 			line.IsError = true;
 			line.ErrMes = errmes;
