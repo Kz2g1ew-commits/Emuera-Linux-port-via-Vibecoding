@@ -1,5 +1,12 @@
 # Emuera for Linux (Ported)
 
+This project is a Linux port of the original [Emuera](https://gitlab.com/VVIIlet/emuera) based on .NET.
+
+> **Original Project:** [https://gitlab.com/VVIIlet/emuera](https://gitlab.com/VVIIlet/emuera)  
+> **Original Author:** MinorShift & VVIIlet
+
+---
+
 이 프로젝트는 원본 Emuera를 리눅스 환경에서 동작하도록 수정한 포팅 버전입니다.
 
 ## License Notice
