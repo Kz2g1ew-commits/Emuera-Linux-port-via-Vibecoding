@@ -30,7 +30,7 @@ Use these commands in a deployed game directory (example: `eraTWKR`):
 Use these commands in this repository root (`emuera.em`):
 
 1. Move to repo root:
-`cd /home/ain/tw/emuera.em`
+`cd /path/to/repo/emuera.em`
 2. Deploy into a game directory:
 `bash scripts/deploy-linux-standalone.sh /path/to/game [target_file_name]`
 3. This deploy step builds/publishes and generates these files in `/path/to/game`:
@@ -83,7 +83,7 @@ Use these commands in this repository root (`emuera.em`):
 이 저장소 루트(`emuera.em`)에서 아래 명령을 사용합니다.
 
 1. 저장소 루트로 이동:
-`cd /home/ain/tw/emuera.em`
+`cd /path/to/repo/emuera.em`
 2. 게임 폴더로 배포:
 `bash scripts/deploy-linux-standalone.sh /path/to/game [원하는출력파일명]`
 3. 위 배포 단계에서 `/path/to/game` 안에 다음이 자동 생성됩니다:
