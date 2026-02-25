@@ -1,8 +1,16 @@
+using System;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text;
 
 internal static class CliTextDisplayWidth
 {
+	private static readonly bool UseNativeWcWidth =
+		!OperatingSystem.IsWindows() &&
+		!string.Equals(Environment.GetEnvironmentVariable("EMUERA_CLI_USE_NATIVE_WCWIDTH"), "0", StringComparison.OrdinalIgnoreCase);
+
+	private static readonly bool HasNativeWcWidth = DetectNativeWcWidth();
+
 	public static int GetDisplayWidth(string? text)
 	{
 		if (string.IsNullOrEmpty(text))
@@ -53,10 +61,46 @@ internal static class CliTextDisplayWidth
 		if (category is UnicodeCategory.NonSpacingMark or UnicodeCategory.SpacingCombiningMark or UnicodeCategory.EnclosingMark)
 			return 0;
 
+		if (TryGetNativeRuneWidth(rune, out var nativeWidth))
+			return nativeWidth;
+
 		if (IsWide(value))
 			return 2;
 		return 1;
 	}
+
+	private static bool DetectNativeWcWidth()
+	{
+		if (!UseNativeWcWidth)
+			return false;
+		try
+		{
+			_ = NativeWcWidth('A');
+			return true;
+		}
+		catch (DllNotFoundException)
+		{
+			return false;
+		}
+		catch (EntryPointNotFoundException)
+		{
+			return false;
+		}
+	}
+
+	private static bool TryGetNativeRuneWidth(Rune rune, out int width)
+	{
+		width = 0;
+		if (!HasNativeWcWidth)
+			return false;
+
+		var result = NativeWcWidth(rune.Value);
+		width = result < 0 ? 0 : result;
+		return true;
+	}
+
+	[DllImport("libc", EntryPoint = "wcwidth")]
+	private static extern int NativeWcWidth(int codePoint);
 
 	private static bool IsControl(int value)
 	{

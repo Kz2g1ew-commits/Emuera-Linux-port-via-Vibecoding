@@ -116,16 +116,17 @@ if [[ -z "\${LANG:-}" ]]; then
 fi
 export LC_CTYPE="\${LC_CTYPE:-\$LANG}"
 
-# Optional: if needed, user can set VTE_CJK_WIDTH=2 before launch.
-# Do not force it by default because terminal/font behavior differs by environment.
+# Optional: if needed, user can set VTE_CJK_WIDTH before launch.
+# Keep terminal-side CJK ambiguous-width policy explicit and user-controlled.
 
 export EMUERA_NO_ANSI="\${EMUERA_NO_ANSI:-0}"
 export EMUERA_CLI_DIRECT_KEY_CAPTURE="\${EMUERA_CLI_DIRECT_KEY_CAPTURE:-0}"
 export EMUERA_CLI_FORCE_BLACK_BG="\${EMUERA_CLI_FORCE_BLACK_BG:-1}"
 export EMUERA_CLI_OSC11_BG="\${EMUERA_CLI_OSC11_BG:-1}"
+export EMUERA_CLI_USE_NATIVE_WCWIDTH="\${EMUERA_CLI_USE_NATIVE_WCWIDTH:-1}"
 export EMUERA_DEFAULT_MODE="\${EMUERA_DEFAULT_MODE:-engine}"
-export EMUERA_CLI_LAYOUT_WIDTH="\${EMUERA_CLI_LAYOUT_WIDTH:-192}"
-export EMUERA_CLI_LAYOUT_HEIGHT="\${EMUERA_CLI_LAYOUT_HEIGHT:-54}"
+export EMUERA_CLI_LAYOUT_WIDTH="\${EMUERA_CLI_LAYOUT_WIDTH:-}"
+export EMUERA_CLI_LAYOUT_HEIGHT="\${EMUERA_CLI_LAYOUT_HEIGHT:-}"
 export EMUERA_CLI_AUTO_RESIZE="\${EMUERA_CLI_AUTO_RESIZE:-1}"
 if [[ "\${EMUERA_CLI_AUTO_RESIZE}" != "0" && -t 1 ]]; then
   if [[ "\${EMUERA_CLI_LAYOUT_WIDTH}" =~ ^[0-9]+$ ]] && [[ "\${EMUERA_CLI_LAYOUT_HEIGHT}" =~ ^[0-9]+$ ]]; then
@@ -215,9 +216,10 @@ Launcher options:
 Environment:
   EMUERA_DEFAULT_TARGET  Optional preferred executable filename.
   EMUERA_DEFAULT_MODE    Default runtime mode (default: engine).
-  EMUERA_CLI_LAYOUT_WIDTH  Stable layout width hint (default: 192).
-  EMUERA_CLI_LAYOUT_HEIGHT Stable layout height hint (default: 54).
-  EMUERA_CLI_AUTO_RESIZE   1 to request terminal resize on launch (default: 1).
+  EMUERA_CLI_USE_NATIVE_WCWIDTH  Use libc wcwidth for terminal column width (default: 1).
+  EMUERA_CLI_LAYOUT_WIDTH  Optional fixed layout width hint (unset by default).
+  EMUERA_CLI_LAYOUT_HEIGHT Optional fixed layout height hint (unset by default).
+  EMUERA_CLI_AUTO_RESIZE   1 to request terminal resize when width/height are set (default: 1).
 USAGE
       exit 0
       ;;
