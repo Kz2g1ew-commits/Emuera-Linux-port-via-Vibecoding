@@ -356,12 +356,14 @@ internal static class CliTerminalMouseInput
 
 		var thresholdPasses = sameRowOnly
 			? new (int MaxRowDistance, int MaxColDistance)[]
-			{
-				(0, 16),
-				(0, 28),
-				(1, 40),
-				(2, 56),
-			}
+				{
+					// Button rows should not snap across distant columns.
+					// Keep nearest fallback very tight to avoid selecting
+					// the left neighbor when width/cursor estimation drifts.
+					(0, 1),
+					(0, 2),
+					(0, 3),
+				}
 			: new (int MaxRowDistance, int MaxColDistance)[]
 			{
 				(0, 40),
@@ -871,11 +873,24 @@ internal static class CliTerminalMouseInput
 			return tokenEnd;
 
 		var index = tokenEnd;
+		var whitespaceRun = 0;
 		while (index < line.Length)
 		{
 			var ch = line[index];
 			if (ch == '[' || ch == '\uFF3B' || ch == '<' || ch == '\r' || ch == '\n')
 				break;
+			if (ch is ' ' or '\t' or '\u3000')
+			{
+				whitespaceRun++;
+				// Keep single-space label tails clickable, but do not let
+				// one button steal wide inter-column gaps.
+				if (whitespaceRun >= 2)
+					break;
+			}
+			else
+			{
+				whitespaceRun = 0;
+			}
 			index++;
 		}
 

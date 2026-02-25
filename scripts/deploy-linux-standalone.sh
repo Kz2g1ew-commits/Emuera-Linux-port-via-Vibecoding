@@ -123,7 +123,7 @@ export EMUERA_NO_ANSI="\${EMUERA_NO_ANSI:-0}"
 export EMUERA_CLI_DIRECT_KEY_CAPTURE="\${EMUERA_CLI_DIRECT_KEY_CAPTURE:-0}"
 export EMUERA_CLI_FORCE_BLACK_BG="\${EMUERA_CLI_FORCE_BLACK_BG:-1}"
 export EMUERA_CLI_OSC11_BG="\${EMUERA_CLI_OSC11_BG:-1}"
-export EMUERA_CLI_USE_NATIVE_WCWIDTH="\${EMUERA_CLI_USE_NATIVE_WCWIDTH:-1}"
+export EMUERA_CLI_USE_NATIVE_WCWIDTH="\${EMUERA_CLI_USE_NATIVE_WCWIDTH:-0}"
 export EMUERA_DEFAULT_MODE="\${EMUERA_DEFAULT_MODE:-engine}"
 export EMUERA_CLI_LAYOUT_WIDTH="\${EMUERA_CLI_LAYOUT_WIDTH:-}"
 export EMUERA_CLI_LAYOUT_HEIGHT="\${EMUERA_CLI_LAYOUT_HEIGHT:-}"
@@ -216,7 +216,7 @@ Launcher options:
 Environment:
   EMUERA_DEFAULT_TARGET  Optional preferred executable filename.
   EMUERA_DEFAULT_MODE    Default runtime mode (default: engine).
-  EMUERA_CLI_USE_NATIVE_WCWIDTH  Use libc wcwidth for terminal column width (default: 1).
+  EMUERA_CLI_USE_NATIVE_WCWIDTH  Use libc wcwidth for terminal column width (default: 0).
   EMUERA_CLI_LAYOUT_WIDTH  Optional fixed layout width hint (unset by default).
   EMUERA_CLI_LAYOUT_HEIGHT Optional fixed layout height hint (unset by default).
   EMUERA_CLI_AUTO_RESIZE   1 to request terminal resize when width/height are set (default: 1).

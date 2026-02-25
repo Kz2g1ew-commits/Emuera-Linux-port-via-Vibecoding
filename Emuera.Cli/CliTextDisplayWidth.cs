@@ -7,7 +7,7 @@ internal static class CliTextDisplayWidth
 {
 	private static readonly bool UseNativeWcWidth =
 		!OperatingSystem.IsWindows() &&
-		!string.Equals(Environment.GetEnvironmentVariable("EMUERA_CLI_USE_NATIVE_WCWIDTH"), "0", StringComparison.OrdinalIgnoreCase);
+		string.Equals(Environment.GetEnvironmentVariable("EMUERA_CLI_USE_NATIVE_WCWIDTH"), "1", StringComparison.OrdinalIgnoreCase);
 
 	private static readonly bool HasNativeWcWidth = DetectNativeWcWidth();
 
