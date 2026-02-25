@@ -130,7 +130,7 @@ static class AppContents
 				{
 					//アニメスプライト宣言。nullでないとき、フレーム追加モード
 					SpriteAnime currentAnime = null;
-					string directory = Path.GetDirectoryName(path) + "\\";
+					string directory = Path.GetDirectoryName(path) ?? Program.ContentDir;
 					string filename = Path.GetFileName(path);
 					string[] lines = File.ReadAllLines(path, EncodingHandler.DetectEncoding(path));
 					int lineNo = 0;
@@ -259,7 +259,10 @@ static class AppContents
 			ParserMediator.Warn(string.Format(trerror.MissingSecondArgumentExtension.Text, arg2), sp, 1);
 			return null;
 		}
-		string parentName = dir + arg2;
+		string relativePath = arg2.Trim().Replace('\\', Path.DirectorySeparatorChar).Replace('/', Path.DirectorySeparatorChar);
+		string parentName = Path.IsPathRooted(relativePath)
+			? Path.GetFullPath(relativePath)
+			: Path.GetFullPath(Path.Combine(dir, relativePath));
 
 
 		//親画像のロードConstImage

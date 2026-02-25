@@ -244,39 +244,32 @@ internal static class CliTerminalMouseInput
 		var interactiveLines = CliRuntimeHostBridge.GetDisplayInteractiveLineSnapshots(includePendingLine: true);
 		var candidates = new List<IReadOnlyList<ScreenHit>>(capacity: 6);
 
-		var hasInteractiveCandidates = false;
-
 		if (executionInteractiveLines.Count > 0)
 		{
-			var before = candidates.Count;
-			AddInteractiveLayoutCandidates(
+			AddInteractiveLayoutCandidatesWithTail(
 				candidates,
 				executionInteractiveLines,
 				terminalWidth,
 				terminalHeight,
 				prompt,
 				currentInputBuffer);
-			hasInteractiveCandidates |= candidates.Count > before;
 		}
 
 		if (interactiveLines.Count > 0)
 		{
-			var before = candidates.Count;
-			AddInteractiveLayoutCandidates(
+			AddInteractiveLayoutCandidatesWithTail(
 				candidates,
 				interactiveLines,
 				terminalWidth,
 				terminalHeight,
 				prompt,
 				currentInputBuffer);
-			hasInteractiveCandidates |= candidates.Count > before;
 		}
 
-		if (hasInteractiveCandidates &&
-			request.InputType is InputType.IntButton or InputType.StrButton)
-		{
-			return candidates;
-		}
+		// For button inputs, do not short-circuit to token-only candidates.
+		// Some games render selectable entries as plain bracket text (for example, [1000])
+		// without emitting explicit interactive tokens on the current frame.
+		// Keep interactive candidates first, but also add text-derived candidates below.
 
 		// For plain INPUT/INPUTS flows, execution console text is authoritative.
 		// Mixing display/runtime history candidates can cause vertical off-by-one routing
@@ -285,7 +278,7 @@ internal static class CliTerminalMouseInput
 		{
 			if (executionLines.Count > 0)
 			{
-				AddLayoutCandidates(
+				AddLayoutCandidatesWithTail(
 					candidates,
 					executionLines,
 					request,
@@ -298,7 +291,7 @@ internal static class CliTerminalMouseInput
 
 			if (displayLines.Count > 0)
 			{
-				AddLayoutCandidates(
+				AddLayoutCandidatesWithTail(
 					candidates,
 					displayLines,
 					request,
@@ -312,7 +305,7 @@ internal static class CliTerminalMouseInput
 
 		if (displayLines.Count > 0)
 		{
-			AddLayoutCandidates(
+			AddLayoutCandidatesWithTail(
 				candidates,
 				displayLines,
 				request,
@@ -324,7 +317,7 @@ internal static class CliTerminalMouseInput
 
 		if (executionLines.Count > 0 && (candidates.Count == 0 || displayLines.Count == 0))
 		{
-			AddLayoutCandidates(
+			AddLayoutCandidatesWithTail(
 				candidates,
 				executionLines,
 				request,
@@ -337,7 +330,7 @@ internal static class CliTerminalMouseInput
 
 		if (executionLines.Count > 0)
 		{
-			AddLayoutCandidates(
+			AddLayoutCandidatesWithTail(
 				candidates,
 				executionLines,
 				request,
@@ -366,12 +359,18 @@ internal static class CliTerminalMouseInput
 			{
 				(0, 16),
 				(0, 28),
+				(1, 40),
+				(2, 56),
 			}
 			: new (int MaxRowDistance, int MaxColDistance)[]
 			{
 				(0, 40),
 				(1, 12),
 				(2, 6),
+				(4, 12),
+				(8, 20),
+				(16, 32),
+				(24, 48),
 			};
 
 		foreach (var threshold in thresholdPasses)
@@ -433,6 +432,26 @@ internal static class CliTerminalMouseInput
 			BuildScreenHitsFromLines(lines, request, prompt, currentInputBuffer, terminalWidth, terminalHeight, HitLayoutMode.BottomAnchored));
 	}
 
+	private static void AddLayoutCandidatesWithTail(
+		List<IReadOnlyList<ScreenHit>> destination,
+		IReadOnlyList<string> lines,
+		InputRequest request,
+		string prompt,
+		string currentInputBuffer,
+		int terminalWidth,
+		int terminalHeight)
+	{
+		if (lines == null || lines.Count == 0)
+			return;
+
+		AddLayoutCandidates(destination, lines, request, prompt, currentInputBuffer, terminalWidth, terminalHeight);
+
+		var tail = SliceTail(lines, ResolveTailLineLimit(terminalHeight));
+		if (tail.Count == 0 || tail.Count == lines.Count)
+			return;
+		AddLayoutCandidates(destination, tail, request, prompt, currentInputBuffer, terminalWidth, terminalHeight);
+	}
+
 	private static void AddInteractiveLayoutCandidates(
 		List<IReadOnlyList<ScreenHit>> destination,
 		IReadOnlyList<CliInteractiveLineSnapshot> lines,
@@ -453,6 +472,45 @@ internal static class CliTerminalMouseInput
 		AddLayoutCandidate(
 			destination,
 			BuildScreenHitsFromInteractiveLines(lines, terminalWidth, terminalHeight, prompt, currentInputBuffer, HitLayoutMode.BottomAnchored));
+	}
+
+	private static void AddInteractiveLayoutCandidatesWithTail(
+		List<IReadOnlyList<ScreenHit>> destination,
+		IReadOnlyList<CliInteractiveLineSnapshot> lines,
+		int terminalWidth,
+		int terminalHeight,
+		string prompt,
+		string currentInputBuffer)
+	{
+		if (lines == null || lines.Count == 0)
+			return;
+
+		AddInteractiveLayoutCandidates(destination, lines, terminalWidth, terminalHeight, prompt, currentInputBuffer);
+
+		var tail = SliceTail(lines, ResolveTailLineLimit(terminalHeight));
+		if (tail.Count == 0 || tail.Count == lines.Count)
+			return;
+		AddInteractiveLayoutCandidates(destination, tail, terminalWidth, terminalHeight, prompt, currentInputBuffer);
+	}
+
+	private static int ResolveTailLineLimit(int terminalHeight)
+	{
+		var byHeight = Math.Max(terminalHeight, 1) * 6;
+		return Math.Max(240, byHeight);
+	}
+
+	private static IReadOnlyList<T> SliceTail<T>(IReadOnlyList<T> source, int tailCount)
+	{
+		if (source == null || source.Count == 0 || tailCount <= 0)
+			return [];
+		if (source.Count <= tailCount)
+			return source;
+
+		var start = source.Count - tailCount;
+		var tail = new List<T>(tailCount);
+		for (var i = start; i < source.Count; i++)
+			tail.Add(source[i]);
+		return tail;
 	}
 
 	private static void AddLayoutCandidate(List<IReadOnlyList<ScreenHit>> destination, IReadOnlyList<ScreenHit> candidate)

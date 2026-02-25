@@ -1,3 +1,4 @@
+using System;
 using MinorShift.Emuera.Runtime;
 using MinorShift.Emuera.Runtime.Config;
 using MinorShift.Emuera.Runtime.Config.JSON;
@@ -30,12 +31,19 @@ public static class RuntimeEngineBootstrap
 
 	public static void WireRuntimeHostHooks()
 	{
+		bool enableContentImages = OperatingSystem.IsWindows() ||
+			string.Equals(Environment.GetEnvironmentVariable("EMUERA_CLI_LOAD_CONTENTS"), "1", StringComparison.OrdinalIgnoreCase);
+
 		RuntimeHost.ProductVersionHook = static () => AssemblyData.EmueraVersionText;
 		RuntimeHost.IsFontInstalledHook = static (fontName) => UiPlatformBridge.IsFontInstalled(fontName);
-		RuntimeHost.LoadContentsHook = static (reload) => AppContents.LoadContents(reload);
+		RuntimeHost.LoadContentsHook = enableContentImages
+			? static (reload) => AppContents.LoadContents(reload)
+			: static (_) => null;
 		RuntimeHost.UnloadTempLoadedConstImagesHook = static () => AppContents.UnloadTempLoadedConstImageNames();
 		RuntimeHost.UnloadTempLoadedGraphicsImagesHook = static () => AppContents.UnloadTempLoadedGraphicsImageNames();
-		RuntimeHost.LoadImageHook = static (filePath) => ImgUtils.LoadImage(filePath);
+		RuntimeHost.LoadImageHook = enableContentImages
+			? static (filePath) => ImgUtils.LoadImage(filePath)
+			: static (_) => null;
 		RuntimeHost.GetGraphicsHook = static (id) => AppContents.GetGraphics(id);
 		RuntimeHost.GetSpriteHook = static (name) => AppContents.GetSprite(name);
 		RuntimeHost.CreateSpriteGHook = static (name, parent, rect) =>

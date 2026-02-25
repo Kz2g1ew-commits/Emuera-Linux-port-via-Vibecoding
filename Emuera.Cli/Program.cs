@@ -636,6 +636,14 @@ root.SetHandler(async context =>
     var useInteractiveDefault =
         string.Equals(defaultMode, "interactive", StringComparison.OrdinalIgnoreCase) ||
         string.Equals(defaultMode, "menu", StringComparison.OrdinalIgnoreCase);
+    var usePlayLikeDefault =
+        string.Equals(defaultMode, "play-like", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(defaultMode, "playlike", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(defaultMode, "autoplay", StringComparison.OrdinalIgnoreCase);
+    var useEngineDefault =
+        string.IsNullOrWhiteSpace(defaultMode) ||
+        string.Equals(defaultMode, "engine", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(defaultMode, "run-engine", StringComparison.OrdinalIgnoreCase);
 
     if (useInteractiveDefault)
     {
@@ -644,8 +652,22 @@ root.SetHandler(async context =>
         return;
     }
 
-    Console.WriteLine("No mode specified. Starting play-like launcher flow...");
-    appExitCode = await LauncherUi.RunAsync(validation, strictRetries, autoPlay: true, allowPeLaunch: false);
+    if (usePlayLikeDefault)
+    {
+        Console.WriteLine("No mode specified. Starting play-like launcher flow...");
+        appExitCode = await LauncherUi.RunAsync(validation, strictRetries, autoPlay: true, allowPeLaunch: false);
+        return;
+    }
+
+    if (useEngineDefault)
+    {
+        Console.WriteLine("No mode specified. Starting embedded runtime engine mode...");
+        appExitCode = await CliEngineRunner.RunAsync(validation, strictSmokeOnly, strictRetries);
+        return;
+    }
+
+    Console.WriteLine($"No mode specified. Unknown EMUERA_DEFAULT_MODE='{defaultMode}'. Starting embedded runtime engine mode...");
+    appExitCode = await CliEngineRunner.RunAsync(validation, strictSmokeOnly, strictRetries);
 });
 
 var commandResult = await root.InvokeAsync(args);

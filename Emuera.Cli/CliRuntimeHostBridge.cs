@@ -33,6 +33,15 @@ internal static class CliRuntimeHostBridge
 	private static readonly Regex NumericBracketTokenRegex = new(
 		@"(?:\[|\uFF3B)\s*[+-]?(?:0[xX][0-9A-Fa-f]+|0[bB][01]+|[0-9]+)\s*(?:\]|\uFF3D)",
 		RegexOptions.Compiled);
+	private static readonly Regex NumericBracketChoiceRegex = new(
+		@"(?:\[|\uFF3B)\s*(?<value>[+-]?\d{1,19})\s*(?:\]|\uFF3D)",
+		RegexOptions.Compiled);
+	private static readonly Regex NumericAngleChoiceRegex = new(
+		@"<\s*(?<value>[+-]?\d{1,19})\s*>",
+		RegexOptions.Compiled);
+	private static readonly Regex AnsiEscapeRegex = new(
+		"\u001b\\[[0-?]*[ -/]*[@-~]",
+		RegexOptions.Compiled);
 	private static readonly Regex AngleValueTokenRegex = new(
 		@"<[^<>\r\n]{0,24}>",
 		RegexOptions.Compiled);
@@ -136,6 +145,7 @@ internal static class CliRuntimeHostBridge
 	private static int ctrlZLastSaveExpected = -1;
 	private static readonly List<string> ctrlZInputs = [];
 	private static long[] ctrlZRandomSeed = [];
+	private static int lastKnownConsoleWidth;
 
 	public static void AttachExecutionConsole(CliExecutionConsole console)
 	{
@@ -498,26 +508,111 @@ internal static class CliRuntimeHostBridge
 			return PendingLine.Length == 0;
 	}
 
-	private static int CountInteractiveButtons(bool _)
+	private static int CountInteractiveButtons(bool integerOnly)
 	{
+		List<string> bridgeTextLines;
+		CliExecutionConsole? localConsole;
 		lock (SyncRoot)
 		{
 			if (generationMarkedUpdated)
 				generationMarkedUpdated = false;
-			return Math.Max(interactiveButtonCount, lastPrintedInteractiveButtonCount);
+
+			var explicitCount = Math.Max(interactiveButtonCount, lastPrintedInteractiveButtonCount);
+			if (explicitCount > 0)
+				return explicitCount;
+
+			bridgeTextLines = BuildBridgeTextLinesSnapshotNoLock();
+			localConsole = executionConsole;
+		}
+
+		var choices = new HashSet<string>(StringComparer.Ordinal);
+		foreach (var line in bridgeTextLines)
+			CollectInferredChoicesFromLine(line, integerOnly, choices);
+
+		if (localConsole != null)
+		{
+			var outputLines = localConsole.GetOutputLinesSnapshot(includePendingLine: true);
+			var start = Math.Max(0, outputLines.Count - 256);
+			for (var i = start; i < outputLines.Count; i++)
+				CollectInferredChoicesFromLine(outputLines[i], integerOnly, choices);
+		}
+
+		return choices.Count;
+	}
+
+	private static List<string> BuildBridgeTextLinesSnapshotNoLock()
+	{
+		var lines = new List<string>(257);
+		var start = Math.Max(0, DisplayTextHistory.Count - 256);
+		for (var i = start; i < DisplayTextHistory.Count; i++)
+			lines.Add(DisplayTextHistory[i]);
+
+		if (PendingLine.Length > 0)
+			lines.Add(PendingLine.ToString());
+
+		return lines;
+	}
+
+	private static void CollectInferredChoicesFromLine(string? line, bool integerOnly, HashSet<string> output)
+	{
+		if (string.IsNullOrWhiteSpace(line))
+			return;
+		var normalized = AnsiEscapeRegex.Replace(line, string.Empty);
+
+		foreach (Match match in NumericBracketChoiceRegex.Matches(normalized))
+		{
+			if (!match.Success)
+				continue;
+			var value = match.Groups["value"].Value.Trim();
+			if (value.Length > 0)
+				output.Add(value);
+		}
+
+		foreach (Match match in NumericAngleChoiceRegex.Matches(normalized))
+		{
+			if (!match.Success)
+				continue;
+			var value = match.Groups["value"].Value.Trim();
+			if (value.Length > 0)
+				output.Add(value);
+		}
+
+		if (!integerOnly)
+		{
+			foreach (Match match in AngleValueTokenRegex.Matches(normalized))
+			{
+				if (!match.Success)
+					continue;
+				var value = match.Value.Trim();
+				if (value.Length > 2)
+					output.Add(value);
+			}
 		}
 	}
 
 	private static int GetConsoleClientWidth()
 	{
+		var forcedLayoutWidth = ParsePositiveIntEnv("EMUERA_CLI_LAYOUT_WIDTH");
+		if (forcedLayoutWidth > 0)
+		{
+			lastKnownConsoleWidth = Math.Clamp(forcedLayoutWidth, 40, 512);
+			return lastKnownConsoleWidth;
+		}
+
 		try
 		{
 			if (!Console.IsOutputRedirected)
 			{
 				if (Console.WindowWidth > 0)
-					return Console.WindowWidth;
+				{
+					lastKnownConsoleWidth = Console.WindowWidth;
+					return lastKnownConsoleWidth;
+				}
 				if (Console.BufferWidth > 0)
-					return Console.BufferWidth;
+				{
+					lastKnownConsoleWidth = Console.BufferWidth;
+					return lastKnownConsoleWidth;
+				}
 			}
 		}
 		catch
@@ -525,7 +620,13 @@ internal static class CliRuntimeHostBridge
 		}
 
 		var fromEnv = ParsePositiveIntEnv("COLUMNS");
-		return fromEnv > 0 ? fromEnv : 0;
+		if (fromEnv > 0)
+		{
+			lastKnownConsoleWidth = fromEnv;
+			return lastKnownConsoleWidth;
+		}
+
+		return lastKnownConsoleWidth > 0 ? lastKnownConsoleWidth : 0;
 	}
 
 	private static void PrintBar()
@@ -1938,6 +2039,10 @@ internal static class CliRuntimeHostBridge
 		// Let the terminal do physical wrapping instead of host-side reflow.
 		if (interactiveTokens == null || interactiveTokens.Count == 0)
 			return false;
+		// Dense numeric menu rows (e.g. 4-column filter lists) should keep
+		// script-provided spacing; host-side split causes unstable columns by width.
+		if (IsLikelyDenseChoiceGridLine(line, interactiveTokens))
+			return false;
 
 		var terminalWidth = GetConsoleClientWidth();
 		if (terminalWidth <= 1)
@@ -2019,6 +2124,30 @@ internal static class CliRuntimeHostBridge
 		if (tailTokens.Count == 0)
 			tailTokens = null;
 		return true;
+	}
+
+	private static bool IsLikelyDenseChoiceGridLine(string line, IReadOnlyList<CliInteractiveToken> interactiveTokens)
+	{
+		if (string.IsNullOrEmpty(line) || interactiveTokens == null || interactiveTokens.Count < 3)
+			return false;
+
+		var numericChoiceCount = 0;
+		var wideGapCount = 0;
+		var previousEndCol = -1;
+		foreach (var token in interactiveTokens)
+		{
+			if (token.StartCol <= 0 || token.EndCol < token.StartCol)
+				continue;
+			if (!long.TryParse(token.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out _))
+				continue;
+
+			numericChoiceCount++;
+			if (previousEndCol > 0 && token.StartCol - previousEndCol >= 4)
+				wideGapCount++;
+			previousEndCol = token.EndCol;
+		}
+
+		return numericChoiceCount >= 3 && wideGapCount >= 2;
 	}
 
 	private static int FindWhitespaceSplitColumn(string line, int width)

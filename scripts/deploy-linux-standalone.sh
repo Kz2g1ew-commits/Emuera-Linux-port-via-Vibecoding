@@ -123,6 +123,15 @@ export EMUERA_NO_ANSI="\${EMUERA_NO_ANSI:-0}"
 export EMUERA_CLI_DIRECT_KEY_CAPTURE="\${EMUERA_CLI_DIRECT_KEY_CAPTURE:-0}"
 export EMUERA_CLI_FORCE_BLACK_BG="\${EMUERA_CLI_FORCE_BLACK_BG:-1}"
 export EMUERA_CLI_OSC11_BG="\${EMUERA_CLI_OSC11_BG:-1}"
+export EMUERA_DEFAULT_MODE="\${EMUERA_DEFAULT_MODE:-engine}"
+export EMUERA_CLI_LAYOUT_WIDTH="\${EMUERA_CLI_LAYOUT_WIDTH:-192}"
+export EMUERA_CLI_LAYOUT_HEIGHT="\${EMUERA_CLI_LAYOUT_HEIGHT:-54}"
+export EMUERA_CLI_AUTO_RESIZE="\${EMUERA_CLI_AUTO_RESIZE:-1}"
+if [[ "\${EMUERA_CLI_AUTO_RESIZE}" != "0" && -t 1 ]]; then
+  if [[ "\${EMUERA_CLI_LAYOUT_WIDTH}" =~ ^[0-9]+$ ]] && [[ "\${EMUERA_CLI_LAYOUT_HEIGHT}" =~ ^[0-9]+$ ]]; then
+    printf '\033[8;%s;%st' "\${EMUERA_CLI_LAYOUT_HEIGHT}" "\${EMUERA_CLI_LAYOUT_WIDTH}" >/dev/tty 2>/dev/null || true
+  fi
+fi
 
 DEFAULT_TARGET="\${EMUERA_DEFAULT_TARGET:-}"
 
@@ -205,6 +214,10 @@ Launcher options:
   --help-launcher        Show this help.
 Environment:
   EMUERA_DEFAULT_TARGET  Optional preferred executable filename.
+  EMUERA_DEFAULT_MODE    Default runtime mode (default: engine).
+  EMUERA_CLI_LAYOUT_WIDTH  Stable layout width hint (default: 192).
+  EMUERA_CLI_LAYOUT_HEIGHT Stable layout height hint (default: 54).
+  EMUERA_CLI_AUTO_RESIZE   1 to request terminal resize on launch (default: 1).
 USAGE
       exit 0
       ;;
@@ -229,8 +242,6 @@ else
 
   should_prompt=0
   if (( force_select == 1 )); then
-    should_prompt=1
-  elif (( \${#available_targets[@]} > 1 )) && [[ -t 0 && -t 1 ]]; then
     should_prompt=1
   fi
 
