@@ -29,12 +29,20 @@ Use these commands in a deployed game directory (example: `eraTWKR`):
 
 Use these commands in this repository root (`emuera.em`):
 
-1. Publish Linux CLI binary:
-`./scripts/publish-linux-cli.sh`
+1. Move to repo root:
+`cd /home/ain/tw/emuera.em`
 2. Deploy into a game directory:
-`./scripts/deploy-linux-standalone.sh /path/to/game "Emuera1824+v11+webp+test+fix.exe"`
-3. Run from the game directory:
+`bash scripts/deploy-linux-standalone.sh /path/to/game [target_file_name]`
+3. This deploy step builds/publishes and generates these files in `/path/to/game`:
+`Run-Emuera-Linux.sh`, `Run-Emuera-Linux.desktop`, Linux runtime binary.
+4. Run from the game directory:
 `./Run-Emuera-Linux.sh`
+5. If multiple Emuera binaries exist, choose at launch:
+`./Run-Emuera-Linux.sh --select-bin`
+
+`[target_file_name]` is optional.
+- If provided, that name is used.
+- If omitted, deploy script auto-picks an existing `Emuera*.exe` name, or falls back to `EmueraLinux`.
 
 ## Notes
 
@@ -74,12 +82,20 @@ Use these commands in this repository root (`emuera.em`):
 
 이 저장소 루트(`emuera.em`)에서 아래 명령을 사용합니다.
 
-1. 리눅스 CLI 바이너리 퍼블리시:
-`./scripts/publish-linux-cli.sh`
+1. 저장소 루트로 이동:
+`cd /home/ain/tw/emuera.em`
 2. 게임 폴더로 배포:
-`./scripts/deploy-linux-standalone.sh /path/to/game "Emuera1824+v11+webp+test+fix.exe"`
-3. 게임 폴더에서 실행:
+`bash scripts/deploy-linux-standalone.sh /path/to/game [원하는출력파일명]`
+3. 위 배포 단계에서 `/path/to/game` 안에 다음이 자동 생성됩니다:
+`Run-Emuera-Linux.sh`, `Run-Emuera-Linux.desktop`, 리눅스 런타임 바이너리
+4. 게임 폴더에서 실행:
 `./Run-Emuera-Linux.sh`
+5. Emuera 실행 파일이 여러 개면 실행 시 선택:
+`./Run-Emuera-Linux.sh --select-bin`
+
+`[원하는출력파일명]`은 선택 사항입니다.
+- 지정하면 그 파일명으로 배포됩니다.
+- 생략하면 `Emuera*.exe` 파일명을 자동 탐색해서 쓰고, 없으면 `EmueraLinux`를 사용합니다.
 
 ## 참고
 

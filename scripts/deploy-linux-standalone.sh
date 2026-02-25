@@ -124,8 +124,138 @@ export EMUERA_CLI_DIRECT_KEY_CAPTURE="\${EMUERA_CLI_DIRECT_KEY_CAPTURE:-0}"
 export EMUERA_CLI_FORCE_BLACK_BG="\${EMUERA_CLI_FORCE_BLACK_BG:-1}"
 export EMUERA_CLI_OSC11_BG="\${EMUERA_CLI_OSC11_BG:-1}"
 
+DEFAULT_TARGET="\${EMUERA_DEFAULT_TARGET:-}"
+
+collect_targets() {
+  local dir="\$1"
+  local -a list=()
+  local default_target="\$DEFAULT_TARGET"
+  local default_path=""
+  if [[ -n "\$default_target" ]]; then
+    default_path="\$dir/\$default_target"
+    if [[ -f "\$default_path" ]]; then
+      list+=("\$default_target")
+    fi
+  fi
+
+  while IFS= read -r name; do
+    [[ -z "\$name" ]] && continue
+    [[ -n "\$default_target" && "\$name" == "\$default_target" ]] && continue
+    list+=("\$name")
+  done < <(find "\$dir" -maxdepth 1 -type f \( -name 'Emuera*.exe' -o -name 'Emuera*' \) -printf '%f\n' 2>/dev/null | sort -u)
+
+  printf '%s\n' "\${list[@]}"
+}
+
+choose_target_interactive() {
+  local -a options=("\$@")
+  local count="\${#options[@]}"
+  if (( count == 0 )); then
+    return 1
+  fi
+  if (( count == 1 )); then
+    printf '%s\n' "\${options[0]}"
+    return 0
+  fi
+
+  echo "Select executable:" >&2
+  local i=1
+  for opt in "\${options[@]}"; do
+    echo "  [\$i] \$opt" >&2
+    ((i++))
+  done
+
+  local selected
+  while true; do
+    read -rp "Enter number (1-\$count): " selected
+    if [[ "\$selected" =~ ^[0-9]+$ ]] && (( selected >= 1 && selected <= count )); then
+      printf '%s\n' "\${options[selected - 1]}"
+      return 0
+    fi
+    echo "Invalid selection." >&2
+  done
+}
+
+launcher_target="\${EMUERA_TARGET_BIN:-}"
+force_select=0
+engine_args=()
+while (( \$# > 0 )); do
+  case "\$1" in
+    --target-bin)
+      shift
+      if (( \$# == 0 )); then
+        echo "missing value for --target-bin" >&2
+        exit 2
+      fi
+      launcher_target="\$1"
+      ;;
+    --target-bin=*)
+      launcher_target="\${1#*=}"
+      ;;
+    --select-bin)
+      force_select=1
+      ;;
+    --help-launcher)
+      cat <<'USAGE'
+Usage: ./Run-Emuera-Linux.sh [launcher-options] [engine-options]
+Launcher options:
+  --target-bin <file>    Run with a specific executable in this folder.
+  --target-bin=<file>    Same as above.
+  --select-bin           Show executable selection menu.
+  --help-launcher        Show this help.
+Environment:
+  EMUERA_DEFAULT_TARGET  Optional preferred executable filename.
+USAGE
+      exit 0
+      ;;
+    *)
+      engine_args+=("\$1")
+      ;;
+  esac
+  shift
+done
+
+if [[ -n "\$launcher_target" ]]; then
+  if [[ ! -f "\$DIR/\$launcher_target" ]]; then
+    echo "target executable not found: \$launcher_target" >&2
+    exit 2
+  fi
+else
+  mapfile -t available_targets < <(collect_targets "\$DIR")
+  if (( \${#available_targets[@]} == 0 )); then
+    echo "no Emuera executable found in: \$DIR" >&2
+    exit 1
+  fi
+
+  should_prompt=0
+  if (( force_select == 1 )); then
+    should_prompt=1
+  elif (( \${#available_targets[@]} > 1 )) && [[ -t 0 && -t 1 ]]; then
+    should_prompt=1
+  fi
+
+  if (( should_prompt == 1 )); then
+    launcher_target="\$(choose_target_interactive "\${available_targets[@]}")"
+  else
+    launcher_target="\${available_targets[0]}"
+    if (( \${#available_targets[@]} > 1 )); then
+      echo "multiple executables found; using default: \$launcher_target" >&2
+      echo "use --select-bin or --target-bin <file> to choose another." >&2
+    fi
+  fi
+fi
+
+target_path="\$DIR/\$launcher_target"
+if [[ ! -x "\$target_path" ]]; then
+  chmod +x "\$target_path" 2>/dev/null || true
+fi
+if [[ ! -x "\$target_path" ]]; then
+  echo "target is not executable: \$launcher_target" >&2
+  exit 1
+fi
+
 direct_mode=0
-for arg in "\$@"; do
+for arg in "\${engine_args[@]}"; do
   case "\$arg" in
     --verify-only|--run-smoke-only|--strict-smoke-only|--strict-retries|--strict-retries=*|--gate-only|--preload-only|--scan-erh-only|--scan-erb-pp-only|--scan-erb-cont-only|--interactive-gui|--play-like|--run-engine|--run-engine-gui|--gui-engine|--run-gui|--launch-bundled|--launch-target|--launch-target=*|--allow-pe-launch)
       direct_mode=1
@@ -135,11 +265,11 @@ for arg in "\$@"; do
 done
 
 if [[ "\$direct_mode" -eq 1 ]]; then
-  exec "\$DIR/$TARGET_NAME" "\$@"
+  exec "\$target_path" "\${engine_args[@]}"
 fi
 
 # Default to terminal runtime gameplay mode.
-exec "\$DIR/$TARGET_NAME" --run-engine "\$@"
+exec "\$target_path" --run-engine "\${engine_args[@]}"
 EOF
 chmod +x "$LAUNCHER_PATH"
 
