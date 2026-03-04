@@ -48,6 +48,9 @@ internal static class CliRuntimeHostBridge
 	private static readonly Regex CollapsedSeparatorRegex = new(
 		@"[-=]{24,}",
 		RegexOptions.Compiled);
+	private static readonly Regex InteractiveTokenHintRegex = new(
+		@"(?:\[[^\]]+\]|<[^>]+>)",
+		RegexOptions.Compiled);
 	private enum AnsiColorMode
 	{
 		TrueColor,
@@ -146,6 +149,7 @@ internal static class CliRuntimeHostBridge
 	private static readonly List<string> ctrlZInputs = [];
 	private static long[] ctrlZRandomSeed = [];
 	private static int lastKnownConsoleWidth;
+	private static readonly bool padMapSymbolsEnabled = ResolvePadMapSymbolsEnabled();
 
 	public static void AttachExecutionConsole(CliExecutionConsole console)
 	{
@@ -2396,7 +2400,10 @@ internal static class CliRuntimeHostBridge
 	private static string FormatWithStyle(string text)
 	{
 		if (string.IsNullOrEmpty(text))
-			return string.Empty;
+		return string.Empty;
+
+		text = NormalizeMapArtSymbolSpacing(text);
+
 		if (!CanUseAnsiControl())
 			return text;
 
@@ -2452,6 +2459,142 @@ internal static class CliRuntimeHostBridge
 
 		var restoreCode = forceBlackBackground ? BuildStyleResetWithBlackBackgroundSgrParameters() : "0";
 		return $"\u001b[{string.Join(';', codes)}m{text}\u001b[{restoreCode}m";
+	}
+
+	private static bool ResolvePadMapSymbolsEnabled()
+	{
+		var env = Environment.GetEnvironmentVariable("EMUERA_CLI_PAD_MAP_SYMBOLS");
+		if (string.IsNullOrWhiteSpace(env))
+			return true;
+		return env.Equals("1", StringComparison.OrdinalIgnoreCase) ||
+			env.Equals("true", StringComparison.OrdinalIgnoreCase) ||
+			env.Equals("yes", StringComparison.OrdinalIgnoreCase);
+	}
+
+	private static string NormalizeMapArtSymbolSpacing(string text)
+	{
+		if (!padMapSymbolsEnabled || string.IsNullOrEmpty(text))
+			return text;
+		if (!CanUseAnsiControl())
+			return text;
+
+		// Runtime often emits map art as per-character fragments.
+		// Handle the common 1-rune case first so padding is actually applied.
+		if (TryPadSingleMapSymbolFragment(text, out var singlePadded))
+			return singlePadded;
+		if (!IsLikelyMapArtLine(text) && !IsLikelyMapArtFragment(text))
+			return text;
+
+		StringBuilder? builder = null;
+		foreach (var rune in text.EnumerateRunes())
+		{
+			if (!ShouldPadMapSymbol(rune.Value))
+			{
+				if (builder != null)
+					builder.Append(rune.ToString());
+				continue;
+			}
+
+			builder ??= new StringBuilder(text.Length + 32);
+			// Keep one visible glyph, then move cursor by one cell.
+			builder.Append(rune.ToString());
+			builder.Append("\u001b[1C");
+		}
+
+		return builder?.ToString() ?? text;
+	}
+
+	private static bool TryPadSingleMapSymbolFragment(string text, out string padded)
+	{
+		padded = text;
+		if (text.Length == 0)
+			return false;
+		if (!Rune.TryGetRuneAt(text, 0, out var rune))
+			return false;
+		if (rune.Utf16SequenceLength != text.Length)
+			return false;
+		if (!ShouldPadMapSymbol(rune.Value))
+			return false;
+		padded = text + "\u001b[1C";
+		return true;
+	}
+
+	private static bool IsLikelyMapArtLine(string text)
+	{
+		if (text.Length < 16)
+			return false;
+		if (InteractiveTokenHintRegex.IsMatch(text))
+			return false;
+
+		var runeCount = 0;
+		var mapSymbolCount = 0;
+		foreach (var rune in text.EnumerateRunes())
+		{
+			runeCount++;
+			if (IsMapArtRune(rune.Value))
+				mapSymbolCount++;
+		}
+
+		if (runeCount == 0)
+			return false;
+		return mapSymbolCount >= 8 && (mapSymbolCount * 100 / runeCount) >= 20;
+	}
+
+	private static bool IsLikelyMapArtFragment(string text)
+	{
+		if (text.Length == 0 || text.Length > 24)
+			return false;
+		if (InteractiveTokenHintRegex.IsMatch(text))
+			return false;
+
+		var runeCount = 0;
+		var symbolCount = 0;
+		foreach (var rune in text.EnumerateRunes())
+		{
+			runeCount++;
+			var value = rune.Value;
+			if (value is 0x20 or 0x3000 or 0x09)
+				continue;
+			if (IsMapArtRune(value))
+			{
+				symbolCount++;
+				continue;
+			}
+			return false;
+		}
+
+		return runeCount > 0 && symbolCount > 0;
+	}
+
+	private static bool IsMapArtRune(int value)
+	{
+		if (ShouldPadMapSymbol(value))
+			return true;
+		return value switch
+		{
+			0x68EE or // 森
+			0x6797 or // 林
+			0x6728 or // 木
+			0x4EEE or // 仮
+			0x3000 => true,
+			_ => false,
+		};
+	}
+
+	private static bool ShouldPadMapSymbol(int value)
+	{
+		if (!CliTextDisplayWidth.IsAmbiguousWidthCandidate(value))
+			return false;
+		if (!Rune.TryCreate(value, out var rune))
+			return false;
+
+		// Only pad when CLI layout expects width-2 but terminal intrinsic width is still 1.
+		var desiredWidth = CliTextDisplayWidth.GetDisplayWidth(rune.ToString());
+		if (desiredWidth <= 1)
+			return false;
+
+		var intrinsicWidth = CliTextDisplayWidth.GetIntrinsicTerminalWidth(rune);
+		return desiredWidth > intrinsicWidth;
 	}
 
 	private static string ApplyInteractiveTokenHighlight(string renderedLine)
