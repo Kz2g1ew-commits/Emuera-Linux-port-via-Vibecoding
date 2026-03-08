@@ -16,7 +16,7 @@ This project is a Linux port of the original [Emuera](https://gitlab.com/VVIIlet
 
 ## Run the Program (End Users)
 
-Use these commands in a deployed game directory (example: `eraTWKR`):
+Use these commands in a deployed game directory:
 
 1. Grant execute permission once:
 `chmod +x Run-Emuera-Linux.sh`
@@ -69,7 +69,7 @@ Use these commands in this repository root (`emuera.em`):
 
 ## 프로그램 실행 방법 (사용자)
 
-배포된 게임 폴더(예: `eraTWKR`)에서 아래처럼 실행합니다.
+배포된 게임 폴더에서 아래처럼 실행합니다.
 
 1. 1회 실행 권한 부여:
 `chmod +x Run-Emuera-Linux.sh`
